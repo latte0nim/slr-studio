@@ -1,0 +1,71 @@
+name: Deploy LitReview Studio to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Build static frontend
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import shutil
+          import sys
+
+          template = Path("templates/index.html")
+          static_dir = Path("static")
+          output = Path("_site")
+
+          if not template.is_file():
+              print("ERROR: templates/index.html tidak ditemukan. Upload isi folder slr_ai_website ke root repository terlebih dahulu.")
+              sys.exit(1)
+          if not (static_dir / "app.js").is_file() or not (static_dir / "style.css").is_file():
+              print("ERROR: static/app.js atau static/style.css tidak ditemukan.")
+              sys.exit(1)
+
+          html = template.read_text(encoding="utf-8")
+          html = html.replace("{{ url_for('static', filename='style.css') }}", "./static/style.css")
+          html = html.replace("{{ url_for('static', filename='app.js') }}", "./static/app.js")
+
+          output.mkdir(parents=True, exist_ok=True)
+          (output / "index.html").write_text(html, encoding="utf-8")
+          shutil.copytree(static_dir, output / "static", dirs_exist_ok=True)
+          print("Static frontend built in _site/.")
+          PY
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
