@@ -4,7 +4,7 @@ cd /d "%~dp0"
 if not exist ".env" (
   copy ".env.example" ".env" >nul
   echo File .env dibuat dari .env.example.
-  echo Isi GEMINI_API_KEY pada .env, simpan, lalu jalankan start_windows.bat lagi.
+  echo Isi GROQ_API_KEY pada .env, simpan, lalu jalankan start_windows.bat lagi.
   start notepad ".env"
   pause
   exit /b

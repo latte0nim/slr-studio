@@ -55,7 +55,16 @@ def extract_json(text):
     return json.loads(text)
 
 
-def groq_json(prompt, max_output_tokens=6500):
+
+# Alias used in code for AI calls; Groq is used here but functions originally named for Gemini.
+
+def gemini_json(prompt: str, max_output_tokens: int = 6500):
+    """Wrapper that forwards to groq_json for compatibility.
+    The codebase uses `gemini_json` to request AI completions. Since we employ Groq as the backend,
+    this function simply calls `groq_json` with the same parameters.
+    """
+    return groq_json(prompt, max_output_tokens)
+def groq_json(prompt: str, max_output_tokens: int = 6500):
     """Call Groq API and parse its JSON response, retrying once if needed."""
 
     if not API_KEY:
@@ -386,7 +395,7 @@ def analyze_pdfs():
     if len(files) > MAX_FILES_PER_BATCH:
         return jsonify({"error": f"Maksimal {MAX_FILES_PER_BATCH} PDF untuk satu batch. Upload batch berikutnya setelah selesai."}), 400
     if not API_KEY:
-        return jsonify({"error": "AI belum dikonfigurasi. Isi GEMINI_API_KEY pada environment server terlebih dahulu."}), 503
+        return jsonify({"error": "AI belum dikonfigurasi. Isi GROQ_API_KEY pada environment server terlebih dahulu."}), 503
 
     research_question = request.form.get("research_question", "").strip()[:1000]
     inclusion = request.form.get("inclusion", "").strip()[:3000]
@@ -463,7 +472,7 @@ def analyze_pdfs():
 @auth_guard
 def synthesize():
     if not API_KEY:
-        return jsonify({"error": "AI belum dikonfigurasi. Isi GEMINI_API_KEY pada environment server."}), 503
+        return jsonify({"error": "AI belum dikonfigurasi. Isi GROQ_API_KEY pada environment server."}), 503
     body = request.get_json(silent=True) or {}
     articles = body.get("articles", [])
     research_question = str(body.get("research_question", "")).strip()[:1000]
