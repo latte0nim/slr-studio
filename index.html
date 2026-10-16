@@ -1,210 +1,136 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SLR Studio – PRISMA, Taksonomi, System Map</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<style>
-:root{--bg:#f7f5f0;--fg:#1d2433;--pn:#ffffff;--ac:#14506b;--bd:#c9d3d8;--ex:#fbe9df;--exb:#b8572a;--mut:#5b6672}
-@media(prefers-color-scheme:dark){:root{--bg:#121a1f;--fg:#e6edf1;--pn:#1a252c;--ac:#6fc0e0;--bd:#33454f;--ex:#34241c;--exb:#e38b5d;--mut:#9aa9b3}}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.55 Georgia,'Times New Roman',serif}
-main{max-width:1000px;margin:0 auto;padding:24px 16px 60px}
-h1{font-size:30px;margin:0 0 4px;color:var(--ac)}h2{font-size:21px;color:var(--ac);margin:34px 0 10px;border-bottom:2px solid var(--bd);padding-bottom:4px}
-p.sub{margin:0 0 18px;color:var(--mut)}
-.panel{background:var(--pn);border:1px solid var(--bd);border-radius:6px;padding:16px;margin:12px 0}
-label{display:block;font-weight:bold;margin:12px 0 4px}small{color:var(--mut);font-weight:normal}
-textarea,input[type=text],input[type=number]{width:100%;padding:8px;border:1px solid var(--bd);border-radius:4px;background:var(--bg);color:var(--fg);font:inherit}
-button{margin-top:14px;background:var(--ac);color:var(--bg);border:0;padding:11px 22px;border-radius:4px;font:bold 15px system-ui;cursor:pointer}
-button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--exb);outline-offset:2px}
-.fc{display:grid;grid-template-columns:1fr 1fr;gap:10px 28px;align-items:stretch}
-.bx{border:2px solid var(--ac);background:var(--pn);border-radius:4px;padding:10px 12px;font-size:14px}
-.bx.ex{border-color:var(--exb);background:var(--ex)}.bx b{display:block;color:var(--ac)}.bx.ex b{color:var(--exb)}
-.bx ul{margin:4px 0 0;padding-left:18px}.ar{grid-column:1;text-align:center;color:var(--ac);font-size:20px;line-height:1}
-.ph{grid-column:1/-1;font:bold 13px system-ui;color:var(--mut);margin-top:8px}
-@media(max-width:620px){.fc{grid-template-columns:1fr}}
-.tree,.tree ul{list-style:none;margin:0;padding-left:22px;border-left:2px solid var(--bd)}.tree{border:0;padding:0}
-.tree li{margin:6px 0}.tree .cl{font-weight:bold}.tree .tm{color:var(--mut)}
-svg{width:100%;height:auto;background:var(--pn);border:1px solid var(--bd);border-radius:6px}svg text{fill:var(--fg);font:11px system-ui}
-table{width:100%;border-collapse:collapse;font-size:13px}td,th{border:1px solid var(--bd);padding:6px;text-align:left;vertical-align:top}
-#st{color:var(--mut);margin-top:10px}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Workspace pribadi untuk analisis systematic literature review berbantuan AI.">
+  <title>LitReview Studio — AI Systematic Review</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script defer src="{{ url_for('static', filename='app.js') }}"></script>
 </head>
 <body>
-<main>
-<h1>SLR Studio</h1>
-<p class="sub">Unggah jurnal PDF. Semua diproses di browser Anda, tidak ada file yang dikirim ke server.</p>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a href="#overview" class="brand" aria-label="LitReview Studio beranda">
+        <span class="brand-mark">L<span>R</span></span>
+        <span><strong>LitReview</strong><small>STUDIO / AI</small></span>
+      </a>
+      <div class="workspace-label">WORKSPACE</div>
+      <nav class="side-nav" aria-label="Navigasi utama">
+        <button class="nav-item active" data-target="overview"><span class="nav-icon">◫</span> Ikhtisar</button>
+        <button class="nav-item" data-target="articles"><span class="nav-icon">▤</span> Artikel <span class="nav-count" id="nav-article-count">0</span></button>
+        <button class="nav-item" data-target="prisma"><span class="nav-icon">⌘</span> PRISMA Flow</button>
+        <button class="nav-item" data-target="synthesis"><span class="nav-icon">✳</span> Review Synthesis</button>
+        <button class="nav-item" data-target="taxonomy"><span class="nav-icon">▦</span> Taxonomy</button>
+        <button class="nav-item" data-target="cooccurrence"><span class="nav-icon">◎</span> Co-occurrence</button>
+        <button class="nav-item" data-target="system-map"><span class="nav-icon">⤳</span> System Map</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="private-card"><span class="private-dot"></span><div><strong>Workspace pribadi</strong><small>Data proyek tersimpan di browser ini</small></div></div>
+        <div class="sidebar-footer">LitReview Studio <span>v0.1 prototype</span></div>
+      </div>
+    </aside>
 
-<div class="panel">
-<label for="rq">Research question <small>(satu pertanyaan per baris)</small></label>
-<textarea id="rq" rows="3">What are the capabilities required for digital transformation?
-How do those capabilities facilitate digital transformation success?</textarea>
-<label for="inc">Kata kunci inklusi <small>(pisahkan dengan koma)</small></label>
-<input type="text" id="inc" value="digital transformation, capabilit">
-<label for="exc">Kata kunci eksklusi <small>(opsional)</small></label>
-<input type="text" id="exc" value="">
-<label for="min">Minimal kemunculan kata inklusi di full text <small>(untuk eligibility assessment)</small></label>
-<input type="number" id="min" value="5" min="1">
-<label for="files">File PDF jurnal <small>(boleh banyak sekaligus)</small></label>
-<input type="file" id="files" accept="application/pdf" multiple>
-<button id="go">Analisis jurnal</button>
-<div id="st" role="status"></div>
-</div>
+    <main class="main-content">
+      <header class="topbar">
+        <div class="breadcrumb"><span>Workspace</span><b>/</b><strong id="breadcrumb-current">Ikhtisar</strong></div>
+        <div class="topbar-right"><span id="ai-status" class="status-pill status-warn"><span class="status-dot"></span> Memeriksa AI…</span><button id="import-json" class="button button-quiet button-small">Impor</button><button id="export-json" class="button button-quiet button-small">Ekspor proyek ↗</button></div>
+      </header>
 
-<div id="out"></div>
-</main>
+      <div class="page-wrap">
+        <section id="overview" class="page-section active-section">
+          <div class="hero-row">
+            <div>
+              <p class="eyebrow">AI-ASSISTED RESEARCH WORKSPACE</p>
+              <h1>Dari kumpulan jurnal,<br><em>menjadi peta pengetahuan.</em></h1>
+              <p class="hero-copy">Unggah artikel ilmiah PDF, verifikasi screening, lalu susun sintesis, PRISMA, taxonomy, dan system map dalam satu ruang kerja.</p>
+            </div>
+            <div class="hero-art" aria-hidden="true"><div class="art-ring ring-one"></div><div class="art-ring ring-two"></div><div class="art-center">LR</div><span class="art-node node-a">PDF</span><span class="art-node node-b">AI</span><span class="art-node node-c">↗</span></div>
+          </div>
 
-<script>
-pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-const $=id=>document.getElementById(id);
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const list=s=>s.split(',').map(x=>x.trim().toLowerCase()).filter(Boolean);
-const count=(t,k)=>t.split(k).length-1;
-const STOP=new Set(('the of and to in a is for that with as on by this are be or from at an it we which not can has have were was their these also been more such than other our its may use used using based study results data one two between however within both into et al fig table research paper article journal review literature section figure university copyright elsevier springer wiley licensee mdpi yang dan di ke dari untuk pada dengan adalah ini itu dalam atau juga oleh sebagai dapat akan tidak ada para http https doi www will would should could their there they them what when where while whose after before over under through each many most some only very just like does done make made well first second third among across further thus therefore since because then pages page volume issue').split(' '));
+          <div id="global-message" class="message hidden" role="status"></div>
 
-async function readPdf(file){
-  const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;
-  let text='',title='';
-  try{const m=await pdf.getMetadata();if(m.info&&m.info.Title&&m.info.Title.length>15)title=m.info.Title}catch(e){}
-  for(let p=1;p<=Math.min(pdf.numPages,40);p++){
-    const c=await(await pdf.getPage(p)).getTextContent();
-    if(p===1&&!title){
-      const h=Math.max(...c.items.map(i=>i.transform[3]||0));
-      title=c.items.filter(i=>Math.abs((i.transform[3]||0)-h)<0.6).map(i=>i.str).join(' ').trim();
-    }
-    text+=c.items.map(i=>i.str).join(' ')+'\n';
-  }
-  if(title.length<10)title=text.trim().slice(0,100);
-  const m=text.match(/abstract[:\s\u2014-]*([\s\S]{200,1800})/i);
-  return{title,text,abs:m?m[1]:text.slice(0,1800)};
-}
+          <div class="section-heading"><div><p class="eyebrow">01 / SETUP REVIEW</p><h2>Definisikan review-mu</h2></div><span class="section-note">Metadata pencarian + kriteria seleksi</span></div>
+          <form id="project-form" class="panel project-form">
+            <div class="field field-wide"><label for="research-question">Research question <span class="optional">(bisa diubah kapan saja)</span></label><textarea id="research-question" rows="2" placeholder="Contoh: Faktor apa yang memengaruhi keberhasilan transformasi digital pada perusahaan?"></textarea><small>AI menggunakan pertanyaan ini saat mengekstrak dan menyintesis artikel.</small></div>
+            <div class="field"><label for="source-name">Sumber/database</label><input id="source-name" type="text" placeholder="Contoh: Scopus, IEEE Xplore, Google Scholar"></div>
+            <div class="field"><label for="search-date">Tanggal pencarian</label><input id="search-date" type="date"></div>
+            <div class="field field-wide"><label for="search-query">Search query / kata kunci</label><textarea id="search-query" rows="2" placeholder="Masukkan query Boolean atau catatan pencarian"></textarea></div>
+            <div class="field"><label for="inclusion">Kriteria inklusi</label><textarea id="inclusion" rows="3" placeholder="Contoh: artikel peer-reviewed, bahasa Inggris/Indonesia, rentang tahun…"></textarea></div>
+            <div class="field"><label for="exclusion">Kriteria eksklusi</label><textarea id="exclusion" rows="3" placeholder="Contoh: editorial, artikel di luar domain, duplikat…"></textarea></div>
+            <div class="form-footer"><span class="save-hint"><span class="save-check">✓</span> Perubahan disimpan lokal di browser</span><button type="submit" class="button button-primary">Simpan konfigurasi <span>→</span></button></div>
+          </form>
 
-function tally(arr){const o={};arr.forEach(x=>o[x]=(o[x]||0)+1);return Object.entries(o)}
-function reasonBox(r){return tally(r).map(([k,v])=>`<li>${esc(k)} (n=${v})</li>`).join('')||'<li>–</li>'}
+          <div class="section-heading upload-heading"><div><p class="eyebrow">02 / ARTICLE IDENTIFICATION</p><h2>Tambahkan jurnal PDF</h2></div><span class="section-note">Maks. 8 PDF per batch · 12 MB per PDF</span></div>
+          <div class="upload-layout">
+            <form id="upload-form" class="panel upload-panel">
+              <label class="dropzone" id="dropzone" for="pdf-files">
+                <span class="upload-icon">↑</span><strong>Letakkan PDF di sini</strong><span>atau klik untuk memilih file dari perangkat</span><small>PDF berbasis teks · batch maksimum 8 dokumen</small>
+                <input id="pdf-files" type="file" accept="application/pdf,.pdf" multiple required>
+              </label>
+              <div id="selected-files" class="selected-files hidden"></div>
+              <div class="upload-actions"><p>PDF akan diproses oleh AI untuk ekstraksi metadata dan rekomendasi screening.</p><button id="analyze-button" type="submit" class="button button-primary"><span class="button-icon">✳</span> Analisis dengan AI</button></div>
+              <div id="upload-progress" class="progress-wrap hidden"><div class="progress-line"><span></span></div><p id="progress-text">Menganalisis artikel…</p></div>
+            </form>
+            <aside class="panel upload-aside"><div class="aside-icon">✦</div><h3>Alur kerja yang transparan</h3><p>AI membantu membaca artikel dan memberi rekomendasi. Status INCLUDE/EXCLUDE tetap harus kamu verifikasi sebelum artikel masuk ke sintesis akhir.</p><div class="mini-step"><span>01</span><div><strong>Ekstraksi</strong><small>Judul, metode, temuan, konsep</small></div></div><div class="mini-step"><span>02</span><div><strong>Verifikasi manual</strong><small>Screening dan full-text eligibility</small></div></div><div class="mini-step"><span>03</span><div><strong>Sintesis kolektif</strong><small>Gunakan artikel yang disetujui</small></div></div></aside>
+          </div>
 
-function flowchart(rq,n0,dup,ex1,n1,ex2,n2,inc){
-  const a='<div class="ar">↓</div><div></div>';
-  return `<div class="fc">
-  <div class="ph">Problem statement</div>
-  <div class="bx" style="grid-column:1/-1"><b>Research question</b>${rq.map(esc).join('<br>')}</div>
-  <div class="ph">Article identification</div>
-  <div class="bx"><b>Artikel yang diunggah</b>n=${n0}</div>
-  <div class="bx ex"><b>Dikeluarkan sebelum screening (n=${dup})</b><ul><li>Duplikat judul</li></ul></div>${a}
-  <div class="ph">Article screening</div>
-  <div class="bx"><b>Screening judul &amp; abstrak</b>n=${n0-dup}</div>
-  <div class="bx ex"><b>Dikeluarkan (n=${ex1.length})</b><ul>${reasonBox(ex1)}</ul></div>${a}
-  <div class="bx"><b>Eligibility assessment (full text)</b>n=${n1}</div>
-  <div class="bx ex"><b>Dikeluarkan (n=${ex2.length})</b><ul>${reasonBox(ex2)}</ul></div>${a}
-  <div class="ph">Article selection</div>
-  <div class="bx"><b>Artikel masuk final review</b>n=${inc}</div><div></div>
-  </div>`;
-}
+          <div class="metrics-grid" id="metrics-grid">
+            <div class="metric-card"><div class="metric-top"><span>PDF unik</span><span class="metric-symbol">▤</span></div><strong id="metric-articles">0</strong><small>Artikel yang berhasil diekstrak</small></div>
+            <div class="metric-card"><div class="metric-top"><span>Menunggu review</span><span class="metric-symbol">◷</span></div><strong id="metric-pending">0</strong><small>Butuh keputusan manual</small></div>
+            <div class="metric-card"><div class="metric-top"><span>Termasuk sintesis</span><span class="metric-symbol">✓</span></div><strong id="metric-included">0</strong><small>Screening + full text INCLUDE</small></div>
+            <div class="metric-card"><div class="metric-top"><span>Research gaps</span><span class="metric-symbol">⌁</span></div><strong id="metric-gaps">—</strong><small id="metric-gaps-note">Jalankan sintesis untuk melihat gap</small></div>
+          </div>
 
-function topTerms(docs,N){
-  const df={},tf={};
-  docs.forEach(d=>{
-    const w=d.text.toLowerCase().match(/[a-z]{4,}/g)||[],seen=new Set();
-    for(let i=0;i<w.length;i++){
-      if(STOP.has(w[i]))continue;
-      const c=[w[i]];if(i+1<w.length&&!STOP.has(w[i+1]))c.push(w[i]+' '+w[i+1]);
-      c.forEach(t=>{tf[t]=(tf[t]||0)+1;if(!seen.has(t)){seen.add(t);df[t]=(df[t]||0)+1}});
-    }
-  });
-  const min=docs.length>1?Math.min(5,docs.length*2):4;
-  const sc=Object.keys(tf).filter(t=>tf[t]>=min).map(t=>[t,df[t]*Math.log(1+tf[t])*(t.includes(' ')?1.3:1)]).sort((a,b)=>b[1]-a[1]);
-  const sel=[];
-  for(const[t]of sc){if(sel.length>=N)break;if(sel.some(s=>s.includes(t)||t.includes(s)))continue;sel.push(t)}
-  return sel.map(t=>({t,df:df[t]}));
-}
+          <div class="section-heading compact-heading"><div><p class="eyebrow">03 / REVIEW PROGRESS</p><h2>Progres analisis</h2></div><button class="text-button" data-go="articles">Kelola artikel <span>→</span></button></div>
+          <div class="panel progress-panel"><div class="progress-panel-head"><div><strong>Screening dan eligibility</strong><p>PRISMA diperbarui dari keputusan yang tersimpan.</p></div><span id="progress-ratio" class="ratio-pill">0 / 0 selesai</span></div><div class="stacked-progress" id="stacked-progress"><span class="seg-included"></span><span class="seg-excluded"></span><span class="seg-pending"></span></div><div class="legend-row"><span><i class="legend-dot dot-included"></i>Termasuk</span><span><i class="legend-dot dot-excluded"></i>Dikeluarkan</span><span><i class="legend-dot dot-pending"></i>Belum diputuskan</span></div></div>
+        </section>
 
-function cluster(terms,text){
-  const words=text.toLowerCase().split(/\s+/),ch=[];
-  for(let i=0;i<words.length;i+=150)ch.push(words.slice(i,i+150).join(' '));
-  const sets=terms.map(x=>new Set(ch.map((c,i)=>c.includes(x.t)?i:-1).filter(i=>i>=0)));
-  const sim=(a,b)=>{let n=0;sets[a].forEach(i=>{if(sets[b].has(i))n++});const u=sets[a].size+sets[b].size-n;return u?n/u:0};
-  const k=Math.min(5,Math.max(2,Math.round(terms.length/5)));
-  const seeds=[0];
-  while(seeds.length<k){
-    let best=-1,bs=9;
-    terms.forEach((_,i)=>{if(seeds.includes(i))return;const m=Math.max(...seeds.map(s=>sim(i,s)));if(m<bs){bs=m;best=i}});
-    seeds.push(best);
-  }
-  const groups=seeds.map(s=>({name:terms[s].t,items:[s]}));
-  terms.forEach((_,i)=>{if(seeds.includes(i))return;let bi=0,bv=-1;seeds.forEach((s,gi)=>{const v=sim(i,s);if(v>bv){bv=v;bi=gi}});groups[bi].items.push(i)});
-  return{groups,sim};
-}
+        <section id="articles" class="page-section">
+          <div class="section-heading page-title-row"><div><p class="eyebrow">ARTICLE MANAGEMENT</p><h1>Daftar artikel</h1><p class="page-subtitle">Periksa hasil ekstraksi, lalu tetapkan keputusan screening dan full-text eligibility.</p></div><button class="button button-secondary" data-go="overview">+ Tambah PDF</button></div>
+          <div class="filter-row"><div class="search-field"><span>⌕</span><input id="article-search" type="search" placeholder="Cari judul, penulis, kata kunci…"></div><select id="article-filter" aria-label="Filter artikel"><option value="all">Semua artikel</option><option value="pending">Belum diputuskan</option><option value="included">Termasuk sintesis</option><option value="excluded">Dikeluarkan</option></select></div>
+          <div class="panel table-panel"><div class="table-top"><div><strong>Evidence library</strong><small id="article-table-note">Belum ada artikel</small></div><button class="text-button" id="clear-articles">Hapus semua artikel</button></div><div class="table-scroll"><table><thead><tr><th>ARTIKEL / METADATA</th><th>REKOMENDASI AI</th><th>SCREENING</th><th>FULL TEXT</th><th></th></tr></thead><tbody id="articles-body"><tr><td colspan="5" class="empty-cell">Belum ada artikel. Unggah PDF pada halaman Ikhtisar.</td></tr></tbody></table></div></div>
+          <div id="article-detail" class="panel article-detail hidden"></div>
+        </section>
 
-function taxonomyHTML(rq,terms,groups){
-  return `<ul class="tree"><li class="cl">${esc(rq[0]||'Topik penelitian')}<ul>`+groups.map(g=>
-    `<li><span class="cl">${esc(g.name)}</span><ul>`+g.items.map(i=>`<li>${esc(terms[i].t)} <span class="tm">(${terms[i].df} artikel)</span></li>`).join('')+'</ul></li>').join('')+'</ul></li></ul>';
-}
+        <section id="prisma" class="page-section">
+          <div class="section-heading page-title-row"><div><p class="eyebrow">SELECTION REPORTING</p><h1>PRISMA flow diagram</h1><p class="page-subtitle">Jumlah dihitung dari artikel unik dan keputusan seleksi yang kamu simpan.</p></div><button id="print-prisma" class="button button-secondary">Cetak / simpan PDF ↗</button></div>
+          <div class="notice notice-warm"><strong>Catatan metodologi</strong><span>Diagram ini adalah pelacakan seleksi berdasarkan PDF yang diunggah. Ia tidak mengklaim jumlah hasil pencarian database yang tidak dimasukkan ke sistem. Artikel pending ditampilkan terpisah agar alur tetap transparan.</span></div>
+          <div class="panel prisma-panel"><div class="diagram-title"><span class="eyebrow">FLOW OF INFORMATION</span><span id="prisma-updated" class="muted-small">Belum ada data</span></div><div id="prisma-diagram" class="prisma-diagram"><div class="empty-state">Unggah PDF dan tetapkan keputusan screening untuk membangun diagram PRISMA.</div></div><div class="diagram-legend"><span><i class="legend-dot dot-included"></i>Include</span><span><i class="legend-dot dot-excluded"></i>Exclude</span><span><i class="legend-dot dot-pending"></i>Pending / perlu verifikasi</span></div></div>
+        </section>
 
-function systemMap(terms,groups,sim){
-  const COL=['#1f78b4','#e31a1c','#33a02c','#ff7f00','#6a3d9a'],cx=450,cy=330,pos={};
-  let s=`<svg viewBox="0 0 900 660" role="img" aria-label="System map"><g>`,e='',n='';
-  groups.forEach((g,gi)=>{
-    const a=gi/groups.length*2*Math.PI-Math.PI/2,gx=cx+Math.cos(a)*190,gy=cy+Math.sin(a)*190;
-    e+=`<line x1="${cx}" y1="${cy}" x2="${gx}" y2="${gy}" stroke="${COL[gi]}" stroke-width="3"/>`;
-    const m=g.items.length;
-    g.items.forEach((ti,j)=>{
-      const b=a+(m>1?(j/(m-1)-.5)*2.2:0),tx=gx+Math.cos(b)*(95+(j%2)*28),ty=gy+Math.sin(b)*(95+(j%2)*28);
-      pos[ti]=[tx,ty,gi];
-      e+=`<line x1="${gx}" y1="${gy}" x2="${tx}" y2="${ty}" stroke="${COL[gi]}" opacity=".5"/>`;
-      n+=`<circle cx="${tx}" cy="${ty}" r="5" fill="${COL[gi]}"/><text x="${tx}" y="${ty-9}" text-anchor="middle">${esc(terms[ti].t)}</text>`;
-    });
-    n+=`<circle cx="${gx}" cy="${gy}" r="14" fill="${COL[gi]}"/><text x="${gx}" y="${gy+28}" text-anchor="middle" style="font-weight:bold;font-size:13px">${esc(g.name)}</text>`;
-  });
-  const ids=Object.keys(pos).map(Number);
-  for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++){
-    const A=ids[i],B=ids[j];
-    if(pos[A][2]!==pos[B][2]&&sim(A,B)>0.2)e+=`<line x1="${pos[A][0]}" y1="${pos[A][1]}" x2="${pos[B][0]}" y2="${pos[B][1]}" stroke="#888" stroke-dasharray="4 3" opacity=".6"/>`;
-  }
-  n+=`<circle cx="${cx}" cy="${cy}" r="30" fill="#14506b"/><text x="${cx}" y="${cy+4}" text-anchor="middle" style="fill:#fff;font-weight:bold">Topik</text>`;
-  return s+e+n+'</g></svg><p class="sub">Garis putus-putus menunjukkan istilah dari kelompok berbeda yang sering muncul berdekatan.</p>';
-}
+        <section id="synthesis" class="page-section">
+          <div class="section-heading page-title-row"><div><p class="eyebrow">ANALYSIS & SYNTHESIS</p><h1>Review synthesis</h1><p class="page-subtitle">Sintesis hanya menggunakan artikel yang kamu tandai INCLUDE pada kedua tahap.</p></div><button id="run-synthesis" class="button button-primary">✳ Jalankan sintesis AI</button></div>
+          <div class="notice notice-blue"><strong>Sebelum menjalankan</strong><span>Pastikan research question dan kriteria seleksi sudah ditetapkan. Minimal satu artikel harus berstatus INCLUDE pada screening dan full-text eligibility.</span></div>
+          <div id="synthesis-empty" class="panel empty-large"><div class="empty-illustration">✳</div><h2>Temukan pola di antara studi</h2><p>Jalankan sintesis untuk membandingkan tema, konsistensi hasil, kontradiksi, research gap, taxonomy, dan relasi sistem.</p><button class="button button-primary" data-go="articles">Verifikasi artikel terlebih dahulu →</button></div>
+          <div id="synthesis-output" class="hidden"></div>
+        </section>
 
-$('go').onclick=async()=>{
-  const files=[...$('files').files],st=$('st');
-  if(!files.length){st.textContent='Pilih minimal satu file PDF dulu.';return}
-  const rq=$('rq').value.split('\n').map(x=>x.trim()).filter(Boolean),inc=list($('inc').value),exc=list($('exc').value),minHits=+$('min').value||1;
-  const docs=[];
-  for(let i=0;i<files.length;i++){
-    st.textContent=`Membaca PDF ${i+1} dari ${files.length}: ${files[i].name}`;
-    try{docs.push({name:files[i].name,...await readPdf(files[i])})}
-    catch(e){docs.push({name:files[i].name,title:files[i].name,text:'',abs:''})}
-  }
-  // Identification
-  const seen=new Set();let dup=0;const recs=[];
-  docs.forEach(d=>{const k=d.title.toLowerCase().replace(/\W+/g,'');if(seen.has(k))dup++;else{seen.add(k);recs.push(d)}});
-  // Screening judul & abstrak
-  const ex1=[],s1=[];
-  recs.forEach(d=>{
-    const ta=(d.title+' '+d.abs).toLowerCase();
-    if(exc.some(k=>ta.includes(k)))ex1.push('Memuat kata kunci eksklusi');
-    else if(inc.length&&!inc.some(k=>ta.includes(k)))ex1.push('Judul/abstrak tidak memuat kata kunci inklusi');
-    else s1.push(d);
-  });
-  // Eligibility full text
-  const ex2=[],fin=[];
-  s1.forEach(d=>{
-    if(d.text.length<500)ex2.push('Full text tidak dapat dibaca');
-    else if(inc.length&&inc.reduce((a,k)=>a+count(d.text.toLowerCase(),k),0)<minHits)ex2.push(`Pembahasan topik kurang dari ${minHits} kemunculan`);
-    else fin.push(d);
-  });
-  let h=`<h2>1. PRISMA flowchart</h2>`+flowchart(rq,docs.length,dup,ex1,s1.length,ex2,fin.length,fin.length);
-  if(fin.length){
-    const terms=topTerms(fin,Math.min(30,8+fin.length*2));
-    if(terms.length>=4){
-      const{groups,sim}=cluster(terms,fin.map(d=>d.text).join(' '));
-      h+=`<h2>2. Taksonomi</h2><div class="panel">${taxonomyHTML(rq,terms,groups)}</div>`;
-      h+=`<h2>3. System map</h2>${systemMap(terms,groups,sim)}`;
-    }else h+='<h2>2. Taksonomi</h2><p>Teks belum cukup untuk membentuk taksonomi. Tambahkan lebih banyak jurnal.</p>';
-    h+=`<h2>4. Tabel artikel terpilih</h2><table><tr><th>No</th><th>Judul</th><th>File</th></tr>`+fin.map((d,i)=>`<tr><td>${i+1}</td><td>${esc(d.title)}</td><td>${esc(d.name)}</td></tr>`).join('')+'</table>';
-  }else h+='<p>Tidak ada artikel yang lolos. Longgarkan kata kunci inklusi atau turunkan batas kemunculan.</p>';
-  $('out').innerHTML=h;st.textContent='Selesai.';
-  $('out').scrollIntoView({behavior:'smooth'});
-};
-</script>
+        <section id="taxonomy" class="page-section">
+          <div class="section-heading page-title-row"><div><p class="eyebrow">KNOWLEDGE ORGANIZATION</p><h1>Taxonomy explorer</h1><p class="page-subtitle">Klasifikasi konseptual yang dihasilkan dari artikel terpilih.</p></div><button class="button button-secondary" data-go="synthesis">Lihat sintesis ↗</button></div>
+          <div class="taxonomy-tabs" role="tablist"><button class="taxonomy-tab active" data-taxonomy="hierarchical">01 / Hierarchical</button><button class="taxonomy-tab" data-taxonomy="poly">02 / Poly-hierarchical</button><button class="taxonomy-tab" data-taxonomy="faceted">03 / Faceted</button><button class="taxonomy-tab" data-taxonomy="flat">04 / List · Flat</button><button class="taxonomy-tab" data-taxonomy="matrix">05 / Matrices</button></div>
+          <div id="taxonomy-content" class="panel taxonomy-panel"><div class="empty-state">Jalankan Review Synthesis untuk menghasilkan taxonomy dari artikel yang termasuk.</div></div>
+        </section>
+
+        <section id="cooccurrence" class="page-section">
+          <div class="section-heading page-title-row"><div><p class="eyebrow">KEYWORD NETWORK ANALYSIS</p><h1>Co-occurrence analysis</h1><p class="page-subtitle">Peta kemunculan bersama kata kunci/konsep antarartikel, terinspirasi alur kerja VOSviewer.</p></div><button class="button button-secondary" id="cooccurrence-download">Unduh network SVG ↗</button></div>
+          <div class="notice notice-warm"><strong>Interpretasi</strong><span>Garis menghubungkan istilah yang muncul bersama pada artikel yang sama. Ketebalan garis menunjukkan frekuensi co-occurrence dalam korpus yang tersedia; ini bukan bukti hubungan kausal. Hasil ini merupakan visualisasi native website, bukan ekspor resmi VOSviewer.</span></div>
+          <div class="panel system-map-panel"><div class="map-toolbar"><span id="cooccurrence-meta">Jalankan sintesis untuk membangun jaringan istilah.</span><label class="field-inline">Minimum kemunculan <select id="cooccurrence-min"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option></select></label></div><div id="cooccurrence-canvas" class="system-map-canvas"><div class="empty-state">Jaringan co-occurrence akan tampil setelah sintesis AI berhasil dilakukan.</div></div></div>
+          <div id="cooccurrence-legend" class="map-node-legend"></div>
+        </section>
+
+        <section id="system-map" class="page-section">
+          <div class="section-heading page-title-row"><div><p class="eyebrow">RELATIONSHIP MAPPING</p><h1>System map</h1><p class="page-subtitle">Peta konsep, faktor, konteks, dan outcome beserta hubungan yang didukung bukti.</p></div><button class="button button-secondary" id="system-map-download">Unduh SVG ↗</button></div>
+          <div class="notice notice-warm"><strong>Baca peta secara kritis</strong><span>Panah menunjukkan hubungan yang diekstrak atau disintesis dari artikel terpilih. Diagram konseptual tidak membuktikan hubungan sebab-akibat.</span></div>
+          <div class="panel system-map-panel"><div class="map-toolbar"><span id="system-map-meta">Belum ada system map</span><span class="map-key"><i class="map-key-node"></i> Konsep / variabel <i class="map-key-line"></i> Hubungan berbukti</span></div><div id="system-map-canvas" class="system-map-canvas"><div class="empty-state">System map akan tampil setelah sintesis AI berhasil dilakukan.</div></div></div>
+          <div id="system-map-legend" class="map-node-legend"></div>
+        </section>
+
+        <footer class="app-footer"><span>LitReview Studio · Prototype untuk riset pribadi</span><span>Ekspor backup secara berkala · Verifikasi semua hasil AI</span></footer>
+      </div>
+    </main>
+  </div>
+  <input type="file" id="import-json-file" accept="application/json,.json" class="hidden">
+  <div id="toast-region" class="toast-region" aria-live="polite" aria-atomic="true"></div>
 </body>
 </html>

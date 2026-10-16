@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: slr-ai-review
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers 1 --threads 4 --timeout 180
+    envVars:
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash-lite
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: APP_USERNAME
+        value: slr-user
+      - key: APP_PASSWORD
+        sync: false
