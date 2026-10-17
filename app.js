@@ -131,7 +131,7 @@
     $('#metric-pending').textContent = c.screeningPending + c.fulltextPending;
     $('#metric-included').textContent = c.included;
     $('#metric-gaps').textContent = state.synthesis ? list(state.synthesis.research_gaps).length : '—';
-    $('#metric-gaps-note').textContent = state.synthesis ? 'Gap hasil sintesis AI' : 'Jalankan sintesis untuk melihat gap';
+    $('#metric-gaps-note').textContent = state.synthesis ? 'Gap hasil sintesis' : 'Jalankan sintesis untuk melihat gap';
     $('#progress-ratio').textContent = `${c.completed} / ${c.total} selesai`;
     const n = c.total || 1;
     $('#stacked-progress .seg-included').style.width = `${(c.included / n) * 100}%`;
@@ -142,7 +142,7 @@
 
   function recommendationBadge(article) {
     const s = (article.screening_suggestion || {}).decision || 'review';
-    const map = {include:['recommend-include','AI menyarankan INCLUDE'], exclude:['recommend-exclude','AI menyarankan EXCLUDE'], review:['recommend-review','Perlu ditinjau']};
+    const map = {include:['recommend-include','Saran INCLUDE'], exclude:['recommend-exclude','Saran EXCLUDE'], review:['recommend-review','Perlu ditinjau']};
     const [cls, label] = map[s] || map.review;
     return `<span class="recommendation ${cls}" title="${esc((article.screening_suggestion || {}).reason || '')}">${esc(label)}</span>`;
   }
@@ -191,15 +191,15 @@
     const a = findArticle(id); if (!a) return;
     activeArticleDetail = id;
     const quotes = list(a.evidence_quotes).map(q => `<li><strong>${esc(q.claim || 'Klaim')}</strong><br>“${esc(q.quote || '')}” ${q.page ? `<span class="article-meta">(hal. ${esc(q.page)})</span>` : ''}</li>`).join('');
-    $('#article-detail').innerHTML = `<button class="icon-button detail-close" id="close-detail" aria-label="Tutup detail">×</button><h2 class="detail-title">${esc(a.title)}</h2><div class="detail-meta">${esc(list(a.authors).join(', ') || 'Penulis tidak terdeteksi')} · ${esc(a.year || 'Tahun tidak terdeteksi')} · ${esc(a.pages || '?')} halaman · ${esc(a.filename || '')}</div><div class="detail-grid">
+    $('#article-detail').innerHTML = `<button class="icon-button detail-close" id="close-detail" aria-label="Tutup detail">×</button><h2 class="detail-title">${esc(a.title)}</h2><div class="detail-meta">${esc(list(a.authors).join(', ') || 'Penulis tidak terdeteksi')} · ${esc(a.year || 'Tahun tidak terdeteksi')} · ${esc(a.pages || '?')} halaman · ${esc(a.filename || '')}</div><div class="pdf-preview-block" style="margin:16px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff"><div style="padding:10px 13px;font-weight:700;font-size:11px;display:flex;justify-content:space-between;gap:10px"><span>Preview PDF asli</span><a href="${esc(a.pdf_url || ('/pdf/' + a.id))}" target="_blank" rel="noopener">Buka PDF ↗</a></div><iframe title="Preview PDF ${esc(a.filename || a.title)}" src="${esc(a.pdf_url || ('/pdf/' + a.id))}" style="width:100%;height:620px;border:0" loading="lazy"></iframe></div><div class="detail-grid">
       <div class="detail-block"><h4>ABSTRACT / TUJUAN</h4><p>${escapeWithBreaks(a.abstract || a.objective || 'Tidak diekstrak.')}</p></div>
       <div class="detail-block"><h4>METODE & KONTEKS</h4><p>${escapeWithBreaks(a.methods || 'Metode tidak terdeteksi')}\n\nKonteks: ${escapeWithBreaks(a.context || 'Tidak tersedia')}</p></div>
       <div class="detail-block"><h4>TEMUAN UTAMA</h4><ul>${list(a.findings).length ? list(a.findings).map(x=>`<li>${esc(x)}</li>`).join('') : '<li>Temuan tidak diekstrak.</li>'}</ul></div>
       <div class="detail-block"><h4>VARIABEL / TOPIK</h4><p>${esc([...list(a.variables), ...list(a.topic_tags)].join(' · ') || 'Tidak terdeteksi')}</p></div>
       <div class="detail-block"><h4>LIMITASI</h4><ul>${list(a.limitations).length ? list(a.limitations).map(x=>`<li>${esc(x)}</li>`).join('') : '<li>Tidak dinyatakan / tidak terdeteksi.</li>'}</ul></div>
-      <div class="detail-block"><h4>REKOMENDASI SCREENING AI</h4><p>${esc((a.screening_suggestion || {}).decision || 'review').toUpperCase()} — ${esc((a.screening_suggestion || {}).reason || 'Perlu verifikasi manual.')}</p></div>
+      <div class="detail-block"><h4>REKOMENDASI SCREENING</h4><p>${esc((a.screening_suggestion || {}).decision || 'review').toUpperCase()} — ${esc((a.screening_suggestion || {}).reason || 'Perlu verifikasi manual.')}</p></div>
       ${quotes ? `<div class="detail-block" style="grid-column:1/-1"><h4>KUTIPAN BUKTI YANG DIEKSTRAK</h4><ul>${quotes}</ul></div>` : ''}
-      <div class="detail-block" style="grid-column:1/-1"><h4>CATATAN</h4><p>Ekstraksi AI perlu dicocokkan dengan PDF asli sebelum dipakai sebagai kutipan atau bukti final. File PDF tidak disimpan di server setelah pemrosesan.</p></div>
+      <div class="detail-block" style="grid-column:1/-1"><h4>CATATAN</h4><p>Hasil ekstraksi perlu dicocokkan dengan PDF asli sebelum dipakai sebagai kutipan atau bukti final. PDF asli disimpan lokal di folder data/pdfs untuk preview.</p></div>
       </div>`;
     $('#article-detail').classList.remove('hidden');
     $('#article-detail').scrollIntoView({behavior:'smooth',block:'start'});
@@ -246,12 +246,12 @@
     const limitations = list(s.limitations_of_corpus).map(x=>`<li>${esc(x)}</li>`).join('');
     const notes = list(s.review_notes).map(x=>`<li>${esc(x)}</li>`).join('');
     $('#synthesis-output').innerHTML = `
-      <div class="synth-card"><div class="synth-eyebrow">SUMMARY / ${esc(s.included_article_count || currentCounts().included)} ARTIKEL</div><div class="synth-card-head"><h2>Sintesis eksekutif</h2><span class="status-pill status-ok">AI-generated · perlu verifikasi</span></div><p>${esc(s.executive_synthesis || 'Tidak ada ringkasan.')}</p><p class="citation-note"><strong>Research question:</strong> ${esc(s.research_question_refinement || $('#research-question').value || 'Belum ditentukan')}</p>${list(s.subquestions).length ? `<h3 style="margin:16px 0 8px">Subquestions</h3><ol class="review-note-list">${list(s.subquestions).map(x=>`<li>${esc(x)}</li>`).join('')}</ol>` : ''}</div>
+      <div class="synth-card"><div class="synth-eyebrow">SUMMARY / ${esc(s.included_article_count || currentCounts().included)} ARTIKEL</div><div class="synth-card-head"><h2>Sintesis eksekutif</h2><span class="status-pill status-ok">Hasil sintesis · perlu verifikasi</span></div><p>${esc(s.executive_synthesis || 'Tidak ada ringkasan.')}</p><p class="citation-note"><strong>Research question:</strong> ${esc(s.research_question_refinement || $('#research-question').value || 'Belum ditentukan')}</p>${list(s.subquestions).length ? `<h3 style="margin:16px 0 8px">Subquestions</h3><ol class="review-note-list">${list(s.subquestions).map(x=>`<li>${esc(x)}</li>`).join('')}</ol>` : ''}</div>
       <div class="synth-card"><div class="synth-card-head"><h2>01 / Tema utama</h2><span class="confidence">${list(s.main_themes).length} tema</span></div><div class="synth-list">${themes || '<p>Belum ada tema utama.</p>'}</div></div>
       <div class="detail-grid" style="margin-bottom:13px;align-items:start"><div class="synth-card" style="margin:0;height:100%"><div class="synth-card-head"><h2>02 / Konsistensi</h2><span class="confidence high">${list(s.agreements).length}</span></div><div class="synth-list">${agreements || '<p>Tidak ada pola konsisten yang dirangkum.</p>'}</div></div><div class="synth-card" style="margin:0;height:100%"><div class="synth-card-head"><h2>03 / Kontradiksi</h2><span class="confidence low">${list(s.contradictions).length}</span></div><div class="synth-list">${contradictions || '<p>Tidak ada kontradiksi yang teridentifikasi dari ringkasan.</p>'}</div></div></div>
       <div class="synth-card"><div class="synth-card-head"><h2>04 / Research gaps</h2><span class="confidence">${list(s.research_gaps).length} kandidat gap</span></div><div class="synth-list">${gaps || '<p>Tidak ada research gap yang dirangkum.</p>'}</div></div>
-      <div class="detail-grid" style="align-items:start"><div class="synth-card" style="margin:0"><h3>Limitasi korpus</h3><ul class="review-note-list">${limitations || '<li>Tidak tersedia.</li>'}</ul></div><div class="synth-card" style="margin:0"><h3>Catatan verifikasi</h3><ul class="review-note-list">${notes || '<li>Periksa kembali output AI pada artikel asli.</li>'}</ul></div></div>
-      <p class="citation-note">Dihasilkan ${esc(prettyDate(s.generated_at))} menggunakan model ${esc(s.model || 'AI')}. Sintesis dibangun dari artikel yang secara manual ditandai INCLUDE pada dua tahap. Chip artikel menunjukkan judul singkat sumber dukungan; tetap buka PDF asli untuk mengonfirmasi klaim.</p>`;
+      <div class="detail-grid" style="align-items:start"><div class="synth-card" style="margin:0"><h3>Limitasi korpus</h3><ul class="review-note-list">${limitations || '<li>Tidak tersedia.</li>'}</ul></div><div class="synth-card" style="margin:0"><h3>Catatan verifikasi</h3><ul class="review-note-list">${notes || '<li>Periksa kembali hasil ekstraksi pada artikel asli.</li>'}</ul></div></div>
+      <p class="citation-note">Dihasilkan ${esc(prettyDate(s.generated_at))} menggunakan model ${esc(s.model || 'lokal')}. Sintesis dibangun dari artikel yang secara manual ditandai INCLUDE pada dua tahap. Chip artikel menunjukkan judul singkat sumber dukungan; tetap buka PDF asli untuk mengonfirmasi klaim.</p>`;
   }
 
   function svgText(text, x, y, size=12, weight=600, fill='#6C151E') {
@@ -302,18 +302,18 @@
     $$('.taxonomy-tab').forEach(b => b.classList.toggle('active', b.dataset.taxonomy === activeTaxonomy));
     if (activeTaxonomy === 'hierarchical') {
       const h = s.taxonomy.hierarchical || {}; const root = h.root || {id:'root',name:'Konsep utama'}; const nodes = list(h.nodes);
-      box.innerHTML = `<div class="synth-eyebrow">HIERARCHICAL TAXONOMY</div><h2 class="taxonomy-title">Struktur dari konsep umum ke subkategori</h2><p class="taxonomy-help">Setiap konsep memiliki satu jalur induk utama. Periksa kembali hierarki yang diusulkan AI.</p>${nodes.length ? renderHierarchySvg(root,nodes,[]) : '<div class="empty-state">Belum ada struktur hierarki. Jalankan ulang sintesis untuk meminta AI menghasilkan node hierarkis.</div>'}`;
+      box.innerHTML = `<div class="synth-eyebrow">HIERARCHICAL TAXONOMY</div><h2 class="taxonomy-title">Struktur dari konsep umum ke subkategori</h2><p class="taxonomy-help">Setiap konsep memiliki satu jalur induk utama. Periksa kembali hierarki yang diusulkan.</p>${nodes.length ? renderHierarchySvg(root,nodes,[]) : '<div class="empty-state">Belum ada struktur hierarki. Jalankan ulang sintesis untuk menghasilkan node hierarkis.</div>'}`;
     } else if (activeTaxonomy === 'faceted') {
       const f=s.taxonomy.faceted||{}; const facets=list(f.facets);
-      box.innerHTML = `<div class="synth-eyebrow">FACETED TAXONOMY</div><h2 class="taxonomy-title">Klasifikasi berdasarkan beberapa facet</h2><p class="taxonomy-help">Setiap kolom menunjukkan dimensi atribut yang berbeda untuk mendeskripsikan studi atau konsep.</p>${facets.length ? `<div class="facet-diagram">${facets.map((facet,i)=>`<div class="facet-column"><div class="facet-head">${esc(facet.name||'Facet '+(i+1))}</div>${list(facet.values).map(v=>`<div class="facet-value"><strong>${esc(v.name||'Kategori')}</strong><small>${esc(v.description||'')}</small><span>${list(v.article_ids).length} artikel</span></div>`).join('')}</div>`).join('')}</div>` : '<div class="empty-state">Belum ada facet yang dihasilkan AI. Jalankan ulang sintesis untuk membuat klasifikasi multi-dimensi.</div>'}`;
+      box.innerHTML = `<div class="synth-eyebrow">FACETED TAXONOMY</div><h2 class="taxonomy-title">Klasifikasi berdasarkan beberapa facet</h2><p class="taxonomy-help">Setiap kolom menunjukkan dimensi atribut yang berbeda untuk mendeskripsikan studi atau konsep.</p>${facets.length ? `<div class="facet-diagram">${facets.map((facet,i)=>`<div class="facet-column"><div class="facet-head">${esc(facet.name||'Facet '+(i+1))}</div>${list(facet.values).map(v=>`<div class="facet-value"><strong>${esc(v.name||'Kategori')}</strong><small>${esc(v.description||'')}</small><span>${list(v.article_ids).length} artikel</span></div>`).join('')}</div>`).join('')}</div>` : '<div class="empty-state">Belum ada facet yang dihasilkan. Jalankan ulang sintesis untuk membuat klasifikasi multi-dimensi.</div>'}`;
     } else if (activeTaxonomy === 'flat') {
       const data = list(s.taxonomy.flat);
-      box.innerHTML = `<div class="synth-eyebrow">FLAT / LIST TAXONOMY</div><h2 style="font-family:Manrope,sans-serif;font-size:17px;margin:0 0 15px">Kategori pada level yang sama</h2>${data.length ? `<div class="taxonomy-list">${data.map((x,i)=>`<div class="taxonomy-item"><div class="taxonomy-index">KATEGORI ${String(i+1).padStart(2,'0')}</div><h3>${esc(x.name || 'Kategori')}</h3><p>${esc(x.description || '')}</p><span class="evidence-count">${list(x.article_ids).length} artikel pendukung</span><div class="source-chips">${citationChips(x.article_ids)}</div></div>`).join('')}</div>` : '<div class="empty-state">AI tidak menghasilkan daftar kategori. Periksa data sintesis atau coba ulangi.</div>'}`;
+      box.innerHTML = `<div class="synth-eyebrow">FLAT / LIST TAXONOMY</div><h2 style="font-family:Manrope,sans-serif;font-size:17px;margin:0 0 15px">Kategori pada level yang sama</h2>${data.length ? `<div class="taxonomy-list">${data.map((x,i)=>`<div class="taxonomy-item"><div class="taxonomy-index">KATEGORI ${String(i+1).padStart(2,'0')}</div><h3>${esc(x.name || 'Kategori')}</h3><p>${esc(x.description || '')}</p><span class="evidence-count">${list(x.article_ids).length} artikel pendukung</span><div class="source-chips">${citationChips(x.article_ids)}</div></div>`).join('')}</div>` : '<div class="empty-state">Model tidak menghasilkan daftar kategori. Periksa data sintesis atau coba ulangi.</div>'}`;
     } else if (activeTaxonomy === 'poly') {
       const data = s.taxonomy.polyhierarchy || {};
       const nodes = list(data.nodes);
       const nodeNames = Object.fromEntries(nodes.map(n => [n.id, n.name]));
-      box.innerHTML = `<div class="synth-eyebrow">POLY-HIERARCHICAL TAXONOMY</div><h2 style="font-family:Manrope,sans-serif;font-size:17px;margin:0 0 7px">Satu konsep dapat memiliki beberapa parent</h2><p style="color:#89958c;font-size:11px;margin:0 0 15px">Relasi parent berasal dari struktur AI dan harus diverifikasi secara konseptual.</p>${nodes.length ? `${renderHierarchySvg(null,nodes,list(data.edges),true)}<div class="poly-tree">${nodes.map(n=>`<div class="poly-node"><h3>${esc(n.name || n.id)}</h3><p>${esc(n.description || '')}</p><div class="poly-parents">Parent: ${list(n.parent_ids).length ? list(n.parent_ids).map(id=>esc(nodeNames[id] || id)).join(' · ') : 'Tidak ditentukan'}</div><div class="source-chips">${citationChips(n.article_ids)}</div></div>`).join('')}</div>` : '<div class="empty-state">Belum ada node poly-hierarchy pada hasil sintesis.</div>'}`;
+      box.innerHTML = `<div class="synth-eyebrow">POLY-HIERARCHICAL TAXONOMY</div><h2 style="font-family:Manrope,sans-serif;font-size:17px;margin:0 0 7px">Satu konsep dapat memiliki beberapa parent</h2><p style="color:#89958c;font-size:11px;margin:0 0 15px">Relasi parent berasal dari struktur model dan harus diverifikasi secara konseptual.</p>${nodes.length ? `${renderHierarchySvg(null,nodes,list(data.edges),true)}<div class="poly-tree">${nodes.map(n=>`<div class="poly-node"><h3>${esc(n.name || n.id)}</h3><p>${esc(n.description || '')}</p><div class="poly-parents">Parent: ${list(n.parent_ids).length ? list(n.parent_ids).map(id=>esc(nodeNames[id] || id)).join(' · ') : 'Tidak ditentukan'}</div><div class="source-chips">${citationChips(n.article_ids)}</div></div>`).join('')}</div>` : '<div class="empty-state">Belum ada node poly-hierarchy pada hasil sintesis.</div>'}`;
     } else {
       const m = s.taxonomy.matrix || {};
       const cols = list(m.columns);
@@ -332,7 +332,7 @@
     const canvas = $('#system-map-canvas');
     const legend = $('#system-map-legend');
     if (!s || !s.system_map || !list(s.system_map.nodes).length) {
-      canvas.innerHTML = '<div class="empty-state">System map akan tampil setelah sintesis AI berhasil dilakukan.</div>';
+      canvas.innerHTML = '<div class="empty-state">System map akan tampil setelah sintesis berhasil dilakukan.</div>';
       $('#system-map-meta').textContent = 'Belum ada system map';
       legend.innerHTML = '';
       return;
@@ -375,7 +375,7 @@
       const h = await api('/api/health');
       if (h.ai_configured) {
         pill.className = 'status-pill status-ok';
-        pill.innerHTML = '<span class="status-dot"></span> AI siap · ' + esc(h.model);
+        pill.innerHTML = '<span class="status-dot"></span> Model siap · ' + esc(h.model);
       } else {
         pill.className = 'status-pill status-warn';
         pill.innerHTML = '<span class="status-dot"></span> API key belum dipasang';
@@ -406,7 +406,7 @@
     data.append('source_name', meta.source_name || 'Upload manual');
     data.append('search_query', meta.search_query);
     data.append('search_date', meta.search_date);
-    setBusy(true, `Membaca dan menganalisis ${files.length} PDF dengan AI…`);
+    setBusy(true, `Membaca dan menganalisis ${files.length} PDF …`);
     try {
       const response = await api('/api/analyze', {method:'POST', body:data});
       const newArticles = list(response.articles);
@@ -455,7 +455,7 @@
     } catch (error) {
       globalMessage(error.message, 'error');
       toast(error.message, 'error');
-    } finally { setBusy(false); $('#run-synthesis').textContent = '✳ Jalankan sintesis AI'; }
+    } finally { setBusy(false); $('#run-synthesis').textContent = '✳ Jalankan sintesis'; }
   }
 
   function renderSelectedFiles() {

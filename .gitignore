@@ -1,5 +1,5 @@
-.env
-.venv/
 __pycache__/
-*.py[cod]
-.DS_Store
+.venv/
+.env
+data/pdfs/*.pdf
+!data/pdfs/.gitkeep
