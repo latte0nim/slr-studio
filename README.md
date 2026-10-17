@@ -1,6 +1,6 @@
 # LitReview Studio — AI Systematic Literature Review
 
-Prototype full-stack untuk workspace systematic literature review pribadi. Antarmuka dibuat dengan HTML/CSS/JavaScript, server memakai Python Flask, ekstraksi PDF memakai PyMuPDF, dan analisis memakai Groq API.
+Prototype full-stack untuk workspace systematic literature review pribadi. Antarmuka dibuat dengan HTML/CSS/JavaScript, server memakai Python Flask, ekstraksi PDF memakai PyMuPDF, dan analisis memakai Gemini API.
 
 ## Fitur yang tersedia
 
@@ -21,7 +21,7 @@ Struktur mengikuti istilah pada `Systematic Review_S2.pdf`: Research Question; A
 ## Kebutuhan
 
 - Python 3.10 atau lebih baru (direkomendasikan 3.11/3.12).
-- API key Groq dari Groq: https://console.groq.com/keys
+- API key Gemini dari Google AI Studio: https://aistudio.google.com/apikey
 - Browser modern.
 
 ## Jalankan di komputer sendiri (Windows)
@@ -47,14 +47,14 @@ Struktur mengikuti istilah pada `Systematic Review_S2.pdf`: Research Question; A
 5. Duplikat `.env.example` menjadi `.env`, lalu edit file `.env` dengan text editor. Ganti `isi_api_key_di_sini` dengan API key dari Google AI Studio. File `.env` dibaca otomatis oleh aplikasi saat berjalan lokal. Contoh konfigurasi:
 
    ```env
-   GROQ_API_KEY=PASTE_API_KEY_ANDA
-   GROQ_MODEL=groq-model
+   GEMINI_API_KEY=PASTE_API_KEY_ANDA
+   GEMINI_MODEL=gemini-3.5-flash-lite
    ```
 
    Untuk penggunaan lokal, `APP_PASSWORD` boleh dibiarkan kosong. Untuk website yang dipublikasikan, wajib isi username dan password yang kuat di pengaturan environment hosting.
 
 6. Buka `http://127.0.0.1:5000` di browser.
-7. Jika AI menampilkan error model/akses, cek model yang tersedia pada akun Groq dan ubah `GROQ_MODEL` sesuai model stabil yang tersedia untuk akunmu.
+7. Jika AI menampilkan error model/akses, cek model yang tersedia pada akun Google AI Studio dan ubah `GEMINI_MODEL` sesuai model stabil yang tersedia untuk akunmu.
 
 Jangan memasukkan API key ke file HTML/JavaScript dan jangan commit `.env` atau API key ke GitHub.
 
@@ -70,8 +70,8 @@ Render menyediakan free web services, tetapi layanan gratis akan tidur setelah t
    - Runtime: Python
    - Plan: Free
 4. Tambahkan environment variables di Render:
-   - `GROQ_API_KEY` = API key dari Google AI Studio
-   - `GROQ_MODEL` = `gemini-3.5-flash-lite` (atau model stabil yang tersedia di akunmu)
+   - `GEMINI_API_KEY` = API key dari Google AI Studio
+   - `GEMINI_MODEL` = `gemini-3.5-flash-lite` (atau model stabil yang tersedia di akunmu)
    - `APP_USERNAME` = username pilihanmu
    - `APP_PASSWORD` = password yang kuat
 5. Deploy. Browser akan meminta username/password HTTP Basic Auth sebelum membuka website jika `APP_PASSWORD` sudah diisi.
@@ -101,7 +101,7 @@ Panduan resmi Render: https://render.com/docs/deploy-flask dan batas free servic
 
 ## Referensi teknologi
 
-- Groq API — https://ai.google.dev/gemini-api/docs/generate-content
+- Gemini API — https://ai.google.dev/gemini-api/docs/generate-content
 - Gemini models — https://ai.google.dev/gemini-api/docs/models
 - PRISMA 2020 — https://www.prisma-statement.org/prisma-2020
 - PRISMA flow diagram — https://www.prisma-statement.org/prisma-2020-flow-diagram

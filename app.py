@@ -1,28 +1,44 @@
 import os
 import json
 import hashlib
+import re
 import urllib.request
 import urllib.error
 from dotenv import load_dotenv
 from datetime import datetime, timezone
 from functools import wraps
 from io import BytesIO
+from pathlib import Path
 
 import fitz  # PyMuPDF
-from flask import Flask, render_template, request, jsonify, Response
+from flask import Flask, render_template, request, jsonify, Response, send_file, abort
 from werkzeug.utils import secure_filename
 
-load_dotenv()
-app = Flask(__name__)
+# Resolve paths relative to app.py so .env is found regardless of the terminal's current folder.
+BASE_DIR = Path(__file__).resolve().parent
+ENV_FILE = BASE_DIR / ".env"
+load_dotenv(dotenv_path=ENV_FILE, override=False)
+
+app = Flask(
+    __name__,
+    template_folder=str(BASE_DIR / "templates"),
+    static_folder=str(BASE_DIR / "static"),
+)
 app.config["MAX_CONTENT_LENGTH"] = 105 * 1024 * 1024  # batas total request: 105 MB
 
-MODEL = os.getenv("GROQ_MODEL", "openai/gpt-oss-20b")
-API_KEY = os.getenv("GROQ_API_KEY", "").strip()
-APP_USERNAME = os.getenv("APP_USERNAME", "slr-user")
+# Ollama local configuration. No cloud API key is required.
+MODEL = os.getenv("OLLAMA_MODEL", "qwen3-vl:8b-instruct").strip() or "qwen3-vl:8b-instruct"
+OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434/api/chat").strip()
+OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "12288"))
+OLLAMA_MAX_OUTPUT_TOKENS = int(os.getenv("OLLAMA_MAX_OUTPUT_TOKENS", "3500"))
+APP_USERNAME = os.getenv("APP_USERNAME", "slr-user").strip() or "slr-user"
 APP_PASSWORD = os.getenv("APP_PASSWORD", "").strip()
 MAX_FILES_PER_BATCH = 8
 MAX_FILE_BYTES = 12 * 1024 * 1024
-MAX_TEXT_CHARS = 55_000
+# Smaller cap helps 8K-context local models avoid overflowing the prompt window.
+MAX_TEXT_CHARS = int(os.getenv("MAX_TEXT_CHARS", "18000"))
+PDF_STORE = BASE_DIR / "data" / "pdfs"
+PDF_STORE.mkdir(parents=True, exist_ok=True)
 
 
 def auth_guard(func):
@@ -55,139 +71,141 @@ def extract_json(text):
     return json.loads(text)
 
 
-
-# Alias used in code for AI calls; Groq is used here but functions originally named for Gemini.
-
-def gemini_json(prompt: str, max_output_tokens: int = 6500):
-    """Wrapper that forwards to groq_json for compatibility.
-    The codebase uses `gemini_json` to request AI completions. Since we employ Groq as the backend,
-    this function simply calls `groq_json` with the same parameters.
-    """
-    return groq_json(prompt, max_output_tokens)
-def groq_json(prompt: str, max_output_tokens: int = 6500):
-    """Call Groq API and parse its JSON response, retrying once if needed."""
-
-    if not API_KEY:
+def ollama_json(prompt, max_output_tokens=3000):
+    """Call Ollama for JSON, retrying empty thinking-only and malformed outputs safely."""
+    if not OLLAMA_URL or not MODEL:
         raise RuntimeError(
-            "API key belum dipasang. Isi GROQ_API_KEY pada file .env."
+            "Ollama belum dikonfigurasi. Periksa OLLAMA_URL dan OLLAMA_MODEL di file .env."
         )
 
-    url = "https://api.groq.com/openai/v1/chat/completions"
+    base_token_limit = max(512, min(
+        int(max_output_tokens),
+        OLLAMA_MAX_OUTPUT_TOKENS,
+        max(1024, OLLAMA_NUM_CTX // 2),
+    ))
     last_problem = "Respons bukan JSON valid."
+    malformed_text = ""
 
+    # Attempt 0: normal extraction. Attempt 1: repeat direct extraction if content was
+    # empty (some thinking models consume the output budget), or repair malformed JSON.
     for attempt in range(2):
-        token_limit = (
-            max_output_tokens
-            if attempt == 0
-            else min(max(max_output_tokens * 2, 9000), 16000)
+        if attempt == 0:
+            request_messages = [
+                {
+                    "role": "system",
+                    "content": (
+                        "Anda asisten riset systematic literature review. Gunakan hanya bukti yang "
+                        "diberikan. Jangan mengarang data. Keluarkan objek JSON valid saja tanpa "
+                        "markdown dan tanpa uraian penalaran. Isi setiap field secara ringkas."
+                    ),
+                },
+                {"role": "user", "content": prompt},
+            ]
+        elif malformed_text.strip():
+            request_messages = [
+                {
+                    "role": "system",
+                    "content": (
+                        "Perbaiki sintaks JSON berikut. Keluarkan SATU objek JSON valid saja. "
+                        "Pertahankan semua isi yang tersedia, jangan mengarang nilai, dan tutup "
+                        "string/array/objek yang terpotong secara aman. Tanpa markdown."
+                    ),
+                },
+                {"role": "user", "content": malformed_text[:14000]},
+            ]
+        else:
+            # Important: do not send an empty JSON-repair prompt when the model returned
+            # only its internal thinking. Repeat the extraction prompt with a direct-output reminder.
+            request_messages = [
+                {
+                    "role": "system",
+                    "content": (
+                        "Jawab langsung dengan SATU objek JSON valid. Jangan tampilkan penalaran, "
+                        "komentar, atau markdown. Gunakan nilai ringkas dan patuhi struktur JSON."
+                    ),
+                },
+                {"role": "user", "content": prompt + "\n\nPENTING: keluarkan isi JSON sekarang; jangan menghasilkan langkah penalaran."},
+            ]
+
+        token_limit = base_token_limit if attempt == 0 else min(
+            OLLAMA_MAX_OUTPUT_TOKENS,
+            max(base_token_limit, min(OLLAMA_NUM_CTX // 2, base_token_limit + 700)),
         )
-
-        request_prompt = prompt
-
-        if attempt == 1:
-            request_prompt += (
-                "\n\nPENTING: Keluarkan tepat satu objek JSON valid. "
-                "Jangan gunakan markdown atau teks di luar JSON. "
-                "Pastikan semua kurung dan string tertutup."
-            )
-
         payload = {
             "model": MODEL,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": request_prompt
-                }
-            ],
-            "temperature": 0.1 if attempt == 0 else 0,
-            "max_completion_tokens": token_limit,
-            "response_format": {
-                "type": "json_object"
-            }
-        }
-
-        req = urllib.request.Request(
-            url,
-            data=json.dumps(payload).encode("utf-8"),
-            headers={
-                "Content-Type": "application/json",
-                "Authorization": f"Bearer {API_KEY}"
+            "messages": request_messages,
+            "think": False,
+            "format": "json",
+            "stream": False,
+            "keep_alive": "5m",
+            "options": {
+                "temperature": 0,
+                "num_predict": token_limit,
+                "num_ctx": OLLAMA_NUM_CTX,
             },
-            method="POST"
+        }
+        req = urllib.request.Request(
+            OLLAMA_URL,
+            data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
         )
-
         try:
-            with urllib.request.urlopen(req, timeout=180) as resp:
-                raw = json.loads(resp.read().decode("utf-8"))
-
+            with urllib.request.urlopen(req, timeout=600) as response:
+                raw = json.loads(response.read().decode("utf-8"))
         except urllib.error.HTTPError as exc:
-            detail = exc.read().decode(
-                "utf-8", errors="replace"
-            )[:1800]
-
-            if exc.code == 429:
+            detail = exc.read().decode("utf-8", errors="replace")[:1600]
+            if exc.code == 404:
                 raise RuntimeError(
-                    "Batas kuota atau rate limit Groq tercapai. "
-                    "Tunggu kuota tersedia atau kurangi ukuran batch."
+                    f"Ollama tidak menemukan model '{MODEL}' atau endpoint. Periksa `ollama list`, "
+                    f"OLLAMA_MODEL dan OLLAMA_URL. Detail: {detail}"
                 ) from exc
-
-            if exc.code in (401, 403):
+            if exc.code == 500:
                 raise RuntimeError(
-                    "API key Groq ditolak. Periksa GROQ_API_KEY "
-                    "dan akses akun Groq."
+                    "Ollama mengembalikan HTTP 500. Periksa apakah Ollama/model berjalan normal. "
+                    f"Detail: {detail}"
                 ) from exc
-
-            raise RuntimeError(
-                f"Permintaan Groq gagal (HTTP {exc.code}): {detail}"
-            ) from exc
-
+            raise RuntimeError(f"Permintaan Ollama gagal (HTTP {exc.code}). Detail: {detail}") from exc
         except urllib.error.URLError as exc:
             raise RuntimeError(
-                f"Tidak dapat terhubung ke Groq: {exc.reason}"
+                "Tidak dapat terhubung ke Ollama lokal. Pastikan Ollama berjalan dan OLLAMA_URL "
+                f"benar ({OLLAMA_URL}). Detail: {exc.reason}"
             ) from exc
-
-        choices = raw.get("choices") or []
-
-        if not choices:
+        except TimeoutError as exc:
             raise RuntimeError(
-                f"Groq tidak mengembalikan hasil: {raw}"
-            )
+                "Ollama terlalu lama merespons (>600 detik). Coba PDF lebih kecil atau model lebih ringan."
+            ) from exc
+        except json.JSONDecodeError as exc:
+            raise RuntimeError("Respons API Ollama sendiri bukan JSON valid.") from exc
 
-        choice = choices[0]
-        finish_reason = choice.get("finish_reason", "unknown")
-        message = choice.get("message") or {}
-        text = message.get("content") or ""
-
-        if not text.strip():
+        message = raw.get("message") or {}
+        output_text = (message.get("content") or "").strip()
+        done_reason = raw.get("done_reason", "unknown")
+        thinking_length = len(message.get("thinking") or "")
+        if not output_text:
             last_problem = (
-                f"Respons kosong; finish_reason={finish_reason}"
+                f"Respons konten kosong; done_reason={done_reason}; thinking_length={thinking_length}; "
+                f"eval_count={raw.get('eval_count', 'unknown')}; num_predict={token_limit}. "
+                "Model mungkin menghabiskan batas output untuk thinking."
             )
-            if attempt == 0:
-                continue
-            raise RuntimeError(last_problem)
-
+            malformed_text = ""
+            continue
         try:
-            parsed = extract_json(text)
-
+            parsed = extract_json(output_text)
             if not isinstance(parsed, dict):
-                raise ValueError(
-                    "Respons JSON bukan objek."
-                )
-
+                raise ValueError("JSON berhasil dibaca tetapi bukan objek JSON.")
             return parsed
-
         except (json.JSONDecodeError, ValueError) as exc:
+            malformed_text = output_text
             last_problem = (
-                f"{type(exc).__name__}: {str(exc)[:240]}; "
-                f"finish_reason={finish_reason}"
+                f"{type(exc).__name__}: {str(exc)[:240]}; output_chars={len(output_text)}; "
+                f"done_reason={done_reason}; eval_count={raw.get('eval_count', 'unknown')}"
             )
-
-            if attempt == 0:
-                continue
 
     raise RuntimeError(
-        "Groq masih mengembalikan JSON tidak valid setelah "
-        f"2 percobaan. Detail: {last_problem}"
+        "Ollama belum menghasilkan JSON valid setelah dua percobaan. "
+        f"Detail diagnostik: {last_problem}. Pastikan memakai model qwen3-vl:8b-instruct "
+        "dan cek /api/test-ai."
     )
 
 
@@ -242,19 +260,19 @@ Kembalikan JSON dengan struktur berikut:
   "authors": ["nama penulis"],
   "year": "tahun atau kosong",
   "doi": "DOI atau kosong",
-  "abstract": "abstrak ringkas berdasarkan artikel, maks 1200 karakter",
-  "objective": "tujuan penelitian",
+  "abstract": "abstrak ringkas berdasarkan artikel, maks 800 karakter",
+  "objective": "tujuan penelitian, maks 500 karakter",
   "research_questions": ["RQ yang dinyatakan artikel, bukan pertanyaan ciptaan"],
-  "methods": "metode, desain, sampel/data, dan teknik analisis",
-  "context": "sektor, populasi, lokasi, atau konteks penelitian",
+  "methods": "metode, desain, sampel/data, dan teknik analisis, maks 700 karakter",
+  "context": "sektor, populasi, lokasi, atau konteks penelitian, maks 400 karakter",
   "variables": ["variabel/konstruk kunci"],
-  "findings": ["temuan utama yang spesifik"],
-  "limitations": ["keterbatasan yang dinyatakan penulis; jangan mengada-ada"],
-  "future_research": ["saran riset masa depan yang dinyatakan penulis"],
+  "findings": ["maksimal 6 temuan utama yang spesifik, singkat, dan berbasis teks"],
+  "limitations": ["maksimal 3 keterbatasan yang dinyatakan penulis; jangan mengada-ada"],
+  "future_research": ["maksimal 3 saran riset masa depan yang dinyatakan penulis"],
   "topic_tags": ["3-8 kata kunci topik"],
-  "concepts": [{{"name":"konsep","description":"definisi singkat berdasarkan artikel","parent_concepts":["konsep induk jika didukung artikel"]}}],
-  "relationships": [{{"source":"konsep sumber","target":"konsep tujuan","relation":"jenis hubungan","evidence":"dasar singkat dari artikel"}}],
-  "evidence_quotes": [{{"claim":"klaim yang didukung","quote":"kutipan persis dan pendek","page":1}}],
+  "concepts": [{{"name":"konsep","description":"definisi singkat berdasarkan artikel","parent_concepts":["konsep induk jika didukung artikel"]}}], (maksimal 6 item)
+  "relationships": [{{"source":"konsep sumber","target":"konsep tujuan","relation":"jenis hubungan","evidence":"dasar singkat dari artikel"}}], (maksimal 6 item)
+  "evidence_quotes": [{{"claim":"klaim yang didukung","quote":"kutipan persis maksimal 20 kata","page":1}}], (maksimal 3 item)
   "screening_suggestion": {{"decision":"include|exclude|review","reason":"alasan terkait kriteria, sertakan ketidakpastian"}}
 }}
 """
@@ -305,6 +323,28 @@ JSON:
  "gaps":[{{"gap":"celah yang tampak","evidence":"mengapa korpus menunjukkan celah tersebut","article_ids":["ID"]}}],
  "taxonomy_seeds":[{{"name":"konsep/kategori","description":"dasar pengelompokan","article_ids":["ID"],"parents":["kategori induk bila relevan"]}}],
  "system_relationships":[{{"source":"konsep","target":"konsep","relation":"hubungan yang dilaporkan","article_ids":["ID"],"evidence":"dasar hubungan"}}]
+}}
+"""
+
+
+def reduce_summaries_prompt(summary_groups, rq, inclusion, exclusion):
+    """Compact a group of batch summaries while preserving evidence article IDs."""
+    return f"""Anda menggabungkan ringkasan hasil systematic literature review untuk model lokal dengan konteks terbatas.
+Gunakan hanya informasi dari JSON yang diberikan. Jangan tambahkan fakta baru, jangan hilangkan ID artikel yang mendukung klaim, dan tandai ketidakpastian. Jawab JSON valid saja dengan ringkas.
+Research question: {rq or '(belum ditentukan)'}
+Kriteria inklusi: {inclusion or '(belum diisi)'}
+Kriteria eksklusi: {exclusion or '(belum diisi)'}
+Ringkasan yang akan digabungkan:
+{json.dumps(summary_groups, ensure_ascii=False)}
+Kembalikan objek JSON dengan struktur:
+{{
+ "batch_overview":"sintesis gabungan singkat",
+ "themes":[{{"name":"tema","synthesis":"pola yang didukung ringkasan input","article_ids":["ID artikel input"]}}],
+ "agreements":[{{"claim":"temuan yang konsisten","article_ids":["ID"],"notes":"batas bukti"}}],
+ "contradictions":[{{"issue":"perbedaan temuan","article_ids":["ID"],"possible_explanation":"hipotesis yang diberi label bila belum dipastikan"}}],
+ "gaps":[{{"gap":"celah riset","evidence":"dasar dari ringkasan input","article_ids":["ID"]}}],
+ "taxonomy_seeds":[{{"name":"kategori konsep","description":"definisi ringkas","article_ids":["ID"],"parents":["kategori induk jika ada"]}}],
+ "system_relationships":[{{"source":"konsep sumber","target":"konsep tujuan","relation":"hubungan yang disebut input","article_ids":["ID"],"evidence":"dasar ringkas"}}]
 }}
 """
 
@@ -372,17 +412,53 @@ def index():
     return render_template("index.html")
 
 
+
+@app.get("/pdf/<article_id>")
+@auth_guard
+def preview_pdf(article_id):
+    """Serve a previously uploaded PDF inline for browser preview."""
+    if not re.fullmatch(r"[a-f0-9]{16}", article_id):
+        abort(404)
+    matches = list(PDF_STORE.glob(f"{article_id}*.pdf"))
+    # IDs are the first 16 chars of SHA-256; resolve exact full hash filename too.
+    if not matches:
+        matches = [p for p in PDF_STORE.glob("*.pdf") if p.stem.startswith(article_id)]
+    if not matches:
+        abort(404)
+    return send_file(matches[0], mimetype="application/pdf", as_attachment=False, download_name=f"{article_id}.pdf", conditional=True)
+
 @app.get("/api/health")
 @auth_guard
 def health():
     return jsonify({
         "ok": True,
-        "ai_configured": bool(API_KEY),
+        "provider": "Ollama lokal",
+        "ai_configured": bool(OLLAMA_URL and MODEL),
         "model": MODEL,
+        "env_file_found": ENV_FILE.is_file(),
         "password_protected": bool(APP_PASSWORD),
         "max_files_per_batch": MAX_FILES_PER_BATCH,
         "max_file_mb": MAX_FILE_BYTES // (1024 * 1024),
     })
+
+
+@app.get("/api/test-ai")
+@auth_guard
+def test_ai():
+    """Test the local Ollama model and confirm JSON output without uploading a PDF."""
+    if not OLLAMA_URL or not MODEL:
+        return jsonify({
+            "ok": False,
+            "error": f"OLLAMA_URL / OLLAMA_MODEL belum terbaca. Periksa file .env di folder {BASE_DIR}."
+        }), 503
+    try:
+        answer = ollama_json(
+            'Kembalikan tepat JSON ini: {"status":"ok","provider":"Ollama"}',
+            max_output_tokens=256,
+        )
+        return jsonify({"ok": True, "provider": "Ollama lokal", "model": MODEL, "response": answer})
+    except Exception as exc:
+        return jsonify({"ok": False, "provider": "Ollama lokal", "model": MODEL, "error": str(exc)[:1800]}), 502
 
 
 @app.post("/api/analyze")
@@ -394,8 +470,8 @@ def analyze_pdfs():
     files = [f for f in files if f.filename]
     if len(files) > MAX_FILES_PER_BATCH:
         return jsonify({"error": f"Maksimal {MAX_FILES_PER_BATCH} PDF untuk satu batch. Upload batch berikutnya setelah selesai."}), 400
-    if not API_KEY:
-        return jsonify({"error": "AI belum dikonfigurasi. Isi GROQ_API_KEY pada environment server terlebih dahulu."}), 503
+    if not OLLAMA_URL or not MODEL:
+        return jsonify({"error": "Ollama belum dikonfigurasi. Periksa OLLAMA_URL dan OLLAMA_MODEL pada file .env."}), 503
 
     research_question = request.form.get("research_question", "").strip()[:1000]
     inclusion = request.form.get("inclusion", "").strip()[:3000]
@@ -421,7 +497,7 @@ def analyze_pdfs():
                 errors.append({"filename": filename, "error": "Teks PDF sangat sedikit/tidak terbaca. Kemungkinan PDF hasil scan; versi ini belum memiliki OCR otomatis. Jalankan OCR terlebih dahulu lalu upload ulang."})
                 continue
             prompt = article_prompt(filename, pages, text, research_question, inclusion, exclusion)
-            data = gemini_json(prompt, max_output_tokens=5000)
+            data = ollama_json(prompt, max_output_tokens=3000)
             if not isinstance(data, dict):
                 raise RuntimeError("Format ekstraksi AI tidak valid.")
             title = safe_string(data.get("title")) or os.path.splitext(filename)[0]
@@ -461,7 +537,13 @@ def analyze_pdfs():
             }
             decision = record["screening_suggestion"].get("decision", "review") if isinstance(record["screening_suggestion"], dict) else "review"
             if decision not in ("include", "exclude", "review"):
-                record["screening_suggestion"] = {"decision": "review", "reason": "Rekomendasi AI perlu dicek manual."}
+                record["screening_suggestion"] = {"decision": "review", "reason": "Rekomendasi model perlu dicek manual."}
+            # Keep the original PDF on this computer so it can be previewed later.
+            stored_pdf = PDF_STORE / f"{digest}.pdf"
+            if not stored_pdf.exists():
+                stored_pdf.write_bytes(pdf_bytes)
+            record["pdf_url"] = f"/pdf/{record_id}"
+            record["pdf_stored"] = True
             results.append(record)
         except Exception as exc:
             errors.append({"filename": filename, "error": str(exc)[:1500]})
@@ -471,8 +553,8 @@ def analyze_pdfs():
 @app.post("/api/synthesize")
 @auth_guard
 def synthesize():
-    if not API_KEY:
-        return jsonify({"error": "AI belum dikonfigurasi. Isi GROQ_API_KEY pada environment server."}), 503
+    if not OLLAMA_URL or not MODEL:
+        return jsonify({"error": "Ollama belum dikonfigurasi. Periksa OLLAMA_URL dan OLLAMA_MODEL pada file .env."}), 503
     body = request.get_json(silent=True) or {}
     articles = body.get("articles", [])
     research_question = str(body.get("research_question", "")).strip()[:1000]
@@ -487,15 +569,62 @@ def synthesize():
         return jsonify({"error": "Prototype ini membatasi sintesis pada 250 artikel yang telah disetujui. Bagi review menjadi beberapa korpus untuk penggunaan yang lebih besar."}), 400
 
     compact = [compact_article(a) for a in selected]
-    batches = [compact[i:i + 8] for i in range(0, len(compact), 8)]
+    # Small batches help the local 8B model stay within its context window.
+    batches = [compact[i:i + 4] for i in range(0, len(compact), 4)]
     try:
         summaries = []
         for idx, group in enumerate(batches, start=1):
-            # for small corpora, this intermediate step remains useful for consistent evidence mapping
-            summary = gemini_json(batch_synthesis_prompt(group, research_question, inclusion, exclusion), max_output_tokens=3500)
-            summaries.append({"batch": idx, "article_ids": [a.get("id") for a in group], "summary": summary})
-        catalog = [{"id": a.get("id"), "title": a.get("title"), "year": a.get("year"), "topic_tags": a.get("topic_tags", [])} for a in compact]
-        result = gemini_json(final_synthesis_prompt(summaries, catalog, research_question, inclusion, exclusion), max_output_tokens=8500)
+            summary = ollama_json(
+                batch_synthesis_prompt(group, research_question, inclusion, exclusion),
+                max_output_tokens=1000,
+            )
+            summaries.append({
+                "batch": idx,
+                "article_ids": [a.get("id") for a in group],
+                "summary": summary,
+            })
+
+        # Recursively reduce the batch summaries so the final prompt stays inside the
+        # local model's 8K context window, even for larger article collections.
+        reduction_level = 1
+        while len(summaries) > 4:
+            reduced = []
+            for idx in range(0, len(summaries), 4):
+                group = summaries[idx:idx + 4]
+                if len(group) == 1:
+                    reduced.append(group[0])
+                    continue
+                merged = ollama_json(
+                    reduce_summaries_prompt(group, research_question, inclusion, exclusion),
+                    max_output_tokens=900,
+                )
+                ids = []
+                for part in group:
+                    for article_id in part.get("article_ids", []):
+                        if article_id not in ids:
+                            ids.append(article_id)
+                reduced.append({
+                    "batch": f"level-{reduction_level}-group-{idx // 4 + 1}",
+                    "article_ids": ids,
+                    "summary": merged,
+                })
+            summaries = reduced
+            reduction_level += 1
+
+        # The catalog is intentionally compact so synthesis across all included articles has room for its JSON output.
+        catalog = [
+            {
+                "id": a.get("id"),
+                "title": str(a.get("title", ""))[:180],
+                "year": a.get("year", ""),
+                "topic_tags": (a.get("topic_tags", []) or [])[:3],
+            }
+            for a in compact
+        ]
+        result = ollama_json(
+            final_synthesis_prompt(summaries, catalog, research_question, inclusion, exclusion),
+            max_output_tokens=1700,
+        )
         if not isinstance(result, dict):
             raise RuntimeError("AI tidak mengembalikan sintesis dalam format yang benar.")
         result = filter_references(result, {a.get("id") for a in compact})
