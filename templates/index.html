@@ -34,7 +34,12 @@
     <main class="main-content">
       <header class="topbar">
         <div class="breadcrumb"><span>Workspace</span><b>/</b><strong id="breadcrumb-current">Ikhtisar</strong></div>
-        <div class="topbar-right"><button id="usage-chip" type="button" class="status-pill usage-chip" title="Pemakaian token model proyek ini"><span class="usage-icon">◔</span> <span id="usage-text">0 token · lokal</span></button><span id="ai-status" class="status-pill status-warn"><span class="status-dot"></span> Memeriksa model…</span><button id="import-json" class="button button-quiet button-small">Impor</button><button id="export-json" class="button button-quiet button-small">Ekspor proyek ↗</button></div>
+        <div class="topbar-right"><div class="usage-wrap"><button id="usage-chip" type="button" class="status-pill usage-chip" aria-haspopup="dialog" aria-expanded="false" aria-controls="usage-popover"><span id="usage-period-dot" class="usage-period-dot" hidden></span><span class="usage-icon">◔</span> <span id="usage-text">0 token · lokal</span></button>
+          <div id="usage-popover" class="usage-popover" role="dialog" aria-label="Pemakaian token" hidden>
+            <div class="usage-pop-head"><strong>Pemakaian token</strong><button id="usage-pop-close" type="button" class="usage-pop-x" aria-label="Tutup">×</button></div>
+            <div id="usage-pop-body"></div>
+            <div class="usage-pop-foot"><button id="usage-reset" type="button" class="button button-quiet button-small">Reset penghitung</button></div>
+          </div></div><span id="ai-status" class="status-pill status-warn"><span class="status-dot"></span> Memeriksa model…</span><button id="import-json" class="button button-quiet button-small">Impor</button><button id="export-json" class="button button-quiet button-small">Ekspor proyek ↗</button></div>
       </header>
 
       <div class="page-wrap">

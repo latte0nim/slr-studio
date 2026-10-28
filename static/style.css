@@ -26,3 +26,27 @@ html,body,button,input,textarea,select{font-family:'Montserrat',sans-serif!impor
 .progress-line{position:relative}.progress-line.is-working::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:translateX(-100%);animation:progress-shimmer 1.4s linear infinite}
 @keyframes progress-shimmer{to{transform:translateX(100%)}}
 @media (prefers-reduced-motion:reduce){.progress-line.is-working::after{animation:none}}
+
+/* Popup pemakaian token (klik chip) */
+.usage-wrap{position:relative}
+.usage-chip[aria-expanded="true"]{background:#f4e8e5}
+.usage-period-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex:none}
+.usage-period-dot.is-peak{background:#E08F3E}.usage-period-dot.is-off{background:#3f8f6b}
+.usage-popover{position:absolute;right:0;top:calc(100% + 10px);width:340px;max-width:calc(100vw - 24px);background:#fffdf9;border:1px solid #B1A7A6;border-radius:14px;box-shadow:0 18px 40px rgba(96,36,55,.18);padding:14px 16px 12px;z-index:20;color:#342326;font-size:12px}
+.usage-popover[hidden]{display:none}
+.usage-pop-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:13px;color:#602437}
+.usage-pop-x{border:0;background:transparent;font-size:20px;line-height:1;color:#806d6d;padding:0 4px}.usage-pop-x:hover{color:#602437}
+.usage-sub{font-size:10.5px;color:#6e6262;margin:-4px 0 10px}
+.usage-period{border-radius:10px;padding:9px 11px;margin-bottom:10px;border:1px solid transparent}
+.usage-period.is-off{background:#e9f4ee;border-color:#c5e0d1}.usage-period.is-peak{background:#fdf0e0;border-color:#f0d0a6}.usage-period.is-local{background:#f4e8e5;border-color:#e8d9cc}
+.usage-period b{display:flex;align-items:center;gap:7px;font-size:12px}
+.usage-period p{margin:4px 0 0;font-size:10.5px;color:#5b4d4d;line-height:1.45}
+.usage-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin:0 0 10px}
+.usage-stats div{display:flex;flex-direction:column;padding:6px 0;border-bottom:1px dashed #e4d6ca}
+.usage-stats span{font-size:10px;color:#806d6d}.usage-stats strong{font-size:13px;font-variant-numeric:tabular-nums;color:#342326}
+.usage-stats .is-wide{grid-column:1/-1}
+.usage-note{font-size:10px;color:#806d6d;line-height:1.5;margin:0 0 10px}
+.usage-pop-foot{display:flex;justify-content:flex-end;border-top:1px solid #efe3d8;padding-top:10px}
+.usage-pop-foot .button.is-confirm{background:#9E2A2B;border-color:#9E2A2B;color:#fff}
+@media(max-width:540px){.usage-popover{position:fixed;left:12px;right:12px;top:64px;width:auto;max-width:none}}
+@media print{.usage-popover{display:none!important}}

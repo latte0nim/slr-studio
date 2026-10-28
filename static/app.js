@@ -132,16 +132,131 @@
     const u = normaliseUsage(state.usage);
     const nf = new Intl.NumberFormat('id-ID');
     const idr = u.cost_usd * u.usd_to_idr;
-    const cost = idr < 1 ? 'lokal' : `≈ Rp${nf.format(Math.round(idr))}`;
+    const cost = u.cost_usd <= 0 ? 'lokal' : (idr < 1 ? '< Rp1' : `≈ Rp${nf.format(Math.round(idr))}`);
     $('#usage-text').textContent = `${nf.format(u.prompt_tokens + u.completion_tokens)} token · ${cost}`;
-    chip.title = [
-      'Pemakaian token model untuk proyek ini',
-      `Input: ${nf.format(u.prompt_tokens)} (cache hit: ${nf.format(u.cache_hit_tokens)})`,
-      `Output: ${nf.format(u.completion_tokens)}`,
-      `Panggilan API: ${nf.format(u.calls)}`,
-      idr < 1 ? 'Biaya: lokal (tanpa biaya API)' : `Estimasi: $${u.cost_usd.toFixed(4)}`,
-      'Klik untuk mereset penghitung.',
-    ].join('\n');
+    updateUsageDot();
+    if (!$('#usage-popover').hidden) renderUsagePopover();
+  }
+
+  // ---- Popup pemakaian token + status tarif peak/off-peak (muncul saat chip diklik) ----
+  let healthInfo = null;
+  function usageTzLabel() {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tz === 'Asia/Jakarta') return 'WIB';
+    if (tz === 'Asia/Makassar') return 'WITA';
+    if (tz === 'Asia/Jayapura') return 'WIT';
+    const part = new Intl.DateTimeFormat('id-ID', {timeZoneName: 'short'}).formatToParts(new Date()).find(x => x.type === 'timeZoneName');
+    return part ? part.value : tz;
+  }
+  const clock = d => new Intl.DateTimeFormat('id-ID', {hour: '2-digit', minute: '2-digit', hour12: false}).format(d).replace('.', ':');
+  function utcHourLocal(h) {
+    const n = new Date();
+    return clock(new Date(Date.UTC(n.getUTCFullYear(), n.getUTCMonth(), n.getUTCDate(), h)));
+  }
+  function fmtDuration(ms) {
+    const mins = Math.max(1, Math.round(ms / 60000));
+    const d = Math.floor(mins / 1440), h = Math.floor((mins % 1440) / 60), m = mins % 60;
+    if (d) return `${d} hari ${h} jam`;
+    if (h) return m ? `${h} jam ${m} menit` : `${h} jam`;
+    return `${m} menit`;
+  }
+  function updateUsageDot() {
+    const dot = $('#usage-period-dot');
+    if (!dot) return;
+    const p = healthInfo && healthInfo.pricing;
+    if (!p) { dot.hidden = true; return; }
+    dot.hidden = false;
+    dot.className = 'usage-period-dot ' + (p.period === 'peak' ? 'is-peak' : 'is-off');
+    dot.title = p.period === 'peak' ? 'Jam peak DeepSeek' : 'Off-peak DeepSeek';
+  }
+  function periodBlockHtml() {
+    if (!healthInfo) {
+      return '<div class="usage-period is-local"><b>Status tarif tidak tersedia</b><p>Backend tidak terhubung, jadi status peak/off-peak tidak dapat dimuat.</p></div>';
+    }
+    const p = healthInfo.pricing;
+    if (!p) {
+      return '<div class="usage-period is-local"><b>Model lokal</b><p>Tanpa biaya API, jadi tarif peak/off-peak tidak berlaku.</p></div>';
+    }
+    const tz = usageTzLabel();
+    const peak = p.period === 'peak';
+    const next = p.next_change_utc ? new Date(p.next_change_utc) : null;
+    const title = !p.peak_enabled ? 'Tarif peak dinonaktifkan' : (peak ? `Jam peak · tarif ×${p.peak_multiplier}` : 'Off-peak · tarif normal');
+    const nextLine = next && p.peak_enabled
+      ? `${peak ? 'Off-peak' : 'Peak'} mulai pukul ${clock(next)} ${tz} (${fmtDuration(next - Date.now())} lagi).`
+      : '';
+    const r = p.rates_now || {};
+    const usd = v => { let t = Number(v).toFixed(4).replace(/0+$/, ''); if ((t.split('.')[1] || '').length < 2) t = Number(v).toFixed(2); return '$' + t; };
+    const rates = `Tarif sekarang / 1 juta token: input ${usd(r.input_miss)} · cache hit ${usd(r.input_hit)} · output ${usd(r.output)}.`;
+    const sched = p.peak_enabled
+      ? `Jadwal peak (Sen–Jum): ${(p.peak_windows_utc || []).map(w => w.replace('-', '–')).join(' & ')} UTC${new Date().getTimezoneOffset() === 0 ? '' : ` = ${utcHourLocal(1)}–${utcHourLocal(4)} & ${utcHourLocal(6)}–${utcHourLocal(10)} ${tz}`}. Di luar itu dan di akhir pekan: off-peak.`
+      : '';
+    return `<div class="usage-period ${peak ? 'is-peak' : 'is-off'}"><b><span class="usage-period-dot ${peak ? 'is-peak' : 'is-off'}"></span>${esc(title)}</b>${nextLine ? `<p>${esc(nextLine)}</p>` : ''}<p>${esc(rates)}</p>${sched ? `<p>${esc(sched)}</p>` : ''}</div>`;
+  }
+  function renderUsagePopover() {
+    const body = $('#usage-pop-body');
+    if (!body) return;
+    const u = normaliseUsage(state.usage);
+    const nf = new Intl.NumberFormat('id-ID');
+    const idr = u.cost_usd * u.usd_to_idr;
+    const costText = u.cost_usd <= 0
+      ? 'Lokal (tanpa biaya API)'
+      : `$${u.cost_usd.toFixed(5)} ≈ Rp${nf.format(Math.round(idr))}`;
+    const sub = healthInfo ? `<p class="usage-sub">${esc(healthInfo.provider || '')} · ${esc(healthInfo.model || '')}</p>` : '';
+    body.innerHTML = `${sub}${periodBlockHtml()}
+      <div class="usage-stats">
+        <div><span>Input</span><strong>${nf.format(u.prompt_tokens)}</strong></div>
+        <div><span>Cache hit</span><strong>${nf.format(u.cache_hit_tokens)}</strong></div>
+        <div><span>Output</span><strong>${nf.format(u.completion_tokens)}</strong></div>
+        <div><span>Panggilan API</span><strong>${nf.format(u.calls)}</strong></div>
+        <div><span>Total token</span><strong>${nf.format(u.prompt_tokens + u.completion_tokens)}</strong></div>
+        <div><span>Estimasi biaya</span><strong>${esc(costText)}</strong></div>
+      </div>
+      <p class="usage-note">Biaya dihitung per panggilan memakai tarif saat panggilan terjadi. Data tersimpan di browser untuk proyek ini dan ikut ekspor/impor.</p>`;
+  }
+  async function refreshHealthInfo() {
+    try { healthInfo = await api('/api/health'); } catch (_) { healthInfo = null; }
+    updateUsageDot();
+    if (!$('#usage-popover').hidden) renderUsagePopover();
+  }
+  let resetArmTimer = null;
+  function disarmReset() {
+    clearTimeout(resetArmTimer);
+    const btn = $('#usage-reset');
+    if (btn) { btn.classList.remove('is-confirm'); btn.textContent = 'Reset penghitung'; }
+  }
+  function openUsagePopover() {
+    $('#usage-popover').hidden = false;
+    $('#usage-chip').setAttribute('aria-expanded', 'true');
+    renderUsagePopover();
+    refreshHealthInfo();
+  }
+  function closeUsagePopover() {
+    $('#usage-popover').hidden = true;
+    $('#usage-chip').setAttribute('aria-expanded', 'false');
+    disarmReset();
+  }
+  function setupUsagePopover() {
+    $('#usage-chip').addEventListener('click', () => $('#usage-popover').hidden ? openUsagePopover() : closeUsagePopover());
+    $('#usage-pop-close').addEventListener('click', closeUsagePopover);
+    document.addEventListener('click', e => {
+      if (!$('#usage-popover').hidden && !e.target.closest('.usage-wrap')) closeUsagePopover();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#usage-popover').hidden) { closeUsagePopover(); $('#usage-chip').focus(); } });
+    $('#usage-reset').addEventListener('click', () => {
+      const btn = $('#usage-reset');
+      if (!btn.classList.contains('is-confirm')) {
+        btn.classList.add('is-confirm');
+        btn.textContent = 'Yakin? Klik lagi untuk reset';
+        resetArmTimer = setTimeout(disarmReset, 4000);
+        return;
+      }
+      disarmReset();
+      state.usage = {...EMPTY_USAGE};
+      saveState();
+      renderUsage();
+      toast('Penghitung token direset.', 'success');
+    });
+    setInterval(refreshHealthInfo, 60000); // perbarui status peak/off-peak tiap menit
   }
   function usageText(u) {
     if (!u || !u.calls) return '';
@@ -392,7 +507,7 @@
     const s = state.synthesis;
     const box = $('#taxonomy-content');
     if (s && s.taxonomy_status === 'failed') {
-      box.innerHTML = `<div class="empty-state"><strong>Sintesis berhasil, tetapi taxonomy belum berhasil dibuat.</strong><p>${esc(s.taxonomy_error || 'Model tidak menghasilkan struktur taxonomy yang dapat dipakai.')}</p><p>Periksa apakah model Ollama masih berjalan, lalu jalankan ulang sintesis untuk mencoba membuat taxonomy lagi.</p></div>`;
+      box.innerHTML = `<div class="empty-state"><strong>Sintesis berhasil, tetapi taxonomy belum berhasil dibuat.</strong><p>${esc(s.taxonomy_error || 'Model tidak menghasilkan struktur taxonomy yang dapat dipakai.')}</p><p>Periksa apakah model AI (Ollama/DeepSeek) masih berjalan, lalu jalankan ulang sintesis untuk mencoba membuat taxonomy lagi.</p></div>`;
       return;
     }
     if (!s || !s.taxonomy) { box.innerHTML = '<div class="empty-state">Jalankan Review Synthesis untuk menghasilkan taxonomy dari artikel yang termasuk.</div>'; return; }
@@ -470,6 +585,7 @@
     const pill = $('#ai-status');
     try {
       const h = await api('/api/health');
+      healthInfo = h; updateUsageDot();
       if (h.ai_configured) {
         pill.className = 'status-pill status-ok';
         pill.innerHTML = '<span class="status-dot"></span> Model siap · ' + esc(h.model);
@@ -627,7 +743,7 @@
     $('#cooccurrence-min')?.addEventListener('change',renderCooccurrence);
     $('#cooccurrence-download')?.addEventListener('click',()=>downloadSvg('#cooccurrence-canvas svg','cooccurrence-network.svg'));
     $('#export-json').addEventListener('click',exportProject);
-    $('#usage-chip').addEventListener('click',()=>{if(!confirm('Reset penghitung token proyek ini ke 0? Riwayat pemakaian di browser akan dihapus.'))return;state.usage={...EMPTY_USAGE};saveState();renderUsage();toast('Penghitung token direset.', 'success');});
+    setupUsagePopover();
     $('#import-json').addEventListener('click',()=>$('#import-json-file').click());
     $('#import-json-file').addEventListener('change',e=>{if(e.target.files[0])importProject(e.target.files[0]);e.target.value='';});
     // Import is reachable with keyboard shortcut Ctrl/Cmd+Shift+O; exports remain accessible in the header.

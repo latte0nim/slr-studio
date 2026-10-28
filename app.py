@@ -5,7 +5,7 @@ import re
 import urllib.request
 import urllib.error
 from dotenv import load_dotenv
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from functools import wraps
 from io import BytesIO
 from pathlib import Path
@@ -26,11 +26,42 @@ app = Flask(
 )
 app.config["MAX_CONTENT_LENGTH"] = 105 * 1024 * 1024  # batas total request: 105 MB
 
-# Ollama local configuration. No cloud API key is required.
-MODEL = os.getenv("OLLAMA_MODEL", "qwen3-vl:8b-instruct").strip() or "qwen3-vl:8b-instruct"
+# ---- Pemilihan provider AI: LLM_PROVIDER=ollama (lokal, default) atau deepseek (API) ----
+LLM_PROVIDER = (os.getenv("LLM_PROVIDER", "ollama").strip().lower() or "ollama")
+if LLM_PROVIDER not in ("ollama", "deepseek"):
+    raise SystemExit(f"LLM_PROVIDER='{LLM_PROVIDER}' tidak dikenal. Pakai 'ollama' atau 'deepseek' di file .env.")
+
+# Ollama lokal
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "qwen3-vl:8b-instruct").strip() or "qwen3-vl:8b-instruct"
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://127.0.0.1:11434/api/chat").strip()
 OLLAMA_NUM_CTX = int(os.getenv("OLLAMA_NUM_CTX", "12288"))
 OLLAMA_MAX_OUTPUT_TOKENS = int(os.getenv("OLLAMA_MAX_OUTPUT_TOKENS", "3500"))
+
+# DeepSeek API. Harga per 1 juta token (USD) = tarif OFF-PEAK; saat jam peak dikalikan
+# DEEPSEEK_PEAK_MULTIPLIER (2). Cek tarif terbaru di https://api-docs.deepseek.com/quick_start/pricing
+# dan ubah lewat .env bila berubah. Peak: Senin-Jumat 01:00-04:00 & 06:00-10:00 UTC (08-11 & 13-17 WIB).
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "").strip()
+DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-flash").strip() or "deepseek-flash"
+DEEPSEEK_URL = os.getenv("DEEPSEEK_URL", "https://api.deepseek.com/chat/completions").strip()
+DEEPSEEK_PRICE_INPUT_MISS = float(os.getenv("DEEPSEEK_PRICE_INPUT_MISS", "0.15"))
+DEEPSEEK_PRICE_INPUT_HIT = float(os.getenv("DEEPSEEK_PRICE_INPUT_HIT", "0.003"))
+DEEPSEEK_PRICE_OUTPUT = float(os.getenv("DEEPSEEK_PRICE_OUTPUT", "0.60"))
+DEEPSEEK_PEAK_MULTIPLIER = float(os.getenv("DEEPSEEK_PEAK_MULTIPLIER", "2"))  # isi 1 untuk mematikan tarif peak
+USD_TO_IDR = float(os.getenv("USD_TO_IDR", "18000"))
+
+# Nilai aktif sesuai provider terpilih (dipakai di seluruh aplikasi).
+if LLM_PROVIDER == "deepseek":
+    PROVIDER_LABEL = "DeepSeek API"
+    MODEL = DEEPSEEK_MODEL
+    AI_URL = DEEPSEEK_URL
+    AI_CONFIGURED = bool(DEEPSEEK_API_KEY and DEEPSEEK_URL and DEEPSEEK_MODEL)
+    CONFIG_ERROR = "DeepSeek belum dikonfigurasi. Isi DEEPSEEK_API_KEY di file .env lalu restart aplikasi."
+else:
+    PROVIDER_LABEL = "Ollama lokal"
+    MODEL = OLLAMA_MODEL
+    AI_URL = OLLAMA_URL
+    AI_CONFIGURED = bool(OLLAMA_URL and OLLAMA_MODEL)
+    CONFIG_ERROR = "Ollama belum dikonfigurasi. Periksa OLLAMA_URL dan OLLAMA_MODEL di file .env."
 APP_USERNAME = os.getenv("APP_USERNAME", "slr-user").strip() or "slr-user"
 APP_PASSWORD = os.getenv("APP_PASSWORD", "").strip()
 MAX_FILES_PER_BATCH = 8
@@ -60,18 +91,68 @@ def progress_update(percent=None, current=None, total=None, filename=None, stage
 
 
 def new_usage():
-    """Penghitung token per permintaan. Model lokal (Ollama) => biaya selalu 0."""
+    """Penghitung token & biaya per permintaan. Ollama lokal => biaya 0; DeepSeek => dihitung dari tarif."""
     return {"calls": 0, "prompt_tokens": 0, "cache_hit_tokens": 0,
-            "completion_tokens": 0, "cost_usd": 0, "cost_idr": 0, "usd_to_idr": 18000}
+            "completion_tokens": 0, "cost_usd": 0, "cost_idr": 0, "usd_to_idr": USD_TO_IDR}
+
+
+def deepseek_is_peak(now=None):
+    """True bila saat ini jam peak DeepSeek (Senin-Jumat 01-04 & 06-10 UTC). Libur nasional China (off-peak) tidak dihitung."""
+    now = now or datetime.now(timezone.utc)
+    if now.weekday() >= 5:
+        return False
+    return 1 <= now.hour < 4 or 6 <= now.hour < 10
+
+
+def deepseek_pricing_info(now=None):
+    """Status tarif DeepSeek saat ini: periode, kapan berganti, dan tarif efektif (USD per 1 juta token)."""
+    now = now or datetime.now(timezone.utc)
+    peak = deepseek_is_peak(now)
+    boundary = now.replace(minute=0, second=0, microsecond=0)
+    next_change = None
+    for _ in range(24 * 8):  # periode hanya berganti di batas jam; maks. 1 minggu ke depan
+        boundary += timedelta(hours=1)
+        if deepseek_is_peak(boundary) != peak:
+            next_change = boundary
+            break
+    factor = DEEPSEEK_PEAK_MULTIPLIER if peak else 1.0
+    return {
+        "period": "peak" if peak else "off-peak",
+        "peak_multiplier": DEEPSEEK_PEAK_MULTIPLIER,
+        "peak_enabled": DEEPSEEK_PEAK_MULTIPLIER != 1,
+        "next_change_utc": next_change.isoformat() if next_change else None,
+        "peak_windows_utc": ["01:00-04:00", "06:00-10:00"],
+        "rates_now": {
+            "input_miss": DEEPSEEK_PRICE_INPUT_MISS * factor,
+            "input_hit": DEEPSEEK_PRICE_INPUT_HIT * factor,
+            "output": DEEPSEEK_PRICE_OUTPUT * factor,
+        },
+    }
 
 
 def add_usage(usage, raw):
-    """Tambahkan token dari respons Ollama (prompt_eval_count & eval_count)."""
+    """Tambahkan token (dan biaya, untuk DeepSeek) dari respons provider aktif."""
     if usage is None:
         return
     usage["calls"] += 1
-    usage["prompt_tokens"] += int(raw.get("prompt_eval_count") or 0)
-    usage["completion_tokens"] += int(raw.get("eval_count") or 0)
+    if LLM_PROVIDER == "deepseek":
+        u = raw.get("usage") or {}
+        prompt = int(u.get("prompt_tokens") or 0)
+        completion = int(u.get("completion_tokens") or 0)
+        hit = int(u.get("prompt_cache_hit_tokens") or (u.get("prompt_tokens_details") or {}).get("cached_tokens") or 0)
+        hit = min(hit, prompt)
+        miss = prompt - hit
+        usage["prompt_tokens"] += prompt
+        usage["cache_hit_tokens"] += hit
+        usage["completion_tokens"] += completion
+        factor = DEEPSEEK_PEAK_MULTIPLIER if deepseek_is_peak() else 1.0
+        usage["cost_usd"] += factor * (
+            hit * DEEPSEEK_PRICE_INPUT_HIT + miss * DEEPSEEK_PRICE_INPUT_MISS + completion * DEEPSEEK_PRICE_OUTPUT
+        ) / 1_000_000
+        usage["cost_idr"] = round(usage["cost_usd"] * usage["usd_to_idr"], 2)
+    else:
+        usage["prompt_tokens"] += int(raw.get("prompt_eval_count") or 0)
+        usage["completion_tokens"] += int(raw.get("eval_count") or 0)
 
 
 def auth_guard(func):
@@ -104,18 +185,19 @@ def extract_json(text):
     return json.loads(text)
 
 
-def ollama_json(prompt, max_output_tokens=3000, usage=None):
-    """Call Ollama for JSON, retrying empty thinking-only and malformed outputs safely."""
-    if not OLLAMA_URL or not MODEL:
-        raise RuntimeError(
-            "Ollama belum dikonfigurasi. Periksa OLLAMA_URL dan OLLAMA_MODEL di file .env."
-        )
+def llm_json(prompt, max_output_tokens=3000, usage=None):
+    """Call the active provider (Ollama / DeepSeek) for JSON, retrying empty or malformed outputs safely."""
+    if not AI_CONFIGURED:
+        raise RuntimeError(CONFIG_ERROR)
 
-    base_token_limit = max(512, min(
-        int(max_output_tokens),
-        OLLAMA_MAX_OUTPUT_TOKENS,
-        max(1024, OLLAMA_NUM_CTX // 2),
-    ))
+    if LLM_PROVIDER == "deepseek":
+        base_token_limit = max(512, int(max_output_tokens))
+    else:
+        base_token_limit = max(512, min(
+            int(max_output_tokens),
+            OLLAMA_MAX_OUTPUT_TOKENS,
+            max(1024, OLLAMA_NUM_CTX // 2),
+        ))
     last_problem = "Respons bukan JSON valid."
     malformed_text = ""
 
@@ -160,27 +242,41 @@ def ollama_json(prompt, max_output_tokens=3000, usage=None):
                 {"role": "user", "content": prompt + "\n\nPENTING: keluarkan isi JSON sekarang; jangan menghasilkan langkah penalaran."},
             ]
 
-        token_limit = base_token_limit if attempt == 0 else min(
-            OLLAMA_MAX_OUTPUT_TOKENS,
-            max(base_token_limit, min(OLLAMA_NUM_CTX // 2, base_token_limit + 700)),
-        )
-        payload = {
-            "model": MODEL,
-            "messages": request_messages,
-            "think": False,
-            "format": "json",
-            "stream": False,
-            "keep_alive": "5m",
-            "options": {
+        if LLM_PROVIDER == "deepseek":
+            token_limit = base_token_limit if attempt == 0 else base_token_limit + 700
+            payload = {
+                "model": MODEL,
+                "messages": request_messages,
+                "thinking": {"type": "disabled"},  # V4 menyalakan thinking secara default => boros token
+                "response_format": {"type": "json_object"},
+                "stream": False,
                 "temperature": 0,
-                "num_predict": token_limit,
-                "num_ctx": OLLAMA_NUM_CTX,
-            },
-        }
+                "max_tokens": token_limit,
+            }
+            headers = {"Content-Type": "application/json", "Authorization": f"Bearer {DEEPSEEK_API_KEY}"}
+        else:
+            token_limit = base_token_limit if attempt == 0 else min(
+                OLLAMA_MAX_OUTPUT_TOKENS,
+                max(base_token_limit, min(OLLAMA_NUM_CTX // 2, base_token_limit + 700)),
+            )
+            payload = {
+                "model": MODEL,
+                "messages": request_messages,
+                "think": False,
+                "format": "json",
+                "stream": False,
+                "keep_alive": "5m",
+                "options": {
+                    "temperature": 0,
+                    "num_predict": token_limit,
+                    "num_ctx": OLLAMA_NUM_CTX,
+                },
+            }
+            headers = {"Content-Type": "application/json"}
         req = urllib.request.Request(
-            OLLAMA_URL,
+            AI_URL,
             data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
-            headers={"Content-Type": "application/json"},
+            headers=headers,
             method="POST",
         )
         try:
@@ -188,6 +284,16 @@ def ollama_json(prompt, max_output_tokens=3000, usage=None):
                 raw = json.loads(response.read().decode("utf-8"))
         except urllib.error.HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")[:1600]
+            if LLM_PROVIDER == "deepseek":
+                hints = {
+                    400: "Permintaan ditolak (cek DEEPSEEK_MODEL / format permintaan).",
+                    401: "API key salah atau belum aktif (cek DEEPSEEK_API_KEY).",
+                    402: "Saldo DeepSeek tidak cukup. Top up di platform.deepseek.com.",
+                    429: "Terkena rate limit DeepSeek. Tunggu sebentar lalu coba lagi.",
+                    500: "Server DeepSeek bermasalah. Coba lagi nanti.",
+                    503: "Server DeepSeek sedang sibuk. Coba lagi nanti.",
+                }
+                raise RuntimeError(f"DeepSeek HTTP {exc.code}. {hints.get(exc.code, '')} Detail: {detail}") from exc
             if exc.code == 404:
                 raise RuntimeError(
                     f"Ollama tidak menemukan model '{MODEL}' atau endpoint. Periksa `ollama list`, "
@@ -200,27 +306,39 @@ def ollama_json(prompt, max_output_tokens=3000, usage=None):
                 ) from exc
             raise RuntimeError(f"Permintaan Ollama gagal (HTTP {exc.code}). Detail: {detail}") from exc
         except urllib.error.URLError as exc:
+            if LLM_PROVIDER == "deepseek":
+                raise RuntimeError(
+                    f"Tidak dapat terhubung ke DeepSeek API ({AI_URL}). Cek koneksi internet. Detail: {exc.reason}"
+                ) from exc
             raise RuntimeError(
                 "Tidak dapat terhubung ke Ollama lokal. Pastikan Ollama berjalan dan OLLAMA_URL "
                 f"benar ({OLLAMA_URL}). Detail: {exc.reason}"
             ) from exc
         except TimeoutError as exc:
             raise RuntimeError(
-                "Ollama terlalu lama merespons (>600 detik). Coba PDF lebih kecil atau model lebih ringan."
+                f"{PROVIDER_LABEL} terlalu lama merespons (>600 detik). Coba PDF lebih kecil atau model lebih ringan."
             ) from exc
         except json.JSONDecodeError as exc:
-            raise RuntimeError("Respons API Ollama sendiri bukan JSON valid.") from exc
+            raise RuntimeError(f"Respons API {PROVIDER_LABEL} sendiri bukan JSON valid.") from exc
 
         add_usage(usage, raw)  # token tetap dihitung walau output kosong/rusak
 
-        message = raw.get("message") or {}
+        if LLM_PROVIDER == "deepseek":
+            choice = (raw.get("choices") or [{}])[0]
+            message = choice.get("message") or {}
+            done_reason = choice.get("finish_reason", "unknown")
+            eval_count = (raw.get("usage") or {}).get("completion_tokens", "unknown")
+            thinking_length = len(message.get("reasoning_content") or "")
+        else:
+            message = raw.get("message") or {}
+            done_reason = raw.get("done_reason", "unknown")
+            eval_count = raw.get("eval_count", "unknown")
+            thinking_length = len(message.get("thinking") or "")
         output_text = (message.get("content") or "").strip()
-        done_reason = raw.get("done_reason", "unknown")
-        thinking_length = len(message.get("thinking") or "")
         if not output_text:
             last_problem = (
                 f"Respons konten kosong; done_reason={done_reason}; thinking_length={thinking_length}; "
-                f"eval_count={raw.get('eval_count', 'unknown')}; num_predict={token_limit}. "
+                f"eval_count={eval_count}; max_output={token_limit}. "
                 "Model mungkin menghabiskan batas output untuk thinking."
             )
             malformed_text = ""
@@ -234,13 +352,12 @@ def ollama_json(prompt, max_output_tokens=3000, usage=None):
             malformed_text = output_text
             last_problem = (
                 f"{type(exc).__name__}: {str(exc)[:240]}; output_chars={len(output_text)}; "
-                f"done_reason={done_reason}; eval_count={raw.get('eval_count', 'unknown')}"
+                f"done_reason={done_reason}; eval_count={eval_count}"
             )
 
     raise RuntimeError(
-        "Ollama belum menghasilkan JSON valid setelah dua percobaan. "
-        f"Detail diagnostik: {last_problem}. Pastikan memakai model qwen3-vl:8b-instruct "
-        "dan cek /api/test-ai."
+        f"{PROVIDER_LABEL} belum menghasilkan JSON valid setelah dua percobaan. "
+        f"Detail diagnostik: {last_problem}. Cek model ({MODEL}) dan buka /api/test-ai."
     )
 
 
@@ -505,8 +622,10 @@ def index():
 def health():
     return jsonify({
         "ok": True,
-        "provider": "Ollama lokal",
-        "ai_configured": bool(OLLAMA_URL and MODEL),
+        "provider": PROVIDER_LABEL,
+        "ai_configured": AI_CONFIGURED,
+        "llm_provider": LLM_PROVIDER,
+        "pricing": deepseek_pricing_info() if LLM_PROVIDER == "deepseek" else None,
         "model": MODEL,
         "env_file_found": ENV_FILE.is_file(),
         "password_protected": bool(APP_PASSWORD),
@@ -524,20 +643,22 @@ def analysis_progress():
 @app.get("/api/test-ai")
 @auth_guard
 def test_ai():
-    """Test the local Ollama model and confirm JSON output without uploading a PDF."""
-    if not OLLAMA_URL or not MODEL:
+    """Test the active AI provider and confirm JSON output without uploading a PDF."""
+    if not AI_CONFIGURED:
         return jsonify({
             "ok": False,
-            "error": f"OLLAMA_URL / OLLAMA_MODEL belum terbaca. Periksa file .env di folder {BASE_DIR}."
+            "error": f"{CONFIG_ERROR} (folder .env: {BASE_DIR})"
         }), 503
     try:
-        answer = ollama_json(
-            'Kembalikan tepat JSON ini: {"status":"ok","provider":"Ollama"}',
+        test_usage = new_usage()
+        answer = llm_json(
+            'Kembalikan tepat JSON ini: {"status":"ok"}',
             max_output_tokens=256,
+            usage=test_usage,
         )
-        return jsonify({"ok": True, "provider": "Ollama lokal", "model": MODEL, "response": answer})
+        return jsonify({"ok": True, "provider": PROVIDER_LABEL, "model": MODEL, "response": answer, "usage": test_usage})
     except Exception as exc:
-        return jsonify({"ok": False, "provider": "Ollama lokal", "model": MODEL, "error": str(exc)[:1800]}), 502
+        return jsonify({"ok": False, "provider": PROVIDER_LABEL, "model": MODEL, "error": str(exc)[:1800]}), 502
 
 
 @app.post("/api/analyze")
@@ -549,8 +670,8 @@ def analyze_pdfs():
     files = [f for f in files if f.filename]
     if len(files) > MAX_FILES_PER_BATCH:
         return jsonify({"error": f"Maksimal {MAX_FILES_PER_BATCH} PDF untuk satu batch. Upload batch berikutnya setelah selesai."}), 400
-    if not OLLAMA_URL or not MODEL:
-        return jsonify({"error": "Ollama belum dikonfigurasi. Periksa OLLAMA_URL dan OLLAMA_MODEL pada file .env."}), 503
+    if not AI_CONFIGURED:
+        return jsonify({"error": CONFIG_ERROR}), 503
 
     progress_update(percent=0, current=0, total=len(files), filename="", stage="Menyiapkan batch", log=f"Batch dimulai: {len(files)} PDF diterima.", active=True)
     usage = new_usage()
@@ -581,9 +702,9 @@ def analyze_pdfs():
             if len(text.strip()) < 100:
                 errors.append({"filename": filename, "error": "Teks PDF sangat sedikit/tidak terbaca. Kemungkinan PDF hasil scan; versi ini belum memiliki OCR otomatis. Jalankan OCR terlebih dahulu lalu upload ulang."})
                 continue
-            progress_update(percent=min(99, base_percent + 7), current=file_index, filename=filename, stage="Menyusun JSON terstruktur", log=f"Teks siap ({len(text):,} karakter, {pages} halaman). Menjalankan Ollama untuk menyusun JSON.")
+            progress_update(percent=min(99, base_percent + 7), current=file_index, filename=filename, stage="Menyusun JSON terstruktur", log=f"Teks siap ({len(text):,} karakter, {pages} halaman). Menjalankan {PROVIDER_LABEL} untuk menyusun JSON.")
             prompt = article_prompt(filename, pages, text, research_question, inclusion, exclusion)
-            data = ollama_json(prompt, max_output_tokens=3000, usage=usage)
+            data = llm_json(prompt, max_output_tokens=3000, usage=usage)
             if not isinstance(data, dict):
                 raise RuntimeError("Format ekstraksi AI tidak valid.")
             title = safe_string(data.get("title")) or os.path.splitext(filename)[0]
@@ -647,8 +768,8 @@ def analyze_pdfs():
 @app.post("/api/synthesize")
 @auth_guard
 def synthesize():
-    if not OLLAMA_URL or not MODEL:
-        return jsonify({"error": "Ollama belum dikonfigurasi. Periksa OLLAMA_URL dan OLLAMA_MODEL pada file .env."}), 503
+    if not AI_CONFIGURED:
+        return jsonify({"error": CONFIG_ERROR}), 503
     body = request.get_json(silent=True) or {}
     articles = body.get("articles", [])
     research_question = str(body.get("research_question", "")).strip()[:1000]
@@ -669,7 +790,7 @@ def synthesize():
     try:
         summaries = []
         for idx, group in enumerate(batches, start=1):
-            summary = ollama_json(
+            summary = llm_json(
                 batch_synthesis_prompt(group, research_question, inclusion, exclusion),
                 max_output_tokens=1000,
                 usage=usage,
@@ -690,7 +811,7 @@ def synthesize():
                 if len(group) == 1:
                     reduced.append(group[0])
                     continue
-                merged = ollama_json(
+                merged = llm_json(
                     reduce_summaries_prompt(group, research_question, inclusion, exclusion),
                     max_output_tokens=900,
                     usage=usage,
@@ -718,7 +839,7 @@ def synthesize():
             }
             for a in compact
         ]
-        result = ollama_json(
+        result = llm_json(
             final_synthesis_prompt(summaries, catalog, research_question, inclusion, exclusion),
             max_output_tokens=1700,
             usage=usage,
@@ -732,7 +853,7 @@ def synthesize():
         # taxonomy competed with the entire synthesis JSON for the same output budget,
         # so the model often returned a valid synthesis but omitted the taxonomy field.
         try:
-            taxonomy_response = ollama_json(
+            taxonomy_response = llm_json(
                 taxonomy_only_prompt(catalog, summaries, result.get("main_themes", []), research_question),
                 max_output_tokens=2300,
                 usage=usage,
