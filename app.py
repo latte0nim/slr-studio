@@ -37,8 +37,41 @@ MAX_FILES_PER_BATCH = 8
 MAX_FILE_BYTES = 12 * 1024 * 1024
 # Smaller cap helps 8K-context local models avoid overflowing the prompt window.
 MAX_TEXT_CHARS = int(os.getenv("MAX_TEXT_CHARS", "18000"))
-PDF_STORE = BASE_DIR / "data" / "pdfs"
+PDF_STORE = BASE_DIR / "data" / "pdfs"  # Original files retained; preview UI/route removed.
+JSON_STORE = BASE_DIR / "data" / "json"
 PDF_STORE.mkdir(parents=True, exist_ok=True)
+JSON_STORE.mkdir(parents=True, exist_ok=True)
+ANALYSIS_PROGRESS = {"active": False, "percent": 0, "current": 0, "total": 0, "filename": "", "stage": "Menunggu proses", "logs": [], "usage": None}
+
+
+def progress_update(percent=None, current=None, total=None, filename=None, stage=None, log=None, active=None):
+    """In-memory progress snapshot polled by the frontend while analysis is running."""
+    global ANALYSIS_PROGRESS
+    if percent is not None: ANALYSIS_PROGRESS["percent"] = max(0, min(100, int(percent)))
+    if current is not None: ANALYSIS_PROGRESS["current"] = int(current)
+    if total is not None: ANALYSIS_PROGRESS["total"] = int(total)
+    if filename is not None: ANALYSIS_PROGRESS["filename"] = str(filename)
+    if stage is not None: ANALYSIS_PROGRESS["stage"] = str(stage)
+    if active is not None: ANALYSIS_PROGRESS["active"] = bool(active)
+    if log:
+        ANALYSIS_PROGRESS.setdefault("logs", []).append({"time": datetime.now().astimezone().strftime("%H:%M:%S"), "message": str(log)[:400]})
+        ANALYSIS_PROGRESS["logs"] = ANALYSIS_PROGRESS["logs"][-80:]
+
+
+
+def new_usage():
+    """Penghitung token per permintaan. Model lokal (Ollama) => biaya selalu 0."""
+    return {"calls": 0, "prompt_tokens": 0, "cache_hit_tokens": 0,
+            "completion_tokens": 0, "cost_usd": 0, "cost_idr": 0, "usd_to_idr": 18000}
+
+
+def add_usage(usage, raw):
+    """Tambahkan token dari respons Ollama (prompt_eval_count & eval_count)."""
+    if usage is None:
+        return
+    usage["calls"] += 1
+    usage["prompt_tokens"] += int(raw.get("prompt_eval_count") or 0)
+    usage["completion_tokens"] += int(raw.get("eval_count") or 0)
 
 
 def auth_guard(func):
@@ -71,7 +104,7 @@ def extract_json(text):
     return json.loads(text)
 
 
-def ollama_json(prompt, max_output_tokens=3000):
+def ollama_json(prompt, max_output_tokens=3000, usage=None):
     """Call Ollama for JSON, retrying empty thinking-only and malformed outputs safely."""
     if not OLLAMA_URL or not MODEL:
         raise RuntimeError(
@@ -177,6 +210,8 @@ def ollama_json(prompt, max_output_tokens=3000):
             ) from exc
         except json.JSONDecodeError as exc:
             raise RuntimeError("Respons API Ollama sendiri bukan JSON valid.") from exc
+
+        add_usage(usage, raw)  # token tetap dihitung walau output kosong/rusak
 
         message = raw.get("message") or {}
         output_text = (message.get("content") or "").strip()
@@ -388,6 +423,58 @@ Kembalikan JSON:
 }}
 """
 
+def taxonomy_only_prompt(article_catalog, batch_summaries, main_themes, rq):
+    """Generate taxonomy separately so a large synthesis response cannot crowd it out."""
+    compact_batches = []
+    for item in batch_summaries:
+        summary = item.get("summary", {}) if isinstance(item, dict) else {}
+        if not isinstance(summary, dict):
+            summary = {"batch_overview": safe_string(summary, "")[:700]}
+        compact_batches.append({
+            "batch": item.get("batch") if isinstance(item, dict) else "",
+            "article_ids": item.get("article_ids", []) if isinstance(item, dict) else [],
+            "batch_overview": safe_string(summary.get("batch_overview"), "")[:700],
+            "themes": summary.get("themes", [])[:5] if isinstance(summary.get("themes"), list) else [],
+            "taxonomy_seeds": summary.get("taxonomy_seeds", [])[:6] if isinstance(summary.get("taxonomy_seeds"), list) else [],
+        })
+    evidence = {
+        "articles": article_catalog,
+        "main_themes": main_themes[:8] if isinstance(main_themes, list) else [],
+        "batch_evidence": compact_batches,
+    }
+    return f"""Anda menyusun TAXONOMY konseptual untuk systematic literature review.
+Gunakan hanya bukti dalam JSON berikut. Jangan mengarang temuan, nama artikel, atau ID artikel. Semua article_ids harus berasal dari katalog artikel. Kelompokkan berdasarkan konsep yang benar-benar muncul pada bukti, bukan sekadar kata umum. Pakai istilah ringkas dan kategori yang tidak tumpang tindih secara tidak perlu.
+Research question: {rq or '(belum dirumuskan)'}
+Bukti korpus:
+{json.dumps(evidence, ensure_ascii=False)}
+
+Keluarkan JSON valid saja, dengan SATU objek top-level bernama taxonomy. Buat satu taxonomy koheren dengan 4-6 konsep utama dan gunakan konsep yang sama secara konsisten di berbagai representasi. Isi representasi yang datanya didukung; bila satu bentuk tidak cocok, gunakan array kosong. Batasi ukuran keluaran agar JSON lengkap.
+Struktur yang WAJIB dipatuhi:
+{{
+ "taxonomy": {{
+  "hierarchical": {{"root": {{"id":"root","name":"Konsep utama dari korpus"}}, "nodes": [{{"id":"h1","name":"subkategori","description":"definisi berdasarkan bukti","parent_id":"root","article_ids":["ID valid"]}}]}},
+  "faceted": {{"facets":[{{"name":"Dimensi klasifikasi","values":[{{"name":"kategori","description":"keterangan ringkas","article_ids":["ID valid"]}}]}}]}},
+  "flat": [{{"name":"kategori sejajar","description":"kriteria kategori berdasarkan bukti","article_ids":["ID valid"]}}],
+  "polyhierarchy": {{"nodes":[{{"id":"p1","name":"konsep","description":"definisi ringkas","parent_ids":["p2"],"article_ids":["ID valid"]}}],"edges":[{{"from":"p1","to":"p2","relation":"subkategori dari"}}]}},
+  "matrix": {{"row_axis_name":"Kelompok konsep","column_axis_name":"Dimensi pembanding","columns":["dimensi A","dimensi B"],"rows":[{{"name":"kategori","cells":[{{"column":"dimensi A","summary":"temuan ringkas atau tidak cukup bukti","article_ids":["ID valid"]}}]}}]}}
+ }}
+}}
+Prioritas: hierarchical dan flat harus memiliki kategori nyata jika bukti mendukung. Gunakan 4-6 node hierarkis, 3-6 kategori flat, 2-3 facets dengan 2-3 values, dan matriks ringkas. Jangan menyalin kutipan panjang. Jangan sertakan markdown atau komentar.
+"""
+
+
+def taxonomy_has_content(taxonomy):
+    if not isinstance(taxonomy, dict):
+        return False
+    hierarchical = taxonomy.get("hierarchical") if isinstance(taxonomy.get("hierarchical"), dict) else {}
+    faceted = taxonomy.get("faceted") if isinstance(taxonomy.get("faceted"), dict) else {}
+    poly = taxonomy.get("polyhierarchy") if isinstance(taxonomy.get("polyhierarchy"), dict) else {}
+    matrix = taxonomy.get("matrix") if isinstance(taxonomy.get("matrix"), dict) else {}
+    return any([
+        bool(hierarchical.get("nodes")), bool(taxonomy.get("flat")),
+        bool(faceted.get("facets")), bool(poly.get("nodes")),
+        bool(matrix.get("rows") and matrix.get("columns")),
+    ])
 
 def filter_references(data, valid_ids):
     if isinstance(data, list):
@@ -413,20 +500,6 @@ def index():
 
 
 
-@app.get("/pdf/<article_id>")
-@auth_guard
-def preview_pdf(article_id):
-    """Serve a previously uploaded PDF inline for browser preview."""
-    if not re.fullmatch(r"[a-f0-9]{16}", article_id):
-        abort(404)
-    matches = list(PDF_STORE.glob(f"{article_id}*.pdf"))
-    # IDs are the first 16 chars of SHA-256; resolve exact full hash filename too.
-    if not matches:
-        matches = [p for p in PDF_STORE.glob("*.pdf") if p.stem.startswith(article_id)]
-    if not matches:
-        abort(404)
-    return send_file(matches[0], mimetype="application/pdf", as_attachment=False, download_name=f"{article_id}.pdf", conditional=True)
-
 @app.get("/api/health")
 @auth_guard
 def health():
@@ -440,6 +513,12 @@ def health():
         "max_files_per_batch": MAX_FILES_PER_BATCH,
         "max_file_mb": MAX_FILE_BYTES // (1024 * 1024),
     })
+
+
+@app.get("/api/analysis-progress")
+@auth_guard
+def analysis_progress():
+    return jsonify(ANALYSIS_PROGRESS)
 
 
 @app.get("/api/test-ai")
@@ -473,6 +552,9 @@ def analyze_pdfs():
     if not OLLAMA_URL or not MODEL:
         return jsonify({"error": "Ollama belum dikonfigurasi. Periksa OLLAMA_URL dan OLLAMA_MODEL pada file .env."}), 503
 
+    progress_update(percent=0, current=0, total=len(files), filename="", stage="Menyiapkan batch", log=f"Batch dimulai: {len(files)} PDF diterima.", active=True)
+    usage = new_usage()
+    ANALYSIS_PROGRESS["usage"] = usage  # objek yang sama dimutasi => polling progres otomatis live
     research_question = request.form.get("research_question", "").strip()[:1000]
     inclusion = request.form.get("inclusion", "").strip()[:3000]
     exclusion = request.form.get("exclusion", "").strip()[:3000]
@@ -481,8 +563,10 @@ def analyze_pdfs():
     search_date = request.form.get("search_date", "").strip()[:80]
 
     results, errors = [], []
-    for file in files:
+    for file_index, file in enumerate(files, start=1):
         filename = secure_filename(file.filename or "article.pdf") or "article.pdf"
+        base_percent = int(((file_index - 1) / max(1, len(files))) * 100)
+        progress_update(percent=base_percent, current=file_index, filename=filename, stage="Membaca PDF", log=f"[{file_index}/{len(files)}] Membaca file {filename}.")
         pdf_bytes = file.read()
         if len(pdf_bytes) > MAX_FILE_BYTES:
             errors.append({"filename": filename, "error": f"File melebihi batas {MAX_FILE_BYTES // (1024 * 1024)} MB."})
@@ -492,12 +576,14 @@ def analyze_pdfs():
             continue
         digest = hashlib.sha256(pdf_bytes).hexdigest()
         try:
+            progress_update(percent=min(99, base_percent + 3), current=file_index, filename=filename, stage="Ekstraksi teks PDF", log=f"Mengekstrak teks dari {filename}.")
             pages, text = read_pdf(pdf_bytes)
             if len(text.strip()) < 100:
                 errors.append({"filename": filename, "error": "Teks PDF sangat sedikit/tidak terbaca. Kemungkinan PDF hasil scan; versi ini belum memiliki OCR otomatis. Jalankan OCR terlebih dahulu lalu upload ulang."})
                 continue
+            progress_update(percent=min(99, base_percent + 7), current=file_index, filename=filename, stage="Menyusun JSON terstruktur", log=f"Teks siap ({len(text):,} karakter, {pages} halaman). Menjalankan Ollama untuk menyusun JSON.")
             prompt = article_prompt(filename, pages, text, research_question, inclusion, exclusion)
-            data = ollama_json(prompt, max_output_tokens=3000)
+            data = ollama_json(prompt, max_output_tokens=3000, usage=usage)
             if not isinstance(data, dict):
                 raise RuntimeError("Format ekstraksi AI tidak valid.")
             title = safe_string(data.get("title")) or os.path.splitext(filename)[0]
@@ -538,16 +624,24 @@ def analyze_pdfs():
             decision = record["screening_suggestion"].get("decision", "review") if isinstance(record["screening_suggestion"], dict) else "review"
             if decision not in ("include", "exclude", "review"):
                 record["screening_suggestion"] = {"decision": "review", "reason": "Rekomendasi model perlu dicek manual."}
-            # Keep the original PDF on this computer so it can be previewed later.
+            # Retain original PDF for traceability; the application does not display a PDF preview.
             stored_pdf = PDF_STORE / f"{digest}.pdf"
             if not stored_pdf.exists():
                 stored_pdf.write_bytes(pdf_bytes)
-            record["pdf_url"] = f"/pdf/{record_id}"
             record["pdf_stored"] = True
+            # Persist the structured extraction so it can be reused without re-running Ollama.
+            record["json_stored"] = True
+            json_path = JSON_STORE / f"{record_id}.json"
+            json_path.write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
+            progress_update(percent=min(99, int((file_index / max(1, len(files))) * 100)), current=file_index, filename=filename, stage="JSON tersimpan", log=f"JSON tervalidasi dan disimpan untuk {filename}.")
             results.append(record)
         except Exception as exc:
             errors.append({"filename": filename, "error": str(exc)[:1500]})
-    return jsonify({"articles": results, "errors": errors, "model": MODEL})
+            progress_update(current=file_index, filename=filename, stage="Gagal memproses", log=f"GAGAL {filename}: {str(exc)[:240]}")
+        finally:
+            progress_update(percent=min(99, int((file_index / max(1, len(files))) * 100)), current=file_index, filename=filename)
+    progress_update(percent=100, current=len(files), total=len(files), stage="Selesai", log=f"Batch selesai: {len(results)} berhasil, {len(errors)} gagal.", active=False)
+    return jsonify({"articles": results, "errors": errors, "model": MODEL, "usage": usage})
 
 
 @app.post("/api/synthesize")
@@ -568,6 +662,7 @@ def synthesize():
     if len(selected) > 250:
         return jsonify({"error": "Prototype ini membatasi sintesis pada 250 artikel yang telah disetujui. Bagi review menjadi beberapa korpus untuk penggunaan yang lebih besar."}), 400
 
+    usage = new_usage()
     compact = [compact_article(a) for a in selected]
     # Small batches help the local 8B model stay within its context window.
     batches = [compact[i:i + 4] for i in range(0, len(compact), 4)]
@@ -577,6 +672,7 @@ def synthesize():
             summary = ollama_json(
                 batch_synthesis_prompt(group, research_question, inclusion, exclusion),
                 max_output_tokens=1000,
+                usage=usage,
             )
             summaries.append({
                 "batch": idx,
@@ -597,6 +693,7 @@ def synthesize():
                 merged = ollama_json(
                     reduce_summaries_prompt(group, research_question, inclusion, exclusion),
                     max_output_tokens=900,
+                    usage=usage,
                 )
                 ids = []
                 for part in group:
@@ -624,17 +721,50 @@ def synthesize():
         result = ollama_json(
             final_synthesis_prompt(summaries, catalog, research_question, inclusion, exclusion),
             max_output_tokens=1700,
+            usage=usage,
         )
         if not isinstance(result, dict):
             raise RuntimeError("AI tidak mengembalikan sintesis dalam format yang benar.")
-        result = filter_references(result, {a.get("id") for a in compact})
+        valid_article_ids = {a.get("id") for a in compact}
+        result = filter_references(result, valid_article_ids)
+
+        # Taxonomy is generated in a separate, focused call. In the previous workflow,
+        # taxonomy competed with the entire synthesis JSON for the same output budget,
+        # so the model often returned a valid synthesis but omitted the taxonomy field.
+        try:
+            taxonomy_response = ollama_json(
+                taxonomy_only_prompt(catalog, summaries, result.get("main_themes", []), research_question),
+                max_output_tokens=2300,
+                usage=usage,
+            )
+            taxonomy = taxonomy_response.get("taxonomy") if isinstance(taxonomy_response, dict) else None
+            if not taxonomy_has_content(taxonomy):
+                raise RuntimeError("Model mengembalikan struktur taxonomy kosong atau tidak lengkap.")
+            result["taxonomy"] = filter_references(taxonomy, valid_article_ids)
+            result.pop("taxonomy_error", None)
+            result["taxonomy_status"] = "ok"
+        except Exception as taxonomy_exc:
+            # Do not discard a valid synthesis or taxonomy just because the focused call failed.
+            if taxonomy_has_content(result.get("taxonomy")):
+                result["taxonomy_status"] = "fallback"
+                result["taxonomy_note"] = str(taxonomy_exc)[:900]
+            else:
+                result["taxonomy_error"] = str(taxonomy_exc)[:900]
+                result["taxonomy_status"] = "failed"
+                result["taxonomy"] = {
+                    "hierarchical": {"root": {"id": "root", "name": "Taxonomy dari korpus"}, "nodes": []},
+                    "faceted": {"facets": []}, "flat": [],
+                    "polyhierarchy": {"nodes": [], "edges": []},
+                    "matrix": {"row_axis_name": "Kategori", "column_axis_name": "Dimensi", "columns": [], "rows": []},
+                }
+
         result["included_article_count"] = len(selected)
         result["generated_at"] = datetime.now(timezone.utc).isoformat()
         result["model"] = MODEL
         result["evidence_catalog"] = catalog
-        return jsonify({"synthesis": result})
+        return jsonify({"synthesis": result, "usage": usage})
     except Exception as exc:
-        return jsonify({"error": str(exc)[:2200]}), 502
+        return jsonify({"error": str(exc)[:2200], "usage": usage}), 502
 
 
 @app.errorhandler(413)

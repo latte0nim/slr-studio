@@ -1,0 +1,161 @@
+{
+  "id": "35e352cd51512fcd",
+  "hash": "35e352cd51512fcd6f3c4192278259a633423a57578e73fa4f26164921580516",
+  "filename": "1-s2.0-S0951832026014110-main_compressed.pdf",
+  "uploaded_at": "2026-10-26T17:03:00.539309+00:00",
+  "pages": 15,
+  "text_chars": 18000,
+  "title": "Multimodal fatigue assessment and mechanism analysis under underground coal mine lighting conditions from a human reliability perspective",
+  "authors": [
+    "Kai Yu",
+    "Shuaiying Liu",
+    "Lujie Zhou",
+    "Xuesong Yang",
+    "Zhen Liu",
+    "Jing Chen"
+  ],
+  "year": "",
+  "doi": "10.1016/j.ress.2026.113609",
+  "abstract": "Penelitian ini mengembangkan metode penilaian kelelahan multimodal di bawah kondisi pencahayaan tambang batu bara bawah tanah, menggunakan data EEG, eye-tracking, dan skala KSS. Model BO–CNN-LSTM dikembangkan untuk klasifikasi tingkat kelelahan dan prediksi skor KSS secara kontinu, dengan akurasi 90.56% dan RMSE 0.512.",
+  "objective": "Mengembangkan metode penilaian kelelahan multimodal di bawah kondisi pencahayaan tambang batu bara bawah tanah dan menganalisis efek pencahayaan terhadap indikator kelelahan.",
+  "research_questions": [
+    "Bagaimana pencahayaan memengaruhi kelelahan kerja di tambang batu bara bawah tanah?",
+    "Apakah model BO–CNN-LSTM dapat mengklasifikasikan tingkat kelelahan dan memprediksi skor KSS secara akurat?"
+  ],
+  "methods": "Eksperimen ICCE dengan pengumpulan data EEG, eye-tracking, dan KSS. Model BO–CNN-LSTM digunakan untuk klasifikasi dan prediksi, dengan optimasi hiperparameter menggunakan Bayesian optimization.",
+  "context": "Tambang batu bara bawah tanah di Tiongkok, dengan fokus pada pengaruh pencahayaan (illuminance dan CCT) terhadap kelelahan kerja dan kinerja operator.",
+  "variables": [
+    "illuminance",
+    "CCT",
+    "EEG",
+    "eye-tracking",
+    "KSS score",
+    "fatigue level"
+  ],
+  "findings": [
+    "Pencahayaan dan CCT secara signifikan memengaruhi indikator kelelahan.",
+    "Kombinasi 500 lx–4000 K dianggap lebih menguntungkan untuk mengurangi kelelahan.",
+    "Model BO–CNN-LSTM mencapai akurasi klasifikasi 90.56% dan RMSE 0.512 untuk prediksi KSS.",
+    "Efek interaksi antara illuminance dan CCT berbeda antar modality.",
+    "Data multimodal (EEG, eye-tracking, KSS) memberikan karakterisasi kelelahan yang lebih komprehensif.",
+    "Model ini memberikan informasi operator-state untuk analisis HRA dinamis dan optimasi pencahayaan."
+  ],
+  "limitations": [
+    "Studi ini tidak menghitung HEP secara langsung.",
+    "Fokus hanya pada efek pencahayaan, bukan faktor lain seperti jadwal kerja atau konteks organisasi.",
+    "Desain eksperimen terbatas pada kondisi tertentu, tidak mencakup variasi lingkungan tambang yang lebih luas."
+  ],
+  "future_research": [
+    "Mengembangkan model HRA yang lebih lengkap yang menggabungkan data kelelahan dengan data kesalahan operasional.",
+    "Mengintegrasikan faktor lain seperti jadwal kerja dan konteks organisasi dalam analisis kelelahan.",
+    "Menerapkan model ini di lingkungan tambang yang lebih luas dan beragam."
+  ],
+  "topic_tags": [
+    "kelelahan kerja",
+    "pencahayaan bawah tanah",
+    "multimodal assessment",
+    "HRA",
+    "BO–CNN-LSTM",
+    "KSS"
+  ],
+  "concepts": [
+    {
+      "name": "fatigue",
+      "description": "Keadaan psikofisik yang menurunkan kewaspadaan, efisiensi kognitif, dan stabilitas perilaku.",
+      "parent_concepts": []
+    },
+    {
+      "name": "human reliability",
+      "description": "Kemampuan operator untuk menjalankan tugas dengan benar dan menjaga perilaku operasional yang aman.",
+      "parent_concepts": []
+    },
+    {
+      "name": "multimodal data fusion",
+      "description": "Penggabungan data dari berbagai sumber (EEG, eye-tracking, KSS) untuk karakterisasi keadaan operator secara komprehensif.",
+      "parent_concepts": []
+    },
+    {
+      "name": "BO–CNN-LSTM",
+      "description": "Model hybrid yang menggabungkan CNN untuk ekstraksi fitur lokal dan LSTM untuk modelasi dependensi temporal, dengan optimasi hiperparameter menggunakan Bayesian optimization.",
+      "parent_concepts": []
+    },
+    {
+      "name": "Karolinska Sleepiness Scale (KSS)",
+      "description": "Skala subjektif untuk mengukur tingkat kantuk atau kelelahan.",
+      "parent_concepts": []
+    },
+    {
+      "name": "illuminance and CCT",
+      "description": "Parameter pencahayaan yang memengaruhi kenyamanan visual, kewaspadaan, dan kelelahan kerja.",
+      "parent_concepts": []
+    }
+  ],
+  "relationships": [
+    {
+      "source": "fatigue",
+      "target": "human reliability",
+      "relation": "pengaruh",
+      "evidence": "Fatigue dapat menurunkan kewaspadaan, efisiensi kognitif, dan stabilitas perilaku, yang berdampak pada human reliability."
+    },
+    {
+      "source": "illuminance and CCT",
+      "target": "fatigue",
+      "relation": "pengaruh",
+      "evidence": "Illuminance dan CCT secara signifikan memengaruhi indikator kelelahan."
+    },
+    {
+      "source": "multimodal data fusion",
+      "target": "fatigue assessment",
+      "relation": "metode",
+      "evidence": "Multimodal data fusion memberikan karakterisasi kelelahan yang lebih komprehensif."
+    },
+    {
+      "source": "BO–CNN-LSTM",
+      "target": "fatigue assessment",
+      "relation": "metode",
+      "evidence": "Model BO–CNN-LSTM digunakan untuk klasifikasi tingkat kelelahan dan prediksi skor KSS."
+    },
+    {
+      "source": "KSS",
+      "target": "fatigue",
+      "relation": "indikator",
+      "evidence": "KSS digunakan untuk mengukur tingkat kelelahan secara subjektif."
+    },
+    {
+      "source": "human reliability",
+      "target": "fatigue",
+      "relation": "korelasi",
+      "evidence": "Fatigue adalah faktor kunci yang memengaruhi human reliability."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "Pencahayaan memengaruhi kelelahan kerja melalui beban visual, pemeliharaan kewaspadaan, dan kenyamanan subjektif.",
+      "quote": "lighting environment not only determines visibility but also affects visual workload, vigilance maintenance, and subjective comfort, thereby influencing workers’ operational state and fatigue level.",
+      "page": 2
+    },
+    {
+      "claim": "Model BO–CNN-LSTM mencapai akurasi klasifikasi 90.56%.",
+      "quote": "Subject-grouped five-fold cross-validation yielded a mean classification accuracy of 90.56% ± 2.06%.",
+      "page": 1
+    },
+    {
+      "claim": "Kombinasi 500 lx–4000 K dianggap lebih menguntungkan untuk mengurangi kelelahan.",
+      "quote": "Under the experimental conditions, the 500 lx–4000 K condition was associated with relatively favorable multimodal fatigue-related responses.",
+      "page": 2
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel secara eksplisit membahas kelelahan kerja di tambang batu bara bawah tanah, menggunakan pendekatan multimodal dan model AI, yang relevan dengan pertanyaan penelitian tentang fatigue. Tidak ada kriteria eksklusi yang diberikan, sehingga artikel ini memenuhi kriteria inklusi."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-26",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

@@ -1,0 +1,3086 @@
+{
+  "format": "litreview-studio-project",
+  "version": 1,
+  "exported_at": "2026-10-26T17:47:41.501Z",
+  "articles": [
+    {
+      "abstract": "Ulasan sistematis mengidentifikasi parameter kinematik untuk deteksi real-time kelelahan fisik selama berjalan, dengan fokus pada gait speed, stride length, dan step width yang dipengaruhi oleh kelelahan otot kunci seperti quadriceps dan plantar flexors.",
+      "analysis_version": 1,
+      "authors": [
+        "Matin Jahani Jirsaraei",
+        "Wenying Ji",
+        "Samuel A. Acuña"
+      ],
+      "concepts": [
+        {
+          "description": "Penurunan kapasitas melakukan pekerjaan fisik karena kelelahan sebelumnya.",
+          "name": "kelelahan fisik",
+          "parent_concepts": []
+        },
+        {
+          "description": "Parameter gerakan tubuh selama berjalan yang dipengaruhi oleh kelelahan fisik.",
+          "name": "kinematika berjalan",
+          "parent_concepts": []
+        },
+        {
+          "description": "Metode yang digunakan untuk menginduksi kelelahan fisik dalam studi.",
+          "name": "protokol kelelahan",
+          "parent_concepts": []
+        },
+        {
+          "description": "Perangkat wearable yang mengukur gerakan kinematik secara real-time.",
+          "name": "IMU",
+          "parent_concepts": []
+        },
+        {
+          "description": "Kemungkinan meningkatnya jatuh akibat gangguan keseimbangan dan koordinasi akibat kelelahan.",
+          "name": "risiko jatuh",
+          "parent_concepts": []
+        },
+        {
+          "description": "Kecepatan berjalan yang berkurang akibat kelelahan fisik.",
+          "name": "gait speed",
+          "parent_concepts": []
+        }
+      ],
+      "context": "Lingkungan konstruksi dan pekerjaan fisik lainnya, dengan fokus pada perubahan gait akibat kelelahan fisik yang berpotensi meningkatkan risiko cedera.",
+      "doi": "10.1016/j.apergo.2025.104640",
+      "eligibility_decision": "include",
+      "evidence_quotes": [
+        {
+          "claim": "Kelelahan fisik memengaruhi koordinasi neuro-muskular.",
+          "page": 1,
+          "quote": "As individuals experience fatigue, the intricate neuro-muscular coordination and motor control required for walking becomes vulnerable."
+        },
+        {
+          "claim": "Parameter kinematik dapat diukur secara real-time.",
+          "page": 2,
+          "quote": "Kinematic measures—such as gait speed, step width, and trunk acceleration—are non-invasive and more practical for continuous monitoring."
+        },
+        {
+          "claim": "Kelelahan otot kunci memengaruhi kinematika berjalan.",
+          "page": 1,
+          "quote": "Fatigue in key muscles, including the quadriceps and ankle plantar flexors, had the greatest impact on walking kinematics."
+        }
+      ],
+      "extraction_status": "ok",
+      "filename": "1-s2.0-S0003687025001760-main_compressed.pdf",
+      "findings": [
+        "Gait speed, stride length, step width, heel contact velocity, dan trunk acceleration sering diukur dan dipengaruhi oleh kelelahan.",
+        "Kelelahan otot kunci seperti quadriceps dan plantar flexors memiliki dampak paling besar terhadap kinematika berjalan.",
+        "Protokol kelelahan berbeda (walking, cycling, squatting) menghasilkan perubahan kinematik yang berbeda.",
+        "Parameter kinematik dapat diukur secara real-time menggunakan IMU tanpa invasivitas.",
+        "Kelelahan fisik memengaruhi koordinasi neuro-muskular dan meningkatkan risiko jatuh.",
+        "Tidak ada perbedaan signifikan antara kelompok usia muda dan tua dalam kemampuan menyesuaikan gait setelah kelelahan."
+      ],
+      "future_research": [
+        "Mengembangkan protokol kelelahan yang lebih standar untuk memudahkan perbandingan studi.",
+        "Mengintegrasikan parameter kinematik dengan teknologi wearable untuk deteksi real-time di lapangan.",
+        "Mengembangkan model prediktif berbasis kinematik untuk deteksi dini kelelahan fisik."
+      ],
+      "hash": "aa4b5ca8a02b1d5446850ffb384ac3d1ebe20d2722b00c48a0eae1c9c1e87297",
+      "id": "aa4b5ca8a02b1d54",
+      "json_stored": true,
+      "limitations": [
+        "Kurangnya konsistensi protokol kelelahan antar studi membuat perbandingan sulit.",
+        "Kurangnya studi yang secara eksplisit mengukur kelelahan fisik melalui protokol eksperimental yang valid.",
+        "Fokus pada kelelahan fisik, bukan kelelahan mental, sehingga tidak mencakup aspek kognitif."
+      ],
+      "methods": "Pencarian sistematis di 4 database (PubMed, Medline, IEEE Xplore, Web of Science) 2000-2024, dengan kriteria inklusi: studi asli, fokus kelelahan fisik selama berjalan, menggunakan parameter kinematik, dan publikasi dalam bahasa Inggris.",
+      "objective": "Mengidentifikasi parameter kinematik yang praktis untuk deteksi real-time kelelahan fisik selama berjalan, serta memahami pengaruh protokol kelelahan terhadap parameter tersebut.",
+      "pages": 12,
+      "pdf_stored": true,
+      "relationships": [
+        {
+          "evidence": "Kelelahan fisik menyebabkan reorganisasi kinematika selama berjalan.",
+          "relation": "mempengaruhi",
+          "source": "kelelahan fisik",
+          "target": "kinematika berjalan"
+        },
+        {
+          "evidence": "Perubahan kinematika akibat kelelahan meningkatkan risiko jatuh.",
+          "relation": "mempengaruhi",
+          "source": "kinematika berjalan",
+          "target": "risiko jatuh"
+        },
+        {
+          "evidence": "IMU digunakan untuk mengukur perubahan kinematika secara real-time.",
+          "relation": "mengukur",
+          "source": "IMU",
+          "target": "kinematika berjalan"
+        },
+        {
+          "evidence": "Protokol kelelahan berbeda menghasilkan perubahan kinematik yang berbeda.",
+          "relation": "mempengaruhi",
+          "source": "protokol kelelahan",
+          "target": "kinematika berjalan"
+        },
+        {
+          "evidence": "Gait speed menurun akibat kelelahan fisik.",
+          "relation": "mempengaruhi",
+          "source": "kelelahan fisik",
+          "target": "gait speed"
+        },
+        {
+          "evidence": "Trunk acceleration meningkat akibat kelelahan fisik.",
+          "relation": "mempengaruhi",
+          "source": "kelelahan fisik",
+          "target": "trunk acceleration"
+        }
+      ],
+      "research_questions": [],
+      "screening_decision": "include",
+      "screening_suggestion": {
+        "decision": "include",
+        "reason": "Memenuhi kriteria inklusi: fokus kelelahan fisik selama berjalan, menggunakan parameter kinematik, studi asli, dan publikasi dalam bahasa Inggris."
+      },
+      "search_date": "2026-10-26",
+      "search_query": "",
+      "source_name": "Upload manual",
+      "text_chars": 18000,
+      "title": "Kinematic indicators of physical fatigue during walking: A systematic review of assessment parameters and protocols",
+      "topic_tags": [
+        "kelelahan fisik",
+        "kinematika",
+        "gait",
+        "deteksi real-time",
+        "konstruksi",
+        "IMU",
+        "biomekanika"
+      ],
+      "uploaded_at": "2026-10-26T13:10:57.413211+00:00",
+      "variables": [
+        "gait speed",
+        "stride length",
+        "step width",
+        "trunk acceleration",
+        "heel contact velocity",
+        "kelelahan otot kunci"
+      ],
+      "year": "2026"
+    },
+    {
+      "abstract": "Studi eksploratori menemukan bahwa variabilitas gait sebelum kelelahan dapat memprediksi kinerja post-fatigue dalam obstacle course. Ukuran variabilitas sendi kinematik memprediksi 73-89% variasi kinerja post-fatigue.",
+      "analysis_version": 1,
+      "authors": [
+        "Sophia Ulman",
+        "Divya Srinivasan",
+        "Maury A. Nussbaum"
+      ],
+      "concepts": [
+        {
+          "description": "ukuran variasi dalam gerakan gait, termasuk karakteristik stride dan koordinasi antar sendi.",
+          "name": "gait variability",
+          "parent_concepts": [
+            "motor variability"
+          ]
+        },
+        {
+          "description": "kinerja individu setelah mengalami protokol kelelahan.",
+          "name": "post-fatigue performance",
+          "parent_concepts": []
+        },
+        {
+          "description": "koordinasi antar sendi dalam gerakan gait, diukur melalui sudut koppel.",
+          "name": "inter-joint coordination",
+          "parent_concepts": []
+        },
+        {
+          "description": "protokol kelelahan yang melibatkan berjalan beban dengan peningkatan kecepatan.",
+          "name": "fatigue protocol",
+          "parent_concepts": []
+        },
+        {
+          "description": "variabilitas dalam gerakan motorik yang mungkin membantu adaptasi terhadap kelelahan.",
+          "name": "motor variability",
+          "parent_concepts": []
+        },
+        {
+          "description": "tugas dinamis yang melibatkan melompati rintangan dan melompat jauh.",
+          "name": "obstacle course",
+          "parent_concepts": []
+        }
+      ],
+      "context": "Militer, cadet ROTC, uji kelelahan dengan beban, obstacle course dinamis, pengukuran kinematik gait.",
+      "doi": "10.1016/j.apergo.2025.104504",
+      "eligibility_decision": "include",
+      "evidence_quotes": [
+        {
+          "claim": "Variabilitas sendi kinematik memprediksi 73-89% variasi kinerja post-fatigue.",
+          "page": 1,
+          "quote": "Measures of joint kinematic variability predicted 73–89% of the variance in post-fatigue performance."
+        },
+        {
+          "claim": "Variabilitas pinggul dan koordinasi pinggul-kaki selama fase swing signifikan.",
+          "page": 1,
+          "quote": "the significant predictors were sagittal plane variability of 1) hip angle and hip-knee coordination during swing phase"
+        },
+        {
+          "claim": "Koordinasi lutut-ankle selama fase stance dan swing signifikan.",
+          "page": 1,
+          "quote": "and 2) knee-ankle coordination during both stance and swing phase."
+        }
+      ],
+      "extraction_status": "ok",
+      "filename": "1-s2.0-S0003687025000407-main_compressed.pdf",
+      "findings": [
+        "Variabilitas sendi kinematik memprediksi 73-89% variasi kinerja post-fatigue.",
+        "Variabilitas pinggul dan koordinasi pinggul-kaki selama fase swing signifikan.",
+        "Variabilitas lutut-ankle selama fase stance dan swing signifikan.",
+        "Kinerja post-fatigue menurun setelah protokol kelelahan.",
+        "Variabilitas gait diukur selama 2 menit berjalan beban.",
+        "Kinerja post-fatigue diukur dari 5 percobaan, hanya satu digunakan untuk analisis."
+      ],
+      "future_research": [
+        "Mengembangkan alat prediksi kinerja berbasis variabilitas gait.",
+        "Mengamati populasi yang lebih heterogen.",
+        "Menggunakan metode pengukuran yang lebih realistis dalam lingkungan lapangan."
+      ],
+      "hash": "a02261260f214b189be9aa68d99de1edeed0e62c346a7fb1bdb5009f45a2f1aa",
+      "id": "a02261260f214b18",
+      "json_stored": true,
+      "limitations": [
+        "Jumlah sampel kecil (n=24).",
+        "Hanya satu sisi tubuh dianalisis (kiri).",
+        "Keterbatasan dalam pengukuran kinerja post-fatigue (hanya satu percobaan)."
+      ],
+      "methods": "Desain ulang ukuran, 24 cadet militer diuji gait dan obstacle course sebelum dan sesudah protokol kelelahan. Variabilitas gait diukur dari karakteristik stride, sudut sendi, dan koordinasi antar sendi. Analisis regresi linear digunakan untuk memprediksi kinerja post-fatigue.",
+      "objective": "Mengukur seberapa jauh variabilitas gait sebelum kelelahan terkait kemampuan individu menjalani obstacle course setelah kelelahan.",
+      "pages": 8,
+      "pdf_stored": true,
+      "relationships": [
+        {
+          "evidence": "Variabilitas sendi kinematik memprediksi 73-89% variasi kinerja post-fatigue.",
+          "relation": "predicts",
+          "source": "gait variability",
+          "target": "post-fatigue performance"
+        },
+        {
+          "evidence": "Koordinasi pinggul-kaki dan lutut-ankle selama fase swing dan stance signifikan.",
+          "relation": "predicts",
+          "source": "inter-joint coordination",
+          "target": "post-fatigue performance"
+        },
+        {
+          "evidence": "Protokol kelelahan menyebabkan penurunan kinerja post-fatigue.",
+          "relation": "causes",
+          "source": "fatigue protocol",
+          "target": "post-fatigue performance"
+        },
+        {
+          "evidence": "Variabilitas tinggi memungkinkan eksplorasi solusi motorik alternatif.",
+          "relation": "enables",
+          "source": "motor variability",
+          "target": "adaptability"
+        },
+        {
+          "evidence": "Variabilitas gait adalah bagian dari konstruksi motor variability.",
+          "relation": "subset",
+          "source": "gait variability",
+          "target": "motor variability"
+        },
+        {
+          "evidence": "Kinerja post-fatigue diukur dalam tugas obstacle course.",
+          "relation": "measured in",
+          "source": "post-fatigue performance",
+          "target": "obstacle course"
+        }
+      ],
+      "research_questions": [
+        "Seberapa jauh variabilitas gait sebelum kelelahan terkait kemampuan individu menjalani obstacle course setelah kelelahan?"
+      ],
+      "screening_decision": "include",
+      "screening_suggestion": {
+        "decision": "include",
+        "reason": "Artikel relevan dengan topik fatigue dan meneliti prediksi kinerja post-fatigue berdasarkan variabilitas gait. Kriteria inklusi tidak ditentukan, sehingga artikel termasuk."
+      },
+      "search_date": "2026-10-26",
+      "search_query": "",
+      "source_name": "Upload manual",
+      "text_chars": 18000,
+      "title": "Gait variability predicts post-fatigue obstacle course performance among military cadets: An exploratory study",
+      "topic_tags": [
+        "fatigue",
+        "gait variability",
+        "military",
+        "obstacle course",
+        "kinematic prediction",
+        "motor adaptability"
+      ],
+      "uploaded_at": "2026-10-26T13:13:39.277768+00:00",
+      "variables": [
+        "variabilitas gait (GV)",
+        "kinerja post-fatigue (HCT, MJH, MJD)",
+        "sudut sendi",
+        "koordinasi antar sendi",
+        "kelelahan (RPE, HR)"
+      ],
+      "year": "2025"
+    },
+    {
+      "abstract": "Studi simulasi menguji efek video entertainment terhadap kognitif load, kelelahan, dan kinerja takeover selama driving otomatis. Hasil menunjukkan video mengurangi kelelahan dan meningkatkan kinerja takeover, meskipun meningkatkan kognitif load.",
+      "analysis_version": 1,
+      "authors": [
+        "Jun Ma",
+        "Lizhuo Zang",
+        "Jiateng Li",
+        "Zaiyan Gong",
+        "Yue Fei",
+        "Jin Lu"
+      ],
+      "concepts": [
+        {
+          "description": "Kelelahan akibat kondisi underloaded selama driving otomatis.",
+          "name": "passive task-related fatigue",
+          "parent_concepts": [
+            "task-related fatigue"
+          ]
+        },
+        {
+          "description": "Aktivitas yang tidak terkait dengan mengemudi, seperti menonton video.",
+          "name": "non-driving related tasks",
+          "parent_concepts": []
+        },
+        {
+          "description": "Kinerja pengemudi saat mengambil kendali kembali dari sistem otomatis.",
+          "name": "takeover performance",
+          "parent_concepts": []
+        },
+        {
+          "description": "Beban kognitif yang diukur melalui diameter pupil dan skor NASA-TLX.",
+          "name": "cognitive load",
+          "parent_concepts": []
+        },
+        {
+          "description": "Kelelahan yang diukur melalui frekuensi blink dan skor KSS.",
+          "name": "fatigue",
+          "parent_concepts": []
+        },
+        {
+          "description": "Metode statistik untuk menganalisis data berulang dengan efek acak peserta.",
+          "name": "linear mixed effects models",
+          "parent_concepts": []
+        }
+      ],
+      "context": "Penelitian dilakukan di simulator driving otomatis tingkat 3, dengan peserta mengalami durasi otomatis 15-60 menit, dalam kondisi dengan atau tanpa video entertainment.",
+      "doi": "10.1016/j.apergo.2025.104644",
+      "eligibility_decision": "include",
+      "evidence_quotes": [
+        {
+          "claim": "Video entertainment effectively suppressed the growth of fatigue with longer ADT.",
+          "page": 1,
+          "quote": "video entertainment not only increased cognitive load, but also effectively suppressed the growth of fatigue with longer ADT"
+        },
+        {
+          "claim": "Video entertainment reduced safety risks by shortening takeover time.",
+          "page": 1,
+          "quote": "These findings suggest that video entertainment can improve comfort and takeover safety under prolonged automated driving scenarios by mitigating PTR fatigue."
+        },
+        {
+          "claim": "Higher cognitive load usually leads to pupil dilation.",
+          "page": 2,
+          "quote": "Higher cognitive load usually leads to pupil dilation and higher NASA-TLX scores"
+        }
+      ],
+      "extraction_status": "ok",
+      "filename": "1-s2.0-S0003687025001802-main_compressed.pdf",
+      "findings": [
+        "Video entertainment meningkatkan kognitif load.",
+        "Video mengurangi pertumbuhan kelelahan seiring waktu.",
+        "Video memperpendek waktu takeover.",
+        "Video meningkatkan waktu minimum hingga tabrakan.",
+        "Kelelahan diukur melalui frekuensi blink dan skor KSS.",
+        "Kognitif load diukur melalui diameter pupil dan NASA-TLX."
+      ],
+      "future_research": [],
+      "hash": "81f4e8f11e5000eebbddfe1100d89b6b26ae61c13a559381ef45fad67838a114",
+      "id": "81f4e8f11e5000ee",
+      "json_stored": true,
+      "limitations": [],
+      "methods": "Desain eksperimen 2x4 dalam-subjek dengan 32 peserta. Ukur kognitif load (pupil diameter, NASA-TLX), kelelahan (blink frequency, KSS), dan kinerja takeover (TOT, max acceleration, min TTC). Analisis menggunakan LMM.",
+      "objective": "Menginvestigasi apakah video entertainment dapat mengurangi risiko kelelahan pasif selama driving otomatis dan meningkatkan kinerja takeover.",
+      "pages": 8,
+      "pdf_stored": true,
+      "relationships": [
+        {
+          "evidence": "Video entertainment effectively suppressed the growth of fatigue with longer ADT.",
+          "relation": "mitigate",
+          "source": "video entertainment",
+          "target": "passive task-related fatigue"
+        },
+        {
+          "evidence": "Video entertainment reduced safety risks by shortening takeover time and increasing minimum time to collision.",
+          "relation": "improve",
+          "source": "video entertainment",
+          "target": "takeover performance"
+        },
+        {
+          "evidence": "Higher cognitive load usually leads to pupil dilation and higher NASA-TLX scores.",
+          "relation": "influence",
+          "source": "cognitive load",
+          "target": "fatigue"
+        },
+        {
+          "evidence": "Prolonged disengagement may induce PTR fatigue, which may negatively impact takeover performance.",
+          "relation": "negatively affect",
+          "source": "passive task-related fatigue",
+          "target": "takeover performance"
+        },
+        {
+          "evidence": "Video entertainment not only increased cognitive load, but also effectively suppressed the growth of fatigue.",
+          "relation": "increase",
+          "source": "video entertainment",
+          "target": "cognitive load"
+        },
+        {
+          "evidence": "Fatigue may negatively affect vigilance and impair takeover performance.",
+          "relation": "negatively affect",
+          "source": "fatigue",
+          "target": "takeover performance"
+        }
+      ],
+      "research_questions": [],
+      "screening_decision": "include",
+      "screening_suggestion": {
+        "decision": "include",
+        "reason": "Artikel secara eksplisit meneliti fatigue dan kinerja takeover dalam konteks driving otomatis, yang relevan dengan pertanyaan riset 'fatigue'."
+      },
+      "search_date": "2026-10-26",
+      "search_query": "",
+      "source_name": "Upload manual",
+      "text_chars": 18000,
+      "title": "Video entertainment to mitigate safety risks during prolonged automated driving: Impacts on cognitive load, fatigue, and takeover performance",
+      "topic_tags": [
+        "fatigue",
+        "automated driving",
+        "video entertainment",
+        "cognitive load",
+        "takeover performance",
+        "NDRTs"
+      ],
+      "uploaded_at": "2026-10-26T13:15:57.750557+00:00",
+      "variables": [
+        "video entertainment",
+        "durasi driving otomatis",
+        "kognitif load",
+        "kelelahan",
+        "kinerja takeover"
+      ],
+      "year": ""
+    },
+    {
+      "abstract": "Stress delays fatigue perception and reduces PFC functional segregation during intermittent exercise, without affecting sex differences in central fatigue mechanisms.",
+      "analysis_version": 1,
+      "authors": [
+        "Oshin Tyagi",
+        "Ranjana K. Mehta"
+      ],
+      "concepts": [
+        {
+          "description": "Exercise-induced impairment in corticospinal pathway reducing neural drive to neuromuscular junction.",
+          "name": "central fatigue",
+          "parent_concepts": []
+        },
+        {
+          "description": "Measure of task-related specialization between brain areas; reduced under stress.",
+          "name": "functional segregation",
+          "parent_concepts": []
+        },
+        {
+          "description": "Subjective measure of exertion; stunted by stress.",
+          "name": "perception of effort",
+          "parent_concepts": []
+        },
+        {
+          "description": "Physiological and psychological response to high mental workload.",
+          "name": "cognitive stress",
+          "parent_concepts": []
+        },
+        {
+          "description": "Functional near-infrared spectroscopy used to monitor cortical activation and connectivity.",
+          "name": "fNIRS",
+          "parent_concepts": []
+        },
+        {
+          "description": "Measured by force steadiness and variability; impaired under stress.",
+          "name": "motor performance",
+          "parent_concepts": []
+        }
+      ],
+      "context": "Laboratory-based neuroergonomic study on healthy young adults; relevant to occupational safety in high-stress environments.",
+      "doi": "10.1016/j.apergo.2026.104843",
+      "eligibility_decision": "include",
+      "evidence_quotes": [
+        {
+          "claim": "Stress prolonged endurance despite poorer motor performance.",
+          "page": 1,
+          "quote": "Stress prolonged endurance among both men and women."
+        },
+        {
+          "claim": "Stress stunted perception of effort.",
+          "page": 1,
+          "quote": "Stress also stunted the perception of effort for exercise."
+        },
+        {
+          "claim": "Stress reduced functional segregation of the PFC.",
+          "page": 1,
+          "quote": "Stress also stunted the perception of effort for exercise and reduced functional segregation of the PFC."
+        }
+      ],
+      "extraction_status": "ok",
+      "filename": "1-s2.0-S0003687026001213-main_compressed.pdf",
+      "findings": [
+        "Stress prolonged endurance despite reduced motor performance.",
+        "Stress stunted perception of effort during exercise.",
+        "Stress reduced functional segregation in the prefrontal cortex.",
+        "Stress did not contribute to sex differences in central fatigue mechanisms.",
+        "Functional integration between PFC and M1 decreased under stress.",
+        "No change in motor outcomes for women under stress."
+      ],
+      "future_research": [],
+      "hash": "a7151a1b25c17f157fd41220fa4fab7d192d30d63d2a8fc9d998154c10b2c61b",
+      "id": "a7151a1b25c17f15",
+      "json_stored": true,
+      "limitations": [],
+      "methods": "30 young adults performed intermittent elbow flexion contractions with/without mental math stress task; fNIRS measured PFC/M1 connectivity; EMG, RPE, and force data collected.",
+      "objective": "To identify the influence of cognitive stress on central fatigue and associated functional changes in cognitive and motor brain areas in men and women.",
+      "pages": 10,
+      "pdf_stored": true,
+      "relationships": [
+        {
+          "evidence": "Stress stunted the perception of effort for exercise.",
+          "relation": "reduces",
+          "source": "cognitive stress",
+          "target": "perception of effort"
+        },
+        {
+          "evidence": "Stress reduced functional segregation of the PFC.",
+          "relation": "reduces",
+          "source": "cognitive stress",
+          "target": "functional segregation"
+        },
+        {
+          "evidence": "Stress impaired motor performance (lower force steadiness).",
+          "relation": "impairs",
+          "source": "cognitive stress",
+          "target": "motor performance"
+        },
+        {
+          "evidence": "Stress did not contribute to the sex differences in central mechanisms of fatigue.",
+          "relation": "does not affect",
+          "source": "cognitive stress",
+          "target": "central fatigue"
+        },
+        {
+          "evidence": "Functional integration between PFC and M1 decreased under stress.",
+          "relation": "associated with",
+          "source": "functional integration",
+          "target": "motor performance"
+        },
+        {
+          "evidence": "Stress prolonged endurance despite poorer motor performance.",
+          "relation": "delayed",
+          "source": "fatigue perception",
+          "target": "endurance"
+        }
+      ],
+      "research_questions": [],
+      "screening_decision": "include",
+      "screening_suggestion": {
+        "decision": "include",
+        "reason": "Artikel secara eksplisit membahas fatigue dan efek stres kognitif, sesuai dengan topik penelitian. Tidak ada kriteria eksklusi yang diberikan, sehingga termasuk."
+      },
+      "search_date": "2026-10-26",
+      "search_query": "",
+      "source_name": "Upload manual",
+      "text_chars": 18000,
+      "title": "The distracting role of stress: Impaired executive attention and delayed fatigue perception",
+      "topic_tags": [
+        "fatigue",
+        "cognitive stress",
+        "neuroergonomics",
+        "prefrontal cortex",
+        "functional connectivity",
+        "exercise performance"
+      ],
+      "uploaded_at": "2026-10-26T13:39:10.154849+00:00",
+      "variables": [
+        "cognitive stress",
+        "fatigue perception",
+        "PFC-M1 connectivity",
+        "motor performance",
+        "sex differences",
+        "functional integration/segregation"
+      ],
+      "year": ""
+    },
+    {
+      "abstract": "Penelitian ini menganalisis kelelahan klinis di ruang darurat pediatrik menggunakan Skala Fatigue Kerja Swedia (SOFI). Ditemukan kelelahan meningkat seiring waktu shift, dipengaruhi oleh jenis shift, gender, usia, dan peran klinis.",
+      "analysis_version": 1,
+      "authors": [
+        "Mustafa Ozkaynak",
+        "Heather L. Smyth",
+        "Cristian Sarabia",
+        "Paul F. Cook",
+        "Rakesh D. Mistry",
+        "Sarah K. Schmidt"
+      ],
+      "concepts": [
+        {
+          "description": "Keadaan kompleks dan nebula yang ditandai dengan kurangnya kewaspadaan dan penurunan kinerja mental dan fisik.",
+          "name": "fatigue",
+          "parent_concepts": []
+        },
+        {
+          "description": "Alat survei 20 item yang mengukur lima dimensi kelelahan: kelelahan fisik, kelelahan motivasi, kelelahan energi, ketidaknyamanan fisik, dan kelelahan tidur.",
+          "name": "Swedish Occupational Fatigue Inventory",
+          "parent_concepts": []
+        },
+        {
+          "description": "Klasifikasi shift menjadi hari, sore, atau malam berdasarkan waktu mulai shift.",
+          "name": "shift type",
+          "parent_concepts": []
+        },
+        {
+          "description": "Peran klinis seperti attending, fellow, atau advanced practice provider.",
+          "name": "clinician role",
+          "parent_concepts": []
+        },
+        {
+          "description": "Teknologi informasi kesehatan, khususnya EHR dan CDS, yang dapat memengaruhi kelelahan klinis.",
+          "name": "health information technology",
+          "parent_concepts": []
+        },
+        {
+          "description": "Kondisi stres jangka panjang yang ditandai dengan kelelahan emosional, depersonalisasi, dan kehilangan rasa pencapaian pribadi.",
+          "name": "burnout",
+          "parent_concepts": []
+        }
+      ],
+      "context": "Ruang darurat pediatrik di fasilitas akademik tingkat tiga, dengan klinis yang bekerja dalam shift 8 jam atau 6 jam.",
+      "doi": "10.1016/j.apergo.2025.104465",
+      "eligibility_decision": "include",
+      "evidence_quotes": [
+        {
+          "claim": "Fatigue meningkat seiring waktu shift.",
+          "page": 1,
+          "quote": "The most common finding in fatigue research is that feelings of fatigue increase steadily over time during shift work."
+        },
+        {
+          "claim": "Fatigue berhubungan dengan penurunan kinerja klinis.",
+          "page": 2,
+          "quote": "Fatigue has been associated with impaired clinician performance, and poor health outcomes."
+        },
+        {
+          "claim": "HIT dapat membantu mengurangi kelelahan.",
+          "page": 2,
+          "quote": "HIT, specifically the electronic health record (EHR), is a known contributor to clinician fatigue and burnout... may mitigate fatigue."
+        }
+      ],
+      "extraction_status": "ok",
+      "filename": "1-s2.0-S0003687025000018-main_compressed.pdf",
+      "findings": [
+        "Kelelahan meningkat secara signifikan dari awal hingga akhir shift.",
+        "Dimensi 'kelelahan energi' paling tinggi dan memburuk seiring waktu.",
+        "Kelelahan dipengaruhi oleh jenis shift, gender, usia, dan peran klinis.",
+        "Analisis menunjukkan variasi kebutuhan klinis berdasarkan tingkat kelelahan.",
+        "SOFI digunakan karena valid dan telah digunakan sebelumnya pada klinis.",
+        "Keterlibatan HIT dalam mitigasi kelelahan disarankan untuk pengembangan sistem pendukung klinis."
+      ],
+      "future_research": [
+        "Mengembangkan HIT dan CDS yang disesuaikan dengan tingkat kelelahan klinis.",
+        "Mengukur dampak EHR terhadap kelelahan secara lebih mendalam.",
+        "Mengamati kelelahan dalam konteks shift yang lebih bervariasi."
+      ],
+      "hash": "934314358837e2a5575599bed6780ee219edf02b36e0aeeb11691ab83b9c8188",
+      "id": "934314358837e2a5",
+      "json_stored": true,
+      "limitations": [
+        "Jumlah sampel kecil (35 klinis).",
+        "Data hanya dikumpulkan dalam dua waktu per shift (awal dan akhir).",
+        "Analisis tidak mempertimbangkan faktor lingkungan atau teknologi EHR secara mendalam."
+      ],
+      "methods": "Survei SOFI diberikan dua kali per shift (awal dan akhir) pada 35 klinis di ruang darurat pediatrik. Analisis statistik menggunakan paired t-test dan regresi linear multivariat.",
+      "objective": "Mengukur perubahan kelelahan klinis selama shift dan faktor-faktor yang memengaruhi dimensi kelelahan di ruang darurat pediatrik.",
+      "pages": 12,
+      "pdf_stored": true,
+      "relationships": [
+        {
+          "evidence": "Fatigue adalah konsekuensi langsung kerja, sedangkan burnout mungkin akibat kelelahan jangka panjang.",
+          "relation": "related",
+          "source": "fatigue",
+          "target": "burnout"
+        },
+        {
+          "evidence": "SOFI digunakan untuk mengukur lima dimensi kelelahan.",
+          "relation": "measures",
+          "source": "Swedish Occupational Fatigue Inventory",
+          "target": "fatigue"
+        },
+        {
+          "evidence": "Kelelahan tergantung pada jenis shift, gender, usia, dan peran klinis.",
+          "relation": "influences",
+          "source": "shift type",
+          "target": "fatigue"
+        },
+        {
+          "evidence": "HIT dan CDS dapat membantu mengurangi kelelahan dan burnout.",
+          "relation": "mitigates",
+          "source": "health information technology",
+          "target": "fatigue"
+        },
+        {
+          "evidence": "Fatigue terkait dengan penurunan kinerja klinis dan kesalahan keputusan.",
+          "relation": "impairs",
+          "source": "fatigue",
+          "target": "clinical performance"
+        },
+        {
+          "evidence": "Fatigue berhubungan dengan penurunan keselamatan pasien dan hasil klinis buruk.",
+          "relation": "negatively impacts",
+          "source": "fatigue",
+          "target": "patient safety"
+        }
+      ],
+      "research_questions": [
+        "Apakah kelelahan klinis berubah selama shift?",
+        "Apa faktor-faktor yang memengaruhi dimensi kelelahan klinis?"
+      ],
+      "screening_decision": "include",
+      "screening_suggestion": {
+        "decision": "include",
+        "reason": "Artikel secara eksplisit meneliti fatigue di ruang darurat pediatrik, menggunakan metode valid (SOFI), dan melaporkan temuan spesifik tentang faktor-faktor yang memengaruhi kelelahan."
+      },
+      "search_date": "2026-10-26",
+      "search_query": "",
+      "source_name": "Upload manual",
+      "text_chars": 18000,
+      "title": "Examining clinicians’ fatigue in a pediatric emergency department",
+      "topic_tags": [
+        "kelelahan klinis",
+        "fatigue",
+        "pediatrik",
+        "shift work",
+        "SOFI",
+        "emergency department",
+        "health information technology"
+      ],
+      "uploaded_at": "2026-10-26T13:42:09.660096+00:00",
+      "variables": [
+        "kelelahan fisik",
+        "kelelahan motivasi",
+        "kelelahan energi",
+        "ketidaknyamanan fisik",
+        "kelelahan tidur",
+        "jenis shift",
+        "gender",
+        "usia",
+        "peran klinis"
+      ],
+      "year": "2025"
+    },
+    {
+      "abstract": "Penelitian ini mengevaluasi efek exoskeleton leher pasif pada kelelahan otot leher-shoulder dan postur selama operasi hewan. Studi menggunakan desain crossover pada 10 ahli bedah hewan, dengan pengukuran EMG dan IMU. Temuan menunjukkan penurunan aktivitas otot dan kelelahan otot dengan exoskeleton, tanpa mengurangi rentang gerak leher.",
+      "analysis_version": 1,
+      "authors": [
+        "Bowen Zheng",
+        "Xuelong Fan",
+        "Sun Young Kim",
+        "Denny Yu"
+      ],
+      "concepts": [
+        {
+          "description": "penurunan kemampuan otot untuk berkontraksi akibat aktivitas fisik berkelanjutan.",
+          "name": "kelelahan otot",
+          "parent_concepts": [
+            "fisiologi otot"
+          ]
+        },
+        {
+          "description": "posisi leher yang mempengaruhi beban otot dan risiko kelelahan.",
+          "name": "postur leher",
+          "parent_concepts": [
+            "ergonomi"
+          ]
+        },
+        {
+          "description": "perangkat mekanis pasif yang memberikan dukungan fisik pada tubuh.",
+          "name": "exoskeleton",
+          "parent_concepts": [
+            "alat bantu ergonomi"
+          ]
+        },
+        {
+          "description": "metode pengukuran aktivitas otot melalui sinyal listrik.",
+          "name": "EMG",
+          "parent_concepts": [
+            "biomekanik"
+          ]
+        },
+        {
+          "description": "pengukuran gerakan tubuh dan posisi otot.",
+          "name": "kinematik",
+          "parent_concepts": [
+            "biomekanik"
+          ]
+        },
+        {
+          "description": "rasa tidak nyaman fisik yang diukur secara subjektif.",
+          "name": "ketidaknyamanan",
+          "parent_concepts": [
+            "kesehatan kerja"
+          ]
+        }
+      ],
+      "context": "Operasi hewan hidup di klinik hewan, dengan fokus pada postur leher fleksi dan kelelahan otot leher-shoulder. Penelitian dilakukan di Purdue University College of Veterinary Medicine.",
+      "doi": "10.1016/j.apergo.2026.104745",
+      "eligibility_decision": "include",
+      "evidence_quotes": [
+        {
+          "claim": "Exoskeleton mengurangi aktivitas otot trapezius dan deltoid.",
+          "page": 2,
+          "quote": "a passive arm-support exoskeleton has been shown to reduce elevated-arm exposure and peak muscle activity in the trapezius and deltoid muscles"
+        },
+        {
+          "claim": "Kelelahan otot menurun dengan exoskeleton.",
+          "page": 2,
+          "quote": "the trunk device significantly decreasing EMG fatigue rates"
+        },
+        {
+          "claim": "Rentang gerak leher tidak terbatasi oleh exoskeleton.",
+          "page": 2,
+          "quote": "without restricting the neck joint range of motion"
+        }
+      ],
+      "extraction_status": "ok",
+      "filename": "1-s2.0-S0003687026000232-main_compressed.pdf",
+      "findings": [
+        "Exoskeleton mengurangi aktivitas otot trapezius dan deltoid selama operasi.",
+        "Kelelahan otot (MPF) menurun signifikan dengan exoskeleton.",
+        "Ketidaknyamanan leher dan punggung berkurang dengan exoskeleton.",
+        "Rentang gerak leher tidak terbatasi oleh exoskeleton.",
+        "Aktivitas otot punggung bawah tidak meningkat dengan exoskeleton.",
+        "Data EMG dan IMU menunjukkan perbaikan biomekanik dan fisiologis."
+      ],
+      "future_research": [
+        "Evaluasi lebih lanjut pada berbagai jenis operasi hewan dan lingkungan bedah.",
+        "Penelitian tentang efek jangka panjang exoskeleton pada kelelahan otot.",
+        "Pengembangan exoskeleton yang lebih ringan dan fleksibel untuk operasi hewan."
+      ],
+      "hash": "f255e9657346b963ecff6fbf17898fde76b7d7a41158286665348caa98bc5239",
+      "id": "f255e9657346b963",
+      "json_stored": true,
+      "limitations": [
+        "Hanya menganalisis 1 jam pertama operasi, bukan seluruh prosedur.",
+        "Sensor EMG dan IMU memiliki keterbatasan dalam pengukuran postur dinamis.",
+        "Studi hanya melibatkan 10 ahli bedah hewan, dengan variasi kecil dalam pengalaman."
+      ],
+      "methods": "Desain crossover pada 10 ahli bedah hewan, menggunakan EMG dan IMU untuk mengukur aktivitas otot dan postur. Data dikumpulkan selama 1 jam pertama operasi, dengan normalisasi terhadap nilai dasar individu.",
+      "objective": "Mengevaluasi efektivitas exoskeleton leher pasif dalam mengurangi kelelahan otot dan ketidaknyamanan leher-shoulder selama operasi hewan, tanpa membatasi gerak leher.",
+      "pages": 11,
+      "pdf_stored": true,
+      "relationships": [
+        {
+          "evidence": "Exoskeleton mengurangi aktivitas otot dan kelelahan otot.",
+          "relation": "mengurangi",
+          "source": "exoskeleton",
+          "target": "kelelahan otot"
+        },
+        {
+          "evidence": "Postur leher fleksi meningkatkan beban otot dan kelelahan.",
+          "relation": "mempengaruhi",
+          "source": "postur leher",
+          "target": "kelelahan otot"
+        },
+        {
+          "evidence": "EMG digunakan untuk mengukur aktivitas otot dan kelelahan.",
+          "relation": "mengukur",
+          "source": "EMG",
+          "target": "kelelahan otot"
+        },
+        {
+          "evidence": "Exoskeleton membantu menjaga postur leher lebih netral.",
+          "relation": "mempengaruhi",
+          "source": "exoskeleton",
+          "target": "postur leher"
+        },
+        {
+          "evidence": "Ketidaknyamanan leher berkorelasi dengan kelelahan otot.",
+          "relation": "terkait",
+          "source": "ketidaknyamanan",
+          "target": "kelelahan otot"
+        },
+        {
+          "evidence": "IMU digunakan untuk mengukur kinematik postur leher.",
+          "relation": "mengukur",
+          "source": "kinematik",
+          "target": "postur leher"
+        }
+      ],
+      "research_questions": [
+        "Apakah penggunaan exoskeleton leher pasif mengurangi ketidaknyamanan, aktivitas otot, dan kelelahan otot di daerah leher-shoulder tanpa membatasi rentang gerak leher?",
+        "Apakah exoskeleton meningkatkan aktivitas otot di punggung bawah?"
+      ],
+      "screening_decision": "include",
+      "screening_suggestion": {
+        "decision": "include",
+        "reason": "Artikel secara eksplisit mengevaluasi efek exoskeleton pada kelelahan otot dan postur leher selama operasi hewan, dengan data empiris dan metode yang jelas. Relevan dengan pertanyaan riset fatigue."
+      },
+      "search_date": "2026-10-26",
+      "search_query": "",
+      "source_name": "Upload manual",
+      "text_chars": 18000,
+      "title": "Effects of a passive neck support exoskeleton on neck-shoulder muscle fatigue and motion during live veterinary surgeries",
+      "topic_tags": [
+        "exoskeleton",
+        "kelelahan otot",
+        "operasi hewan",
+        "postur leher",
+        "biomekanik",
+        "ergonomi"
+      ],
+      "uploaded_at": "2026-10-26T13:45:11.417017+00:00",
+      "variables": [
+        "aktivitas otot (%MVE)",
+        "kelelahan otot (MPF)",
+        "ketidaknyamanan leher dan punggung",
+        "postur leher (kinematik)",
+        "rentang gerak leher",
+        "durasi operasi"
+      ],
+      "year": "2026"
+    },
+    {
+      "abstract": "Penelitian ini menganalisis mekanisme awal retak lelah pada logam Al–Zn–Mg–Cu yang diproses dengan additive friction stir deposition (AFSD) dan diuji sebelum dan sesudah T6 heat treatment. Temuan menunjukkan bahwa T6 meningkatkan kekuatan lelah sekitar 52,7% tetapi tidak menghilangkan partikel Mg–Si atau presipitat batas butiran yang tetap menjadi sumber inisiasi retak.",
+      "analysis_version": 1,
+      "authors": [
+        "Zhichao Wang",
+        "Zhikang Shen",
+        "Zexi Wu",
+        "Mengjia Xu",
+        "Javier Piazzese",
+        "Michele Chiumenti",
+        "Narges Dialami",
+        "Kalinur Sadyrov",
+        "Keyang Wu",
+        "Guoqiang Huang",
+        "Yuman Zhu",
+        "Wenya Li",
+        "Huijun Li"
+      ],
+      "concepts": [
+        {
+          "description": "Perbedaan mikrostruktur sepanjang arah pembuatan akibat eksposur termal kumulatif.",
+          "name": "build-direction heterogeneity",
+          "parent_concepts": [
+            "microstructural heterogeneity"
+          ]
+        },
+        {
+          "description": "Perlakuan panas yang mencakup solusi, pendinginan, dan penuaan untuk memperbaiki presipitat.",
+          "name": "T6 heat treatment",
+          "parent_concepts": [
+            "heat treatment",
+            "precipitation hardening"
+          ]
+        },
+        {
+          "description": "Proses munculnya retak lelah akibat stres siklik di lokasi lemah atau partikel.",
+          "name": "fatigue crack initiation",
+          "parent_concepts": [
+            "fatigue",
+            "crack nucleation"
+          ]
+        },
+        {
+          "description": "Presipitat metastabil yang dominan setelah T6, memberikan penguatan.",
+          "name": "η′-dominated precipitation",
+          "parent_concepts": [
+            "precipitation hardening",
+            "microstructure"
+          ]
+        },
+        {
+          "description": "Partikel yang menjadi sumber inisiasi retak lelah meskipun T6.",
+          "name": "Mg–Si-rich particles",
+          "parent_concepts": [
+            "constituent particles",
+            "fatigue failure"
+          ]
+        },
+        {
+          "description": "Presipitat batas butiran yang tetap aktif sebagai sumber inisiasi retak lelah.",
+          "name": "grain-boundary η/S phases",
+          "parent_concepts": [
+            "grain boundary",
+            "precipitation"
+          ]
+        }
+      ],
+      "context": "Penelitian fokus pada logam Al–Zn–Mg–Cu (AA7075) untuk aplikasi struktural berat, dengan konteks fabrikasi additif solid-state dan perlakuan panas T6.",
+      "doi": "10.1016/j.ijfatigue.2026.110024",
+      "eligibility_decision": "include",
+      "evidence_quotes": [
+        {
+          "claim": "T6 meningkatkan kekuatan lelah sekitar 52,7%.",
+          "page": 1,
+          "quote": "fatigue strength at 107 cycles from approximately 55 MPa to 84 MPa, representing a 52.7 % improvement"
+        },
+        {
+          "claim": "T6 tidak menghilangkan partikel Mg–Si atau presipitat batas butiran.",
+          "page": 1,
+          "quote": "residual Mg–Si-rich particles and grain-boundary η/S precipitates continue to limit the fatigue performance"
+        },
+        {
+          "claim": "T6 mengubah mekanisme inisiasi retak dari interlayer ke partikel/grain-boundary.",
+          "page": 2,
+          "quote": "T6 treatment may shift the dominant fatigue crack-initiation mechanism from an interlayer- or soft-zone-controlled mode to a particle- or grain-boundary-precipitate-controlled mode"
+        }
+      ],
+      "extraction_status": "ok",
+      "filename": "1-s2.0-S0142112326005451-main_compressed.pdf",
+      "findings": [
+        "As-deposited alloy menunjukkan heterogenitas arah pembuatan yang memperkuat inisiasi retak dari zona lemah antar lapisan.",
+        "T6 meningkatkan kekuatan lelah dari 55 MPa menjadi 84 MPa (52,7% peningkatan) karena rekonstruksi presipitat η′.",
+        "Setelah T6, retak lelah tetap terjadi di partikel Mg–Si dan presipitat batas butiran (η/S).",
+        "T6 mengubah mekanisme inisiasi retak dari interlayer/soft-zone menjadi partikel/grain-boundary precipitate.",
+        "Heterogenitas arah pembuatan tetap ada meskipun T6, karena eksposur termal kumulatif tidak merata.",
+        "Fatigue failure masih sensitif terhadap partikel dan presipitat meskipun T6."
+      ],
+      "future_research": [
+        "Perlu model multiphysics yang lebih detail untuk menghubungkan sejarah termomekanik, evolusi mikrostruktur, dan kinerja lelah.",
+        "Perlu penelitian lebih lanjut tentang pengaruh geometri dan desain komponen terhadap mekanisme inisiasi retak.",
+        "Perlu optimasi proses AFSD dan T6 untuk mengurangi heterogenitas dan partikel berbahaya."
+      ],
+      "hash": "0c4c91b436215c3554db76e9a9d9944d12932e28a9b387dfde8eb468a75ece36",
+      "id": "0c4c91b436215c35",
+      "json_stored": true,
+      "limitations": [
+        "Tidak dilakukan pengukuran suhu in-situ selama proses AFSD.",
+        "Penelitian fokus pada deposit tebal, bukan komponen kompleks atau geometri lain.",
+        "Tidak semua partikel atau presipitat dapat dihilangkan meskipun T6."
+      ],
+      "methods": "Fabrikasi deposit 102 lapis dengan AFSD, uji lelah S–N, uji tarik, pemetaan kekerasan, EBSD, TEM, dan analisis permukaan patahan. T6 diterapkan dengan proses solusi, pendinginan, dan penuaan.",
+      "objective": "Mengidentifikasi mekanisme inisiasi retak lelah pada deposit tebal AFSD Al–Zn–Mg–Cu sebelum dan sesudah T6, serta memahami perubahan mekanisme akibat perlakuan panas.",
+      "pages": 19,
+      "pdf_stored": true,
+      "relationships": [
+        {
+          "evidence": "Heterogenitas arah pembuatan mempromosikan lokalisasi regangan siklik dan inisiasi retak.",
+          "relation": "memicu",
+          "source": "build-direction heterogeneity",
+          "target": "fatigue crack initiation"
+        },
+        {
+          "evidence": "T6 meningkatkan presipitat η′-dominated dan homogenisasi lokal.",
+          "relation": "menghasilkan",
+          "source": "T6 heat treatment",
+          "target": "η′-dominated precipitation"
+        },
+        {
+          "evidence": "T6 mengubah mekanisme inisiasi retak dari interlayer ke partikel/grain-boundary.",
+          "relation": "mengubah mekanisme",
+          "source": "T6 heat treatment",
+          "target": "fatigue crack initiation"
+        },
+        {
+          "evidence": "Partikel Mg–Si tetap menjadi sumber inisiasi retak meskipun T6.",
+          "relation": "menjadi sumber",
+          "source": "Mg–Si-rich particles",
+          "target": "fatigue crack initiation"
+        },
+        {
+          "evidence": "Presipitat batas butiran η/S tetap aktif sebagai sumber inisiasi retak.",
+          "relation": "menjadi sumber",
+          "source": "grain-boundary η/S phases",
+          "target": "fatigue crack initiation"
+        },
+        {
+          "evidence": "T6 tidak menghilangkan heterogenitas arah pembuatan karena eksposur termal kumulatif.",
+          "relation": "tidak sepenuhnya diatasi",
+          "source": "build-direction heterogeneity",
+          "target": "T6 heat treatment"
+        }
+      ],
+      "research_questions": [
+        "Apakah mekanisme inisiasi retak lelah pada AFSD Al–Zn–Mg–Cu dipengaruhi oleh heterogenitas arah pembuatan atau partikel/precipitat batas butiran?"
+      ],
+      "screening_decision": "include",
+      "screening_suggestion": {
+        "decision": "include",
+        "reason": "Artikel secara eksplisit meneliti mekanisme inisiasi retak lelah pada AFSD Al–Zn–Mg–Cu sebelum dan sesudah T6, yang relevan dengan pertanyaan riset fatigue. Tidak ada kriteria eksklusi yang diberikan oleh pengguna."
+      },
+      "search_date": "2026-10-26",
+      "search_query": "",
+      "source_name": "Upload manual",
+      "text_chars": 18000,
+      "title": "Build-direction heterogeneity and T6-induced shift in fatigue failure mechanisms of thick-wall additive friction stir deposited Al–Zn–Mg–Cu alloy",
+      "topic_tags": [
+        "fatigue",
+        "additive manufacturing",
+        "Al–Zn–Mg–Cu",
+        "T6 treatment",
+        "fatigue crack initiation",
+        "build-direction heterogeneity",
+        "precipitation hardening"
+      ],
+      "uploaded_at": "2026-10-26T16:26:04.062925+00:00",
+      "variables": [
+        "heterogenitas arah pembuatan",
+        "perlakuan T6",
+        "kekuatan lelah",
+        "partikel Mg–Si",
+        "presipitat batas butiran",
+        "lokasi inisiasi retak"
+      ],
+      "year": ""
+    },
+    {
+      "abstract": "Penelitian ini mengidentifikasi mekanisme degradasi kekuatan fatique pada Ti-6Al-4V setelah USRP, dengan fokus pada rasio jari-jari inisiasi retak (A). Ditemukan bahwa ketika A meningkat dari 0 hingga 0.26, batas fatique meningkat 34%, namun saat A > 0.27, kekuatan fatique menurun 29% akibat konsentrasi stres di antar fase α/β.",
+      "analysis_version": 1,
+      "authors": [
+        "Wenwen Xu",
+        "Yilong Liang",
+        "Xiaoqian Yang",
+        "Peng Chen",
+        "Xu Huang",
+        "Guigui Peng",
+        "Xing Ran",
+        "Mingyu Zhu"
+      ],
+      "concepts": [
+        {
+          "description": "Rasio antara kedalaman inisiasi retak (d) dan jari-jari spesimen (r), digunakan untuk mengukur lokasi inisiasi retak.",
+          "name": "crack initiation radius ratio (A)",
+          "parent_concepts": []
+        },
+        {
+          "description": "Kondisi stres di ujung retak yang mempengaruhi perilaku dislokasi dan propagasi retak.",
+          "name": "stress triaxiality",
+          "parent_concepts": []
+        },
+        {
+          "description": "Stres kompresif yang tersisa di permukaan material setelah pemrosesan, yang dapat meningkatkan kekuatan fatique.",
+          "name": "compressive residual stress",
+          "parent_concepts": []
+        },
+        {
+          "description": "Struktur mikroskopis material, termasuk fase α dan β, yang memengaruhi perilaku fatique.",
+          "name": "microstructure",
+          "parent_concepts": []
+        },
+        {
+          "description": "Tingkat stres maksimum yang dapat diterapkan tanpa kegagalan dalam jangka waktu tertentu (10^7 siklus).",
+          "name": "fatigue limit",
+          "parent_concepts": []
+        },
+        {
+          "description": "Teknik permukaan yang menggunakan getaran ultrasonik untuk menghasilkan nanostruktur dan stres residual kompresif.",
+          "name": "ultrasonic surface rolling processing (USRP)",
+          "parent_concepts": []
+        }
+      ],
+      "context": "Aerospace material, Ti-6Al-4V, diperkuat dengan USRP, fokus pada mekanisme degradasi fatique akibat pergeseran lokasi inisiasi retak.",
+      "doi": "10.1016/j.engfailanal.2026.111322",
+      "eligibility_decision": "include",
+      "evidence_quotes": [
+        {
+          "claim": "Ketika A meningkat dari 0 hingga 0.26, batas fatique meningkat 34%.",
+          "page": 1,
+          "quote": "as A increases from 0 to 0.26, the fatigue limit increases by 34 %."
+        },
+        {
+          "claim": "Ketika A > 0.27, kekuatan fatique menurun 29% akibat konsentrasi stres di antar fase α/β.",
+          "page": 1,
+          "quote": "fatigue strength decreases by 29 %, despite deeper hardened and residual stress fields. ... promoting interfacial stress concentration and brittle cleavage fracture."
+        },
+        {
+          "claim": "Teknik USRP menghasilkan lapisan nanostruktur dan stres residual kompresif, namun dapat menyebabkan degradasi fatique jika A terlalu tinggi.",
+          "page": 1,
+          "quote": "USRP induces gradient nanostructures and compressive residual stress fields to enhance fatigue performance. However, counterintuitive degradation in high-cycle fatigue strength has been observed."
+        }
+      ],
+      "extraction_status": "ok",
+      "filename": "1-s2.0-S1350630726007971-main_compressed.pdf",
+      "findings": [
+        "Ketika A meningkat dari 0 hingga 0.26, batas fatique meningkat 34%.",
+        "Ketika A > 0.27, kekuatan fatique menurun 29% akibat konsentrasi stres di antar fase α/β.",
+        "Teknik USRP menghasilkan lapisan nanostruktur dan stres residual kompresif, namun dapat menyebabkan degradasi fatique jika A terlalu tinggi.",
+        "Ketika A > 0.27, stres triaksialitas tinggi di ujung retak menghambat emisi dan perkalian dislokasi.",
+        "Optimal process window ditemukan pada A = 0.20–0.27 untuk performa fatique puncak.",
+        "TEM menunjukkan bahwa konsentrasi stres antar fase α/β memicu patahan ambang."
+      ],
+      "future_research": [],
+      "hash": "c6940a9ebd228d9116533cf10d4c945e9321084ee4bf8877579a9e80365f0814",
+      "id": "c6940a9ebd228d91",
+      "json_stored": true,
+      "limitations": [],
+      "methods": "Uji fatique tingkat tinggi (HCF) pada spesimen Ti-6Al-4V dengan USRP, karakterisasi mikrostruktur, kekerasan, stres residual, dan analisis TEM untuk mengidentifikasi lokasi inisiasi retak.",
+      "objective": "Mengidentifikasi mekanisme degradasi kekuatan fatique pada Ti-6Al-4V setelah USRP dan menetapkan kriteria optimal untuk menghindari over-strengthening.",
+      "pages": 13,
+      "pdf_stored": true,
+      "relationships": [
+        {
+          "evidence": "Ketika A meningkat dari 0 hingga 0.26, batas fatique meningkat 34%.",
+          "relation": "pengaruh",
+          "source": "crack initiation radius ratio (A)",
+          "target": "fatigue limit"
+        },
+        {
+          "evidence": "Elevated stress triaxiality at the crack tip suppresses dislocation emission.",
+          "relation": "menghambat",
+          "source": "stress triaxiality",
+          "target": "dislocation emission"
+        },
+        {
+          "evidence": "Struktur mikroskopis memengaruhi konsentrasi stres antar fase α/β.",
+          "relation": "mempengaruhi",
+          "source": "microstructure",
+          "target": "fatigue performance"
+        },
+        {
+          "evidence": "Compressive residual stress counteracts external tensile stress and reduces effective shear stress for dislocation slip.",
+          "relation": "menguntungkan",
+          "source": "compressive residual stress",
+          "target": "fatigue strength"
+        },
+        {
+          "evidence": "USRP mengubah lokasi inisiasi retak, yang diukur dengan A.",
+          "relation": "mempengaruhi",
+          "source": "ultrasonic surface rolling processing (USRP)",
+          "target": "crack initiation radius ratio (A)"
+        },
+        {
+          "evidence": "When A exceeds a critical value Ac (≈0.27), interfacial stress concentration promotes brittle cleavage fracture.",
+          "relation": "mempengaruhi",
+          "source": "crack initiation radius ratio (A)",
+          "target": "interfacial stress concentration"
+        }
+      ],
+      "research_questions": [],
+      "screening_decision": "include",
+      "screening_suggestion": {
+        "decision": "include",
+        "reason": "Artikel secara eksplisit membahas mekanisme degradasi fatique pada Ti-6Al-4V setelah USRP, dengan fokus pada rasio jari-jari inisiasi retak (A), yang relevan dengan pertanyaan penelitian tentang fatigue."
+      },
+      "search_date": "2026-10-26",
+      "search_query": "",
+      "source_name": "Upload manual",
+      "text_chars": 18000,
+      "title": "Unveiling the fatigue strength degradation mechanism in surface-strengthened Ti-6Al-4V alloy: the critical role of crack initiation radius ratio",
+      "topic_tags": [
+        "fatigue degradation",
+        "Ti-6Al-4V",
+        "ultrasonic surface rolling",
+        "crack initiation",
+        "residual stress",
+        "microstructure"
+      ],
+      "uploaded_at": "2026-10-26T16:28:50.953926+00:00",
+      "variables": [
+        "crack initiation radius ratio (A)",
+        "compressive residual stress",
+        "hardness depth",
+        "fatigue limit",
+        "stress triaxiality",
+        "microstructure"
+      ],
+      "year": ""
+    },
+    {
+      "abstract": "Studi ini menemukan bahwa kelelahan fisik meningkatkan waktu selesai simulasi pemadam kebakaran di kapal dan beban persepsi kerja, serta mengurangi kekuatan otot setelah simulasi.",
+      "analysis_version": 1,
+      "authors": [
+        "Bronia Glen",
+        "Rhiannon Campbell",
+        "Jodie A. Wills",
+        "Mark Wiggins",
+        "Rohan Edmonds",
+        "Benjamin J.C. Kirk",
+        "Tim L.A. Doyle"
+      ],
+      "concepts": [
+        {
+          "description": "Kondisi di mana individu mengalami penurunan kinerja fisik akibat aktivitas fisik berat sebelumnya.",
+          "name": "kelelahan fisik",
+          "parent_concepts": []
+        },
+        {
+          "description": "Jumlah waktu yang dibutuhkan untuk menyelesaikan simulasi pemadam kebakaran.",
+          "name": "waktu selesai simulasi",
+          "parent_concepts": []
+        },
+        {
+          "description": "Persepsi subjektif tentang beban kerja yang dirasakan individu selama aktivitas.",
+          "name": "perceived workload",
+          "parent_concepts": []
+        },
+        {
+          "description": "Kemampuan otot untuk menghasilkan gaya maksimal dalam waktu singkat.",
+          "name": "kekuatan otot",
+          "parent_concepts": []
+        },
+        {
+          "description": "Kondisi di mana suhu tubuh dan lingkungan meningkat, memperburuk kelelahan fisik.",
+          "name": "kondisi panas",
+          "parent_concepts": []
+        },
+        {
+          "description": "Aktivitas simulasi pemadam kebakaran yang dilakukan di lingkungan kapal dengan kondisi fisik tertentu.",
+          "name": "simulasi kapal",
+          "parent_concepts": []
+        }
+      ],
+      "context": "Simulasi laboratorium pemadam kebakaran di kapal dengan peserta non-profesional, dalam kondisi fisik segar dan lelah, dengan atau tanpa sauna suit.",
+      "doi": "10.1016/j.apergo.2026.104877",
+      "eligibility_decision": "include",
+      "evidence_quotes": [
+        {
+          "claim": "Kelelahan fisik meningkatkan waktu selesai simulasi.",
+          "page": 1,
+          "quote": "simulation TTC increased by 7.2% and 8.5% under Fatigue and Fatigue + Heat conditions respectively (p < 0.001)."
+        },
+        {
+          "claim": "Kelelahan fisik meningkatkan beban persepsi kerja.",
+          "page": 1,
+          "quote": "RPE increasing by 32% (Fatigue) and 46% (Fatigue + Heat) (p < 0.001)."
+        },
+        {
+          "claim": "Kelelahan fisik mengurangi kekuatan otot setelah simulasi.",
+          "page": 1,
+          "quote": "pre-simulation fatigue reduced both isometric mid-thigh pull and push-up peak forces (measured post-simulation) compared to control strength measures (p < 0.05)."
+        }
+      ],
+      "extraction_status": "ok",
+      "filename": "1-s2.0-S0003687026001559-main_compressed.pdf",
+      "findings": [
+        "Waktu selesai simulasi meningkat 7.2% di bawah kondisi kelelahan dan 8.5% di bawah kondisi kelelahan + panas (p < 0.001).",
+        "Perceived workload (RPE) meningkat 32% di bawah kondisi kelelahan dan 46% di bawah kondisi kelelahan + panas (p < 0.001).",
+        "Kekuatan isometrik mid-thigh pull dan push-up berkurang setelah simulasi di bawah kondisi kelelahan dibandingkan kondisi segar (p < 0.05).",
+        "Kondisi kelelahan + panas menunjukkan penurunan lebih besar dalam kekuatan otot dibandingkan kondisi kelelahan saja.",
+        "Kondisi kelelahan + panas menghasilkan peningkatan HR dan suhu inti lebih tinggi dibandingkan kondisi kelelahan.",
+        "Tidak ada penelitian sebelumnya yang mengukur efek kelelahan fisik pada simulasi pemadam kebakaran di kapal secara kontinu dan terintegrasi dengan pengukuran kekuatan otot pasca-simulasi."
+      ],
+      "future_research": [
+        "Memahami interaksi antara kelelahan fisik dan panas dalam konteks operasional nyata.",
+        "Mengembangkan protokol latihan untuk mengurangi efek kelelahan fisik pada kinerja pemadam kebakaran.",
+        "Mengukur efek kelelahan fisik pada kinerja kognitif selama simulasi pemadam kebakaran."
+      ],
+      "hash": "06a6af07a6fc4f7d6c9ee44c71f9a41b7034b5b2036fd5ae6742ece120413fbc",
+      "id": "06a6af07a6fc4f7d",
+      "json_stored": true,
+      "limitations": [
+        "Studi menggunakan peserta non-profesional, bukan petugas pemadam kebakaran profesional.",
+        "Simulasi dilakukan di laboratorium, bukan di lingkungan operasional nyata.",
+        "Tidak ada pengukuran kinerja kognitif atau kecepatan reaksi selama simulasi."
+      ],
+      "methods": "Studi menggunakan desain eksperimental dengan 30 peserta yang menjalani simulasi pemadam kebakaran di kapal dalam kondisi segar, lelah, dan lelah + panas, diikuti tes kekuatan otot. Data dianalisis dengan ANOVA berulang.",
+      "objective": "Menentukan pengaruh kelelahan fisik terhadap kinerja dan kekuatan otot selama simulasi pemadam kebakaran di kapal, serta membandingkan efeknya dengan kondisi panas.",
+      "pages": 12,
+      "pdf_stored": true,
+      "relationships": [
+        {
+          "evidence": "Waktu selesai simulasi meningkat 7.2% di bawah kondisi kelelahan (p < 0.001).",
+          "relation": "mempengaruhi",
+          "source": "kelelahan fisik",
+          "target": "waktu selesai simulasi"
+        },
+        {
+          "evidence": "Perceived workload (RPE) meningkat 32% di bawah kondisi kelelahan (p < 0.001).",
+          "relation": "mempengaruhi",
+          "source": "kelelahan fisik",
+          "target": "perceived workload"
+        },
+        {
+          "evidence": "Kekuatan isometrik mid-thigh pull dan push-up berkurang setelah simulasi di bawah kondisi kelelahan (p < 0.05).",
+          "relation": "mempengaruhi",
+          "source": "kelelahan fisik",
+          "target": "kekuatan otot"
+        },
+        {
+          "evidence": "Waktu selesai simulasi meningkat 8.5% di bawah kondisi kelelahan + panas (p < 0.001).",
+          "relation": "mempengaruhi",
+          "source": "kondisi panas",
+          "target": "waktu selesai simulasi"
+        },
+        {
+          "evidence": "Perceived workload (RPE) meningkat 46% di bawah kondisi kelelahan + panas (p < 0.001).",
+          "relation": "mempengaruhi",
+          "source": "kondisi panas",
+          "target": "perceived workload"
+        },
+        {
+          "evidence": "Kondisi kelelahan + panas menunjukkan penurunan lebih besar dalam kekuatan otot dibandingkan kondisi kelelahan saja.",
+          "relation": "interaksi",
+          "source": "kelelahan fisik",
+          "target": "kondisi panas"
+        }
+      ],
+      "research_questions": [
+        "Bagaimana kelelahan fisik memengaruhi waktu selesai simulasi pemadam kebakaran di kapal?",
+        "Bagaimana kelelahan fisik memengaruhi beban persepsi kerja dan kekuatan otot setelah simulasi?",
+        "Bagaimana interaksi kelelahan fisik dan panas memengaruhi kinerja?"
+      ],
+      "screening_decision": "include",
+      "screening_suggestion": {
+        "decision": "include",
+        "reason": "Artikel secara eksplisit meneliti efek kelelahan fisik pada kinerja simulasi pemadam kebakaran di kapal, yang relevan dengan pertanyaan penelitian 'fatigue'."
+      },
+      "search_date": "2026-10-26",
+      "search_query": "",
+      "source_name": "Upload manual",
+      "text_chars": 18000,
+      "title": "Physical fatigue increases shipboard firefighting simulation completion time and perceived workload",
+      "topic_tags": [
+        "kelelahan fisik",
+        "pemadam kebakaran",
+        "simulasi kapal",
+        "kekuatan otot",
+        "perceived workload",
+        "panas",
+        "kondisi laboratorium"
+      ],
+      "uploaded_at": "2026-10-26T16:32:07.833562+00:00",
+      "variables": [
+        "kelelahan fisik",
+        "waktu selesai simulasi",
+        "perceived workload (RPE)",
+        "kekuatan otot (IMTP, IPU, handgrip)",
+        "kondisi panas",
+        "kondisi segar"
+      ],
+      "year": ""
+    },
+    {
+      "abstract": "Penelitian ini mengusulkan metode model probabilitas keausan berbasis fractography untuk baja tahan karat non-magnetik, menggunakan regresi Gaussian proses dengan prior fisik yang diambil dari analisis fractografi, meningkatkan akurasi prediksi di bawah kondisi sampel kecil.",
+      "analysis_version": 1,
+      "authors": [
+        "Shuang Li",
+        "Dong Guo",
+        "Yongyou Yang",
+        "Haifeng Zhao"
+      ],
+      "concepts": [
+        {
+          "description": "Pemodelan yang memanfaatkan informasi morfologi retak dari analisis fractografi untuk membangun prior fisik.",
+          "name": "Fractography-informed modeling",
+          "parent_concepts": []
+        },
+        {
+          "description": "Metode regresi probabilistik yang memodelkan hubungan antara input dan output dengan distribusi probabilitas.",
+          "name": "Gaussian Process Regression",
+          "parent_concepts": []
+        },
+        {
+          "description": "Prior fisik yang dibangun dari mekanisme kerusakan mikroskopis, bukan dari model teoritis umum.",
+          "name": "Physics-informed prior",
+          "parent_concepts": []
+        },
+        {
+          "description": "Keausan yang terjadi pada siklus beban tinggi, umumnya di atas 10^4 siklus.",
+          "name": "High-cycle fatigue",
+          "parent_concepts": []
+        },
+        {
+          "description": "Kondisi di mana jumlah data eksperimen terbatas, membutuhkan pendekatan yang lebih efisien dan robust.",
+          "name": "Small-sample regime",
+          "parent_concepts": []
+        },
+        {
+          "description": "Prediksi umur keausan material berdasarkan data eksperimen dan model fisik atau data-driven.",
+          "name": "Fatigue life prediction",
+          "parent_concepts": []
+        }
+      ],
+      "context": "Aplikasi industri dalam sistem pengeboran rotary steerable di lapangan minyak dan gas, menggunakan baja tahan karat non-magnetik yang terpapar beban siklik tinggi di lingkungan suhu tinggi.",
+      "doi": "10.1016/j.ijfatigue.2026.110015",
+      "eligibility_decision": "include",
+      "evidence_quotes": [
+        {
+          "claim": "Metode FI-GPR mengurangi error rata-rata absolut.",
+          "page": 1,
+          "quote": "the mean absolute error from 0.22 to 0.17"
+        },
+        {
+          "claim": "Cakupan probabilitas interval prediksi meningkat.",
+          "page": 1,
+          "quote": "the prediction interval coverage probability from 74% to 93%"
+        },
+        {
+          "claim": "Metode ini lebih tahan terhadap ukuran sampel kecil.",
+          "page": 1,
+          "quote": "reduced sensitivity to sample size"
+        }
+      ],
+      "extraction_status": "ok",
+      "filename": "1-s2.0-S0142112326005360-main_compressed.pdf",
+      "findings": [
+        "Metode FI-GPR mengurangi error rata-rata absolut dari 0.22 menjadi 0.17.",
+        "Cakupan probabilitas interval prediksi meningkat dari 74% menjadi 93%.",
+        "Metode ini lebih tahan terhadap ukuran sampel kecil dibanding metode umum.",
+        "Prior fisik dari fractografi lebih spesifik dan relevan dibanding prior teoritis umum.",
+        "Model menunjukkan generalisasi lebih baik di bawah kondisi data terbatas.",
+        "Keragaman data keausan mencapai 0.11 hingga 0.67 pada tingkat stres tertentu."
+      ],
+      "future_research": [],
+      "hash": "f6b23ffd111c7d02e3e410b57dbc962db01c89e94ed894e8b27339cbd00b4c18",
+      "id": "f6b23ffd111c7d02",
+      "json_stored": true,
+      "limitations": [],
+      "methods": "Metode regresi Gaussian proses yang diintegrasikan dengan prior fisik dari analisis fractografi dan mekanisme pertumbuhan retak. Data uji keausan digunakan sebagai supervisi, sementara prior fisik memberikan kendali mekanisme. Uji ablasasi dilakukan untuk mengevaluasi efektivitas prior fisik.",
+      "objective": "Mengembangkan model prediksi keausan probabilistik berbasis fractography untuk baja tahan karat non-magnetik dalam sistem pengeboran rotary steerable, dengan memanfaatkan data eksperimen dan prior fisik dari mekanisme kerusakan.",
+      "pages": 19,
+      "pdf_stored": true,
+      "relationships": [
+        {
+          "evidence": "Metode FI-GPR menggabungkan prior fisik dari fractografi dengan GPR untuk prediksi keausan.",
+          "relation": "menggunakan",
+          "source": "Fractography-informed modeling",
+          "target": "Gaussian Process Regression"
+        },
+        {
+          "evidence": "Prior fisik diterapkan sebagai kendali mekanisme dalam GPR.",
+          "relation": "mengontrol",
+          "source": "Physics-informed prior",
+          "target": "Gaussian Process Regression"
+        },
+        {
+          "evidence": "Model ini dirancang untuk memprediksi keausan tingkat tinggi pada baja tahan karat.",
+          "relation": "diprediksi",
+          "source": "High-cycle fatigue",
+          "target": "Fatigue life prediction"
+        },
+        {
+          "evidence": "Metode ini dirancang untuk bekerja di bawah kondisi sampel kecil.",
+          "relation": "diterapkan pada",
+          "source": "Small-sample regime",
+          "target": "Gaussian Process Regression"
+        },
+        {
+          "evidence": "Fractography digunakan untuk mengidentifikasi mekanisme kerusakan dan mengekstrak prior fisik.",
+          "relation": "menghasilkan",
+          "source": "Fractography-informed modeling",
+          "target": "Physics-informed prior"
+        },
+        {
+          "evidence": "GPR digunakan untuk memprediksi keausan dengan data eksperimen dan prior fisik.",
+          "relation": "menghasilkan",
+          "source": "Gaussian Process Regression",
+          "target": "Fatigue life prediction"
+        }
+      ],
+      "research_questions": [],
+      "screening_decision": "include",
+      "screening_suggestion": {
+        "decision": "include",
+        "reason": "Artikel secara eksplisit membahas prediksi keausan (fatigue) dengan pendekatan berbasis fractografi dan GPR, relevan dengan pertanyaan riset 'fatigue'."
+      },
+      "search_date": "2026-10-26",
+      "search_query": "",
+      "source_name": "Upload manual",
+      "text_chars": 18000,
+      "title": "Fractography-informed Gaussian process regression for fatigue prediction of non-magnetic stainless steel in rotary steerable drilling system",
+      "topic_tags": [
+        "fatigue modeling",
+        "fractography",
+        "Gaussian process regression",
+        "non-magnetic stainless steel",
+        "high cycle fatigue",
+        "probabilistic modeling"
+      ],
+      "uploaded_at": "2026-10-26T16:40:32.638882+00:00",
+      "variables": [
+        "keausan",
+        "suhu",
+        "frekuensi beban",
+        "prior fisik dari fractografi",
+        "data eksperimen",
+        "prediksi interval keausan"
+      ],
+      "year": ""
+    },
+    {
+      "abstract": "Penelitian ini mengembangkan model kegagalan fatig yang kompetitif untuk mengevaluasi mode kegagalan fatig dominan dan retakan campuran multi-situs pada deck baja ortotropik skala penuh. Model ini memprediksi kehidupan fatig dengan akurasi rata-rata error <15% untuk tegangan struktural dan <26% untuk panjang retakan.",
+      "analysis_version": 1,
+      "authors": [
+        "Haibo Yang",
+        "Shuobin Chen",
+        "Zhihao Chen",
+        "Ping Wang",
+        "Hongliang Qian"
+      ],
+      "concepts": [
+        {
+          "description": "Model yang membandingkan semua mode kegagalan fatig untuk mengidentifikasi mode dominan dan memprediksi kehidupan struktur.",
+          "name": "competitive fatigue failure model",
+          "parent_concepts": []
+        },
+        {
+          "description": "Proses munculnya retakan fatig pada posisi kritis seperti ujung las.",
+          "name": "fatigue crack initiation",
+          "parent_concepts": []
+        },
+        {
+          "description": "Teori yang menyatakan kegagalan terjadi ketika akumulasi kerusakan mencapai 1.0.",
+          "name": "Miner's linear cumulative damage theory",
+          "parent_concepts": []
+        },
+        {
+          "description": "Tegangan yang dihitung berdasarkan keseimbangan mekanik dan teori fraktur, bukan tegangan hotspot atau efektif.",
+          "name": "structural stress",
+          "parent_concepts": []
+        },
+        {
+          "description": "Retakan fatig yang muncul di berbagai lokasi dengan mode berbeda, saling mempengaruhi.",
+          "name": "multi-site mixed-mode fatigue cracks",
+          "parent_concepts": []
+        },
+        {
+          "description": "Desain lubang lengkung pada crossbeam yang meningkatkan ketahanan fatig.",
+          "name": "arc-shaped cutouts",
+          "parent_concepts": []
+        }
+      ],
+      "context": "Jembatan baja ortotropik dengan struktur multi-span dan multi-girder, fokus pada koneksi las kritis seperti U-rib ke crossbeam dan deck ke U-rib.",
+      "doi": "10.1016/j.engfailanal.2026.111505",
+      "eligibility_decision": "include",
+      "evidence_quotes": [],
+      "extraction_status": "ok",
+      "filename": "1-s2.0-S1350630726009805-main_compressed.pdf",
+      "findings": [
+        "Model kegagalan fatig kompetitif dapat menentukan mode kegagalan dominan dan retakan campuran multi-situs dengan akurasi tinggi.",
+        "Akurasi prediksi kehidupan fatig menggunakan model ini memiliki standar deviasi 4.56, lebih baik dibanding pendekatan konvensional.",
+        "Tegangan fatig pada koneksi deck-U-rib berkurang 32.95%, sementara pada crossbeam meningkat 22.99%.",
+        "Penambahan cutout lengkung meningkatkan ketahanan fatig secara signifikan.",
+        "Efek akumulasi kerusakan fatig di bawah beban multi-level dapat diidentifikasi dan diukur.",
+        "Kriteria pengaruh tegangan geser dapat diturunkan dari model ini."
+      ],
+      "future_research": [],
+      "hash": "9ac9ffc7301449aecfa728463002d487adc069b79ba18e64e1f221f9290dd433",
+      "id": "9ac9ffc7301449ae",
+      "json_stored": true,
+      "limitations": [],
+      "methods": "Uji fatig skala penuh pada model deck baja ortotropik multi-span dan multi-girder, disertai model kompetitif kegagalan fatig berbasis simulasi elemen hingga dan analisis tegangan nodal.",
+      "objective": "Mengembangkan model kegagalan fatig kompetitif untuk memprediksi mode kegagalan dominan dan kehidupan fatig pada deck baja ortotropik skala penuh, serta mengevaluasi efek akumulasi kerusakan fatig.",
+      "pages": 20,
+      "pdf_stored": true,
+      "relationships": [
+        {
+          "evidence": "Model ini dapat menentukan mode kegagalan dominan dan retakan campuran multi-situs.",
+          "relation": "mengidentifikasi",
+          "source": "competitive fatigue failure model",
+          "target": "fatigue crack initiation"
+        },
+        {
+          "evidence": "Tegangan struktural dihitung untuk memprediksi kehidupan fatig.",
+          "relation": "menggunakan",
+          "source": "structural stress",
+          "target": "fatigue life prediction"
+        },
+        {
+          "evidence": "Kegagalan fatig dianggap terjadi ketika akumulasi kerusakan mencapai 1.0.",
+          "relation": "dasar teori",
+          "source": "Miner's linear cumulative damage theory",
+          "target": "fatigue failure"
+        },
+        {
+          "evidence": "Model ini menangani evolusi bersamaan dari berbagai mode kegagalan.",
+          "relation": "objek analisis",
+          "source": "multi-site mixed-mode fatigue cracks",
+          "target": "competitive fatigue failure model"
+        },
+        {
+          "evidence": "Penambahan cutout lengkung meningkatkan ketahanan fatig secara signifikan.",
+          "relation": "mengoptimalkan",
+          "source": "arc-shaped cutouts",
+          "target": "fatigue resistance"
+        },
+        {
+          "evidence": "Tegangan struktural digunakan dalam model akumulasi kerusakan.",
+          "relation": "komponen",
+          "source": "structural stress",
+          "target": "Miner's linear cumulative damage theory"
+        }
+      ],
+      "research_questions": [],
+      "screening_decision": "include",
+      "screening_suggestion": {
+        "decision": "include",
+        "reason": "Artikel secara eksplisit menangani fatigue pada deck baja ortotropik skala penuh, mengembangkan model kompetitif, dan menyajikan data uji dengan akurasi prediksi yang diukur. Relevan dengan pertanyaan riset fatigue."
+      },
+      "search_date": "2026-10-26",
+      "search_query": "",
+      "source_name": "Upload manual",
+      "text_chars": 18000,
+      "title": "Fatigue performance analysis of full-scale multi-span and multi-girder orthotropic steel bridge decks: A competitive fatigue failure model",
+      "topic_tags": [
+        "fatigue failure",
+        "orthotropic steel deck",
+        "competitive failure model",
+        "fatigue life prediction",
+        "cumulative damage",
+        "welding details"
+      ],
+      "uploaded_at": "2026-10-26T16:42:46.257529+00:00",
+      "variables": [
+        "tegangan struktural",
+        "panjang retakan",
+        "kehidupan fatig",
+        "mode kegagalan fatig dominan",
+        "efek akumulasi kerusakan fatig",
+        "desain cutout lengkung"
+      ],
+      "year": ""
+    },
+    {
+      "abstract": "Ulasan tentang bagaimana struktur mikro laminasi dan fase metastabil memengaruhi ketahanan lelah baja berkekuatan tinggi, dengan fokus pada mekanisme TICC dan RICC untuk mengatasi trade-off antara kekuatan tarik dan ketahanan lelah.",
+      "analysis_version": 1,
+      "authors": [
+        "Zhao Zhang",
+        "Bochuan Li",
+        "He Liu",
+        "Wanjia Li",
+        "Motomichi Koyama"
+      ],
+      "concepts": [
+        {
+          "description": "Transformasi induksi crack closure yang dihasilkan oleh fase metastabil.",
+          "name": "TICC",
+          "parent_concepts": []
+        },
+        {
+          "description": "Crack closure yang dihasilkan oleh ketidakrataan permukaan retak.",
+          "name": "RICC",
+          "parent_concepts": []
+        },
+        {
+          "description": "Struktur mikro yang terdiri dari lapisan yang menghambat propagasi retak.",
+          "name": "laminated microstructure",
+          "parent_concepts": []
+        },
+        {
+          "description": "Fase yang dapat bertransformasi secara induksi deformasi, meningkatkan ketahanan lelah.",
+          "name": "metastable phase",
+          "parent_concepts": []
+        },
+        {
+          "description": "Ketahanan lelah dibandingkan dengan kekuatan tarik untuk mengatasi trade-off.",
+          "name": "fatigue strength normalized by tensile strength",
+          "parent_concepts": []
+        },
+        {
+          "description": "Baja dengan struktur mikro laminasi dan fase metastabil yang menggabungkan TICC dan RICC.",
+          "name": "TRIP-maraging steel",
+          "parent_concepts": []
+        }
+      ],
+      "context": "Aplikasi baja berkekuatan tinggi dalam industri otomotif, pesawat, kapal, dan struktur bangunan dengan fokus pada ketahanan lelah dan desain ringan.",
+      "doi": "10.1016/j.engfracmech.2026.112725",
+      "eligibility_decision": "include",
+      "evidence_quotes": [
+        {
+          "claim": "Ketahanan lelah dipengaruhi oleh mikrostruktur, bukan hanya kekuatan tarik.",
+          "page": 2,
+          "quote": "Fatigue strength shows different dependencies on microstructures such as grain size."
+        },
+        {
+          "claim": "Struktur laminasi meningkatkan ketahanan lelah.",
+          "page": 3,
+          "quote": "Laminated microstructure could be regarded as the key to improving the fatigue crack resistance."
+        },
+        {
+          "claim": "Kombinasi laminasi dan fase metastabil meningkatkan ketahanan lelah.",
+          "page": 1,
+          "quote": "Synergistically activate multiple fatigue resistance mechanisms, namely TICC and RICC."
+        }
+      ],
+      "extraction_status": "ok",
+      "filename": "1-s2.0-S0013794426008878-main_compressed.pdf",
+      "findings": [
+        "Ketahanan lelah baja berkekuatan tinggi dipengaruhi oleh mikrostruktur, bukan hanya kekuatan tarik.",
+        "Struktur laminasi (seperti dalam baja pearlitik) meningkatkan ketahanan lelah melalui defleksi retak.",
+        "Fase metastabil (TRIP) meningkatkan ketahanan lelah melalui transformasi induksi plastisitas (TICC).",
+        "Kombinasi laminasi dan fase metastabil (TRIP-maraging) menghasilkan ketahanan lelah yang lebih baik dibandingkan baja konvensional.",
+        "Ketahanan lelah normalisasi terhadap kekuatan tarik menunjukkan tren non-monotonik terhadap struktur mikro.",
+        "Distribusi martensit pulau lebih baik daripada martensit berbentuk serat dalam hal ketahanan lelah normalisasi."
+      ],
+      "future_research": [
+        "Mengoptimalkan desain komposisi/alloy untuk memaksimalkan efek transformasi fase.",
+        "Mempelajari mekanisme interaksi antara TICC dan RICC dalam mikrostruktur laminasi.",
+        "Mengembangkan strategi desain mikrostruktur untuk aplikasi industri spesifik."
+      ],
+      "hash": "38f944d4409434997e28360c345fbf3d18118ebf4f3394e437067236480cafa1",
+      "id": "38f944d440943499",
+      "json_stored": true,
+      "limitations": [],
+      "methods": "Ulasan sistematis literatur dengan fokus pada material baja berkekuatan tinggi, analisis mekanisme lelah berdasarkan mikrostruktur, dan perbandingan sifat lelah berbagai jenis baja.",
+      "objective": "Mengulas kontribusi struktur mikro laminasi dan fase metastabil terhadap sifat lelah baja berkekuatan tinggi, serta menyarankan strategi desain mikrostruktur untuk meningkatkan ketahanan lelah.",
+      "pages": 28,
+      "pdf_stored": true,
+      "relationships": [
+        {
+          "evidence": "Laminated microstructure defleksi retak dan meningkatkan ketahanan lelah.",
+          "relation": "menghambat",
+          "source": "laminated microstructure",
+          "target": "fatigue crack resistance"
+        },
+        {
+          "evidence": "Fase metastabil menghasilkan TICC melalui transformasi induksi plastisitas.",
+          "relation": "menghasilkan",
+          "source": "metastable phase",
+          "target": "TICC"
+        },
+        {
+          "evidence": "TICC memperlambat pertumbuhan retak dan meningkatkan ketahanan lelah.",
+          "relation": "meningkatkan",
+          "source": "TICC",
+          "target": "fatigue strength"
+        },
+        {
+          "evidence": "RICC memperlambat pertumbuhan retak melalui ketidakrataan permukaan.",
+          "relation": "meningkatkan",
+          "source": "RICC",
+          "target": "fatigue strength"
+        },
+        {
+          "evidence": "TRIP-maraging steel menunjukkan peningkatan ketahanan lelah normalisasi.",
+          "relation": "meningkatkan",
+          "source": "TRIP-maraging steel",
+          "target": "fatigue strength normalized by tensile strength"
+        },
+        {
+          "evidence": "Morphology martensite mempengaruhi pertumbuhan retak melalui defleksi dan kekuatan.",
+          "relation": "mempengaruhi",
+          "source": "martensite morphology",
+          "target": "fatigue crack propagation"
+        }
+      ],
+      "research_questions": [],
+      "screening_decision": "include",
+      "screening_suggestion": {
+        "decision": "include",
+        "reason": "Artikel relevan dengan topik ketahanan lelah dan mikrostruktur baja berkekuatan tinggi, dengan temuan spesifik dan metodologi sistematis."
+      },
+      "search_date": "2026-10-26",
+      "search_query": "",
+      "source_name": "Upload manual",
+      "text_chars": 18000,
+      "title": "Overview of laminated microstructure and metastable phase effects on fatigue of high-strength steels",
+      "topic_tags": [
+        "ketahanan lelah",
+        "struktur mikro",
+        "baja berkekuatan tinggi",
+        "TICC",
+        "RICC",
+        "TRIP",
+        "laminasi mikro",
+        "metastabil"
+      ],
+      "uploaded_at": "2026-10-26T16:49:08.536263+00:00",
+      "variables": [
+        "struktur mikro laminasi",
+        "fase metastabil",
+        "kekuatan tarik",
+        "ketahanan lelah",
+        "TICC",
+        "RICC"
+      ],
+      "year": ""
+    },
+    {
+      "abstract": "Studi ini mengevaluasi pemulihan PLFFD setelah kontraksi isometrik triceps pada intensitas tinggi (70% MVF) dan rendah (20% MVF). Hasil menunjukkan perbedaan awal dalam rasio 20/100 Hz, tetapi pemulihan selanjutnya sama antara intensitas.",
+      "analysis_version": 1,
+      "authors": [
+        "Sanjay Veerasammy",
+        "Justin B. Davidson",
+        "Jared-Isaac Friedel",
+        "James R. Potvin",
+        "A. Russell Tupling",
+        "Steven L. Fischer"
+      ],
+      "concepts": [
+        {
+          "description": "Penurunan kemampuan menghasilkan gaya pada frekuensi rendah dibanding frekuensi tinggi setelah kelelahan otot.",
+          "name": "PLFFD",
+          "parent_concepts": []
+        },
+        {
+          "description": "Unit saraf otot yang mengontrol satu atau lebih sel otot, dengan tingkat ambang yang berbeda.",
+          "name": "Motor Unit",
+          "parent_concepts": []
+        },
+        {
+          "description": "Prinsip bahwa motor unit dengan ambang rendah (slow twitch) diterbitkan lebih awal dibanding unit ambang tinggi (fast twitch).",
+          "name": "Size Principle",
+          "parent_concepts": []
+        },
+        {
+          "description": "Kecepatan pemulihan kemampuan menghasilkan gaya setelah kelelahan.",
+          "name": "Recovery Rate",
+          "parent_concepts": []
+        },
+        {
+          "description": "Metode pemberian rangsangan listrik ke otot melalui kulit untuk mengukur kemampuan menghasilkan gaya tanpa keterlibatan pusat.",
+          "name": "Transcutaneous Stimulation",
+          "parent_concepts": []
+        },
+        {
+          "description": "Kelelahan yang terjadi ketika individu tidak mampu melanjutkan kontraksi meskipun masih mampu secara fisiologis.",
+          "name": "Volitional Fatigue",
+          "parent_concepts": []
+        }
+      ],
+      "context": "Penelitian dilakukan di laboratorium kinesiologi, melibatkan mahasiswa universitas sehat, dengan fokus pada pemulihan kelelahan otot setelah kontraksi isometrik.",
+      "doi": "10.1016/j.apergo.2025.104552",
+      "eligibility_decision": "include",
+      "evidence_quotes": [
+        {
+          "claim": "Perbedaan awal rasio 20/100 Hz kemungkinan disebabkan potentiasi pasca-aktivasi.",
+          "page": 1,
+          "quote": "Initial differences in the 20/100 Hz ratio within the first 0–4 min are likely explained by post-activation potentiation."
+        },
+        {
+          "claim": "Pemulihan PLFFD mungkin tidak bergantung pada intensitas kontraksi.",
+          "page": 1,
+          "quote": "The practical impact is that recovery of prolonged frequency fatigue may not depend on the intensity of the contraction that caused the fatigue."
+        },
+        {
+          "claim": "Model SPiTFiRe belum divalidasi secara empiris terkait pemulihan motor unit.",
+          "page": 2,
+          "quote": "However, we know little about the recovery rates of different motor units, and this is a significant gap in our ability to advance the use of models to predict recovery requirements."
+        }
+      ],
+      "extraction_status": "ok",
+      "filename": "1-s2.0-S0003687025000882-main_compressed.pdf",
+      "findings": [
+        "Rasio 20/100 Hz awal lebih tinggi setelah intensitas tinggi.",
+        "Pemulihan rasio 20/100 Hz sama antara intensitas tinggi dan rendah setelah 4 menit.",
+        "Perbedaan awal kemungkinan disebabkan potentiasi pasca-aktivasi.",
+        "Pemulihan PLFFD mungkin tidak bergantung pada intensitas kontraksi yang menyebabkan kelelahan.",
+        "Model SPiTFiRe belum divalidasi secara empiris terkait pemulihan motor unit.",
+        "Tidak ada perbedaan signifikan dalam pemulihan rasio 20/100 Hz setelah 60 menit."
+      ],
+      "future_research": [
+        "Memvalidasi model SPiTFiRe terkait laju pemulihan motor unit.",
+        "Mengukur pemulihan jangka panjang PLFFD.",
+        "Mengkaji dampak kelelahan psikologis terhadap pemulihan PLFFD."
+      ],
+      "hash": "9b2af610e854b83e5049204f4f0155eadf9d9142f22eb40132f78d8e9165105a",
+      "id": "9b2af610e854b83e",
+      "json_stored": true,
+      "limitations": [
+        "Tidak ada data tentang pemulihan jangka panjang.",
+        "Tidak ada kontrol terhadap faktor motivasi atau kelelahan psikologis.",
+        "Hanya melibatkan populasi mahasiswa sehat, tidak mewakili populasi kerja umum."
+      ],
+      "methods": "Studi eksperimental dengan 28 peserta (14 laki-laki, 14 perempuan) melakukan kontraksi isometrik triceps hingga kelelahan volunter pada intensitas 70% dan 20% MVF. Rasio 20/100 Hz diukur sebelum dan selama 60 menit pemulihan.",
+      "objective": "Menginvestigasi pemulihan PLFFD dalam 1 jam setelah kelelahan volunter berdasarkan intensitas kontraksi isometrik triceps.",
+      "pages": 7,
+      "pdf_stored": true,
+      "relationships": [
+        {
+          "evidence": "PLFFD diukur melalui rasio 20/100 Hz yang mencerminkan perbedaan pemulihan antar motor unit.",
+          "relation": "dipengaruhi oleh",
+          "source": "PLFFD",
+          "target": "Motor Unit"
+        },
+        {
+          "evidence": "Motor unit ambang rendah diterbitkan lebih awal sesuai prinsip ukuran.",
+          "relation": "mengikuti",
+          "source": "Motor Unit",
+          "target": "Size Principle"
+        },
+        {
+          "evidence": "Rasio 20/100 Hz digunakan untuk mengukur laju pemulihan PLFFD.",
+          "relation": "mengukur",
+          "source": "PLFFD",
+          "target": "Recovery Rate"
+        },
+        {
+          "evidence": "Stimulasi transkutan digunakan untuk mengukur PLFFD tanpa bias pusat.",
+          "relation": "metode pengukuran",
+          "source": "Transcutaneous Stimulation",
+          "target": "PLFFD"
+        },
+        {
+          "evidence": "Prinsip ukuran menentukan urutan penerbitan motor unit berdasarkan ambang.",
+          "relation": "mengatur",
+          "source": "Size Principle",
+          "target": "Motor Unit"
+        },
+        {
+          "evidence": "Recovery rate diukur melalui pemulihan rasio 20/100 Hz setelah kelelahan.",
+          "relation": "komponen",
+          "source": "Recovery Rate",
+          "target": "PLFFD"
+        }
+      ],
+      "research_questions": [
+        "Does the intensity of sustained isometric triceps brachii contraction to fatigue affect PLFFD at volitional fatigue, and during 60 min of recovery?"
+      ],
+      "screening_decision": "include",
+      "screening_suggestion": {
+        "decision": "include",
+        "reason": "Artikel secara eksplisit menjawab pertanyaan penelitian tentang pemulihan PLFFD berdasarkan intensitas kontraksi, dengan temuan empiris dan metode yang jelas. Cocok untuk systematic review tentang fatigue."
+      },
+      "search_date": "2026-10-26",
+      "search_query": "",
+      "source_name": "Upload manual",
+      "text_chars": 18000,
+      "title": "Prolonged low-frequency force depression recovery response following an isometric triceps extension to volitional fatigue at a high versus low intensity contraction",
+      "topic_tags": [
+        "muscle fatigue",
+        "recovery",
+        "PLFFD",
+        "motor unit",
+        "isometric contraction",
+        "ergonomics"
+      ],
+      "uploaded_at": "2026-10-26T16:52:48.721936+00:00",
+      "variables": [
+        "intensitas kontraksi",
+        "rasio 20/100 Hz",
+        "waktu pemulihan",
+        "motor unit tingkat rendah dan tinggi"
+      ],
+      "year": "2025"
+    },
+    {
+      "abstract": "SAFE framework integrates wearable sensing, biomechanical modelling, and task detection to monitor operator endurance. Validated with 10 participants, it predicts fatigue using IMUs, pressure insoles, and torque-based models, correlating strongly with subjective ratings.",
+      "analysis_version": 1,
+      "authors": [
+        "Patricia O'Sullivan",
+        "Matteo Menolotto",
+        "Brendan O'Flynn",
+        "Dimitrios-Sokratis Komaris"
+      ],
+      "concepts": [
+        {
+          "description": "Estimated time before fatigue onset under current task demands.",
+          "name": "endurance time",
+          "parent_concepts": []
+        },
+        {
+          "description": "Instantaneous measure of endurance used during activity.",
+          "name": "endurance consumption",
+          "parent_concepts": []
+        },
+        {
+          "description": "Identification of task type using sensor data to adapt fatigue predictions.",
+          "name": "task classification",
+          "parent_concepts": []
+        },
+        {
+          "description": "Mechanistic model using empirical data to predict endurance under dynamic, loaded conditions.",
+          "name": "torque-based endurance model",
+          "parent_concepts": []
+        },
+        {
+          "description": "Participant-reported perceived exertion used for validation and model tuning.",
+          "name": "subjective fatigue rating",
+          "parent_concepts": []
+        },
+        {
+          "description": "Use of IMUs and pressure insoles to capture biomechanical data for fatigue prediction.",
+          "name": "wearable sensing",
+          "parent_concepts": []
+        }
+      ],
+      "context": "Laboratory setting with 10 participants performing industry-type tasks. Focus on occupational ergonomics and fatigue prediction using wearable sensors.",
+      "doi": "10.1016/j.apergo.2026.104856",
+      "eligibility_decision": "include",
+      "evidence_quotes": [
+        {
+          "claim": "IMU-derived joint angles were validated against motion capture.",
+          "page": 1,
+          "quote": "Validation against motion capture confirmed that IMU-derived joint angles were within acceptable error ranges for endurance estimation."
+        },
+        {
+          "claim": "Framework correlated strongly with subjective fatigue ratings.",
+          "page": 1,
+          "quote": "The framework produced endurance metrics that correlated strongly with subjective fatigue ratings (rmm≥.878, P < .001)."
+        },
+        {
+          "claim": "Framework enables task-specific endurance predictions.",
+          "page": 1,
+          "quote": "Task classification via pressure insole data enabled the application of task-specific endurance coefficients."
+        }
+      ],
+      "extraction_status": "ok",
+      "filename": "1-s2.0-S0003687026001341-main_compressed.pdf",
+      "findings": [
+        "IMU-derived joint angles validated against motion capture with acceptable error ranges.",
+        "Framework distinguished high- and low-risk tasks (P < .05).",
+        "Strong correlation between predicted endurance and subjective fatigue (r ≥ .878, P < .001).",
+        "Task classification via pressure insoles enabled task-specific endurance coefficients.",
+        "Framework outputs include predicted ET and CE for real-time monitoring.",
+        "System adaptable to dynamic tasks and individual parameters."
+      ],
+      "future_research": [
+        "Deploy SAFE for real-time online operator monitoring.",
+        "Integrate mobility during tasks for future deployment.",
+        "Use perceived exertion to tune model outputs for better validity."
+      ],
+      "hash": "cc340a8d17679496be4c636e1147c5eceefe215dd1f1b1d755887f3f05ad542c",
+      "id": "cc340a8d17679496",
+      "json_stored": true,
+      "limitations": [],
+      "methods": "Offline lab study with 10 participants performing industry tasks. Used IMUs, pressure insoles, torque-based endurance model, task classification, and custom app. Validated against motion capture and subjective fatigue ratings.",
+      "objective": "To develop and validate a wearable framework (SAFE) that predicts operator endurance and ergonomic risk using biomechanical modelling and task classification.",
+      "pages": 17,
+      "pdf_stored": true,
+      "relationships": [
+        {
+          "evidence": "Model computes predicted ET using torque and task parameters.",
+          "relation": "predicts",
+          "source": "torque-based endurance model",
+          "target": "endurance time"
+        },
+        {
+          "evidence": "Task classification enables task-specific endurance coefficients for accurate predictions.",
+          "relation": "influences",
+          "source": "task classification",
+          "target": "endurance time"
+        },
+        {
+          "evidence": "Strong correlation (r ≥ .878) between subjective ratings and endurance consumption.",
+          "relation": "validates",
+          "source": "subjective fatigue rating",
+          "target": "endurance consumption"
+        },
+        {
+          "evidence": "Joint angles validated against motion capture and used in endurance model.",
+          "relation": "informs",
+          "source": "IMU-derived joint angles",
+          "target": "endurance time"
+        },
+        {
+          "evidence": "Pressure insoles used to classify tasks and detect rest.",
+          "relation": "enables",
+          "source": "pressure insoles",
+          "target": "task classification"
+        },
+        {
+          "evidence": "Wearables stream data for task classification and endurance prediction.",
+          "relation": "supports",
+          "source": "wearable sensing",
+          "target": "task classification"
+        }
+      ],
+      "research_questions": [],
+      "screening_decision": "include",
+      "screening_suggestion": {
+        "decision": "include",
+        "reason": "Artikel secara langsung membahas fatigue dalam konteks kerja dan menggunakan pendekatan wearable untuk prediksi, sesuai dengan fokus sistematis review tentang fatigue."
+      },
+      "search_date": "2026-10-26",
+      "search_query": "",
+      "source_name": "Upload manual",
+      "text_chars": 18000,
+      "title": "System for Activity-aware Fatigue Evaluation (SAFE) framework: Predictive fatigue modelling for occupational tasks",
+      "topic_tags": [
+        "fatigue prediction",
+        "wearable systems",
+        "biomechanical modelling",
+        "ergonomic risk",
+        "task classification",
+        "endurance modelling"
+      ],
+      "uploaded_at": "2026-10-26T16:54:53.157694+00:00",
+      "variables": [
+        "endurance time",
+        "endurance consumption",
+        "task classification",
+        "subjective fatigue rating",
+        "joint angles",
+        "external load"
+      ],
+      "year": ""
+    },
+    {
+      "abstract": "Penelitian ini mengevaluasi dampak stres residu hasil las terhadap kinerja kelelahan pada sambungan gusset plate ke crossbeam di jembatan baja truss, menggunakan metode mekanika kerusakan. Hasil menunjukkan stres residu mengurangi umur kelelahan 39,6%, sementara PWHT meningkatkannya 23,6%.",
+      "analysis_version": 1,
+      "authors": [
+        "Zhao Xindong",
+        "Liu Yongjian",
+        "Chen Hongming",
+        "Ma Wenjie",
+        "Jiang Lei",
+        "Liu Zhenbei"
+      ],
+      "concepts": [
+        {
+          "description": "Stres yang tersisa di material setelah proses las, memengaruhi kinerja kelelahan.",
+          "name": "stres residu las",
+          "parent_concepts": []
+        },
+        {
+          "description": "Proses pemanasan pasca-las untuk mengurangi stres residu.",
+          "name": "pengobatan pasca-las (PWHT)",
+          "parent_concepts": []
+        },
+        {
+          "description": "Metode untuk memodelkan proses kerusakan dari awal hingga kegagalan.",
+          "name": "mekanika kerusakan",
+          "parent_concepts": []
+        },
+        {
+          "description": "Jumlah siklus beban sebelum kegagalan akibat kelelahan.",
+          "name": "umur kelelahan",
+          "parent_concepts": []
+        },
+        {
+          "description": "Titik di mana retakan mulai terbentuk akibat beban siklik.",
+          "name": "lokasi retakan awal",
+          "parent_concepts": []
+        },
+        {
+          "description": "Metode koupling antara simulasi suhu dan mekanik untuk memodelkan stres residu.",
+          "name": "simulasi termomekanik",
+          "parent_concepts": []
+        }
+      ],
+      "context": "Jembatan baja truss, sambungan gusset plate ke crossbeam, stres residu las, pengobatan pasca-las (PWHT), dan analisis kelelahan.",
+      "doi": "10.1016/j.istruc.2026.113211",
+      "eligibility_decision": "include",
+      "evidence_quotes": [
+        {
+          "claim": "Stres residu las mencapai kekuatan leleh baja.",
+          "page": 1,
+          "quote": "The initial welding residual stress reaches the yield strength of the steel."
+        },
+        {
+          "claim": "PWHT mengurangi stres residu hingga 71–80%.",
+          "page": 1,
+          "quote": "PWHT significantly reduces the residual stress level, corresponding to a stress relief ratio exceeding 71–80%."
+        },
+        {
+          "claim": "Stres residu mengurangi umur kelelahan 39,6%.",
+          "page": 1,
+          "quote": "welding residual stress reduces the fatigue life by 39.6%."
+        }
+      ],
+      "extraction_status": "ok",
+      "filename": "1-s2.0-S2352012426021612-main_compressed.pdf",
+      "findings": [
+        "Stres residu las mencapai kekuatan leleh baja.",
+        "PWHT mengurangi stres residu hingga 71–80%.",
+        "Retakan awal bergeser dari atas lubang akses las ke sisi sambungan.",
+        "Umur kelelahan dengan PWHT adalah 2.1 × 10⁶ siklus, memenuhi standar desain.",
+        "Stres residu mengurangi umur kelelahan 39,6%.",
+        "PWHT meningkatkan umur kelelahan 23,6%."
+      ],
+      "future_research": [],
+      "hash": "9db9de55778e280754f8d08860226b997a772df087e0ef45cd9f2e92e8c76130",
+      "id": "9db9de55778e2807",
+      "json_stored": true,
+      "limitations": [],
+      "methods": "Simulasi termomekanik koupling, model pemanas ganda-ellipsoidal, model kerusakan Norton-Bailey, dan metode mekanika kerusakan berbasis elemen hingga.",
+      "objective": "Mengembangkan kerangka penilaian umur kelelahan yang mempertimbangkan stres residu las dan pengobatan pasca-las (PWHT) pada sambungan gusset plate ke crossbeam di jembatan baja truss.",
+      "pages": 14,
+      "pdf_stored": true,
+      "relationships": [
+        {
+          "evidence": "Stres residu mengurangi umur kelelahan 39,6%.",
+          "relation": "pengaruh negatif",
+          "source": "stres residu las",
+          "target": "umur kelelahan"
+        },
+        {
+          "evidence": "PWHT mengurangi stres residu hingga 71–80%.",
+          "relation": "pengurangan",
+          "source": "pengobatan pasca-las (PWHT)",
+          "target": "stres residu las"
+        },
+        {
+          "evidence": "Mekanika kerusakan memungkinkan penentuan lokasi awal retakan.",
+          "relation": "pengaruh",
+          "source": "mekanika kerusakan",
+          "target": "lokasi retakan awal"
+        },
+        {
+          "evidence": "Simulasi termomekanik digunakan untuk menghitung distribusi stres residu.",
+          "relation": "pengukuran",
+          "source": "simulasi termomekanik",
+          "target": "stres residu las"
+        },
+        {
+          "evidence": "PWHT meningkatkan umur kelelahan 23,6%.",
+          "relation": "pengaruh positif",
+          "source": "pengobatan pasca-las (PWHT)",
+          "target": "umur kelelahan"
+        },
+        {
+          "evidence": "Stres residu menyebabkan pergeseran lokasi retakan awal.",
+          "relation": "pengaruh",
+          "source": "stres residu las",
+          "target": "lokasi retakan awal"
+        }
+      ],
+      "research_questions": [],
+      "screening_decision": "include",
+      "screening_suggestion": {
+        "decision": "include",
+        "reason": "Artikel secara eksplisit membahas kelelahan baja, stres residu las, dan pengobatan pasca-las, yang relevan dengan pertanyaan penelitian tentang kelelahan."
+      },
+      "search_date": "2026-10-26",
+      "search_query": "",
+      "source_name": "Upload manual",
+      "text_chars": 18000,
+      "title": "Fatigue performance assessment of the steel truss gusset plate-to-crossbeam joint considering welding residual stress",
+      "topic_tags": [
+        "kelelahan baja",
+        "stres residu las",
+        "pengobatan pasca-las",
+        "mekanika kerusakan",
+        "jembatan truss",
+        "analisis numerik"
+      ],
+      "uploaded_at": "2026-10-26T17:00:01.876411+00:00",
+      "variables": [
+        "stres residu las",
+        "pengobatan pasca-las (PWHT)",
+        "umur kelelahan",
+        "lokasi awal retakan",
+        "metode mekanika kerusakan"
+      ],
+      "year": ""
+    },
+    {
+      "abstract": "Penelitian ini mengembangkan metode penilaian kelelahan multimodal di bawah kondisi pencahayaan tambang batu bara bawah tanah, menggunakan data EEG, eye-tracking, dan skala KSS. Model BO–CNN-LSTM dikembangkan untuk klasifikasi tingkat kelelahan dan prediksi skor KSS secara kontinu, dengan akurasi 90.56% dan RMSE 0.512.",
+      "analysis_version": 1,
+      "authors": [
+        "Kai Yu",
+        "Shuaiying Liu",
+        "Lujie Zhou",
+        "Xuesong Yang",
+        "Zhen Liu",
+        "Jing Chen"
+      ],
+      "concepts": [
+        {
+          "description": "Keadaan psikofisik yang menurunkan kewaspadaan, efisiensi kognitif, dan stabilitas perilaku.",
+          "name": "fatigue",
+          "parent_concepts": []
+        },
+        {
+          "description": "Kemampuan operator untuk menjalankan tugas dengan benar dan menjaga perilaku operasional yang aman.",
+          "name": "human reliability",
+          "parent_concepts": []
+        },
+        {
+          "description": "Penggabungan data dari berbagai sumber (EEG, eye-tracking, KSS) untuk karakterisasi keadaan operator secara komprehensif.",
+          "name": "multimodal data fusion",
+          "parent_concepts": []
+        },
+        {
+          "description": "Model hybrid yang menggabungkan CNN untuk ekstraksi fitur lokal dan LSTM untuk modelasi dependensi temporal, dengan optimasi hiperparameter menggunakan Bayesian optimization.",
+          "name": "BO–CNN-LSTM",
+          "parent_concepts": []
+        },
+        {
+          "description": "Skala subjektif untuk mengukur tingkat kantuk atau kelelahan.",
+          "name": "Karolinska Sleepiness Scale (KSS)",
+          "parent_concepts": []
+        },
+        {
+          "description": "Parameter pencahayaan yang memengaruhi kenyamanan visual, kewaspadaan, dan kelelahan kerja.",
+          "name": "illuminance and CCT",
+          "parent_concepts": []
+        }
+      ],
+      "context": "Tambang batu bara bawah tanah di Tiongkok, dengan fokus pada pengaruh pencahayaan (illuminance dan CCT) terhadap kelelahan kerja dan kinerja operator.",
+      "doi": "10.1016/j.ress.2026.113609",
+      "eligibility_decision": "include",
+      "evidence_quotes": [
+        {
+          "claim": "Pencahayaan memengaruhi kelelahan kerja melalui beban visual, pemeliharaan kewaspadaan, dan kenyamanan subjektif.",
+          "page": 2,
+          "quote": "lighting environment not only determines visibility but also affects visual workload, vigilance maintenance, and subjective comfort, thereby influencing workers’ operational state and fatigue level."
+        },
+        {
+          "claim": "Model BO–CNN-LSTM mencapai akurasi klasifikasi 90.56%.",
+          "page": 1,
+          "quote": "Subject-grouped five-fold cross-validation yielded a mean classification accuracy of 90.56% ± 2.06%."
+        },
+        {
+          "claim": "Kombinasi 500 lx–4000 K dianggap lebih menguntungkan untuk mengurangi kelelahan.",
+          "page": 2,
+          "quote": "Under the experimental conditions, the 500 lx–4000 K condition was associated with relatively favorable multimodal fatigue-related responses."
+        }
+      ],
+      "extraction_status": "ok",
+      "filename": "1-s2.0-S0951832026014110-main_compressed.pdf",
+      "findings": [
+        "Pencahayaan dan CCT secara signifikan memengaruhi indikator kelelahan.",
+        "Kombinasi 500 lx–4000 K dianggap lebih menguntungkan untuk mengurangi kelelahan.",
+        "Model BO–CNN-LSTM mencapai akurasi klasifikasi 90.56% dan RMSE 0.512 untuk prediksi KSS.",
+        "Efek interaksi antara illuminance dan CCT berbeda antar modality.",
+        "Data multimodal (EEG, eye-tracking, KSS) memberikan karakterisasi kelelahan yang lebih komprehensif.",
+        "Model ini memberikan informasi operator-state untuk analisis HRA dinamis dan optimasi pencahayaan."
+      ],
+      "future_research": [
+        "Mengembangkan model HRA yang lebih lengkap yang menggabungkan data kelelahan dengan data kesalahan operasional.",
+        "Mengintegrasikan faktor lain seperti jadwal kerja dan konteks organisasi dalam analisis kelelahan.",
+        "Menerapkan model ini di lingkungan tambang yang lebih luas dan beragam."
+      ],
+      "hash": "35e352cd51512fcd6f3c4192278259a633423a57578e73fa4f26164921580516",
+      "id": "35e352cd51512fcd",
+      "json_stored": true,
+      "limitations": [
+        "Studi ini tidak menghitung HEP secara langsung.",
+        "Fokus hanya pada efek pencahayaan, bukan faktor lain seperti jadwal kerja atau konteks organisasi.",
+        "Desain eksperimen terbatas pada kondisi tertentu, tidak mencakup variasi lingkungan tambang yang lebih luas."
+      ],
+      "methods": "Eksperimen ICCE dengan pengumpulan data EEG, eye-tracking, dan KSS. Model BO–CNN-LSTM digunakan untuk klasifikasi dan prediksi, dengan optimasi hiperparameter menggunakan Bayesian optimization.",
+      "objective": "Mengembangkan metode penilaian kelelahan multimodal di bawah kondisi pencahayaan tambang batu bara bawah tanah dan menganalisis efek pencahayaan terhadap indikator kelelahan.",
+      "pages": 15,
+      "pdf_stored": true,
+      "relationships": [
+        {
+          "evidence": "Fatigue dapat menurunkan kewaspadaan, efisiensi kognitif, dan stabilitas perilaku, yang berdampak pada human reliability.",
+          "relation": "pengaruh",
+          "source": "fatigue",
+          "target": "human reliability"
+        },
+        {
+          "evidence": "Illuminance dan CCT secara signifikan memengaruhi indikator kelelahan.",
+          "relation": "pengaruh",
+          "source": "illuminance and CCT",
+          "target": "fatigue"
+        },
+        {
+          "evidence": "Multimodal data fusion memberikan karakterisasi kelelahan yang lebih komprehensif.",
+          "relation": "metode",
+          "source": "multimodal data fusion",
+          "target": "fatigue assessment"
+        },
+        {
+          "evidence": "Model BO–CNN-LSTM digunakan untuk klasifikasi tingkat kelelahan dan prediksi skor KSS.",
+          "relation": "metode",
+          "source": "BO–CNN-LSTM",
+          "target": "fatigue assessment"
+        },
+        {
+          "evidence": "KSS digunakan untuk mengukur tingkat kelelahan secara subjektif.",
+          "relation": "indikator",
+          "source": "KSS",
+          "target": "fatigue"
+        },
+        {
+          "evidence": "Fatigue adalah faktor kunci yang memengaruhi human reliability.",
+          "relation": "korelasi",
+          "source": "human reliability",
+          "target": "fatigue"
+        }
+      ],
+      "research_questions": [
+        "Bagaimana pencahayaan memengaruhi kelelahan kerja di tambang batu bara bawah tanah?",
+        "Apakah model BO–CNN-LSTM dapat mengklasifikasikan tingkat kelelahan dan memprediksi skor KSS secara akurat?"
+      ],
+      "screening_decision": "include",
+      "screening_suggestion": {
+        "decision": "include",
+        "reason": "Artikel secara eksplisit membahas kelelahan kerja di tambang batu bara bawah tanah, menggunakan pendekatan multimodal dan model AI, yang relevan dengan pertanyaan penelitian tentang fatigue. Tidak ada kriteria eksklusi yang diberikan, sehingga artikel ini memenuhi kriteria inklusi."
+      },
+      "search_date": "2026-10-26",
+      "search_query": "",
+      "source_name": "Upload manual",
+      "text_chars": 18000,
+      "title": "Multimodal fatigue assessment and mechanism analysis under underground coal mine lighting conditions from a human reliability perspective",
+      "topic_tags": [
+        "kelelahan kerja",
+        "pencahayaan bawah tanah",
+        "multimodal assessment",
+        "HRA",
+        "BO–CNN-LSTM",
+        "KSS"
+      ],
+      "uploaded_at": "2026-10-26T17:03:00.539309+00:00",
+      "variables": [
+        "illuminance",
+        "CCT",
+        "EEG",
+        "eye-tracking",
+        "KSS score",
+        "fatigue level"
+      ],
+      "year": ""
+    }
+  ],
+  "identifiedTotal": 16,
+  "duplicateCount": 0,
+  "synthesis": {
+    "evidence_catalog": [
+      {
+        "id": "aa4b5ca8a02b1d54",
+        "title": "Kinematic indicators of physical fatigue during walking: A systematic review of assessment parameters and protocols",
+        "topic_tags": [
+          "kelelahan fisik",
+          "kinematika",
+          "gait"
+        ],
+        "year": "2026"
+      },
+      {
+        "id": "a02261260f214b18",
+        "title": "Gait variability predicts post-fatigue obstacle course performance among military cadets: An exploratory study",
+        "topic_tags": [
+          "fatigue",
+          "gait variability",
+          "military"
+        ],
+        "year": "2025"
+      },
+      {
+        "id": "81f4e8f11e5000ee",
+        "title": "Video entertainment to mitigate safety risks during prolonged automated driving: Impacts on cognitive load, fatigue, and takeover performance",
+        "topic_tags": [
+          "fatigue",
+          "automated driving",
+          "video entertainment"
+        ],
+        "year": ""
+      },
+      {
+        "id": "a7151a1b25c17f15",
+        "title": "The distracting role of stress: Impaired executive attention and delayed fatigue perception",
+        "topic_tags": [
+          "fatigue",
+          "cognitive stress",
+          "neuroergonomics"
+        ],
+        "year": ""
+      },
+      {
+        "id": "934314358837e2a5",
+        "title": "Examining clinicians’ fatigue in a pediatric emergency department",
+        "topic_tags": [
+          "kelelahan klinis",
+          "fatigue",
+          "pediatrik"
+        ],
+        "year": "2025"
+      },
+      {
+        "id": "f255e9657346b963",
+        "title": "Effects of a passive neck support exoskeleton on neck-shoulder muscle fatigue and motion during live veterinary surgeries",
+        "topic_tags": [
+          "exoskeleton",
+          "kelelahan otot",
+          "operasi hewan"
+        ],
+        "year": "2026"
+      },
+      {
+        "id": "0c4c91b436215c35",
+        "title": "Build-direction heterogeneity and T6-induced shift in fatigue failure mechanisms of thick-wall additive friction stir deposited Al–Zn–Mg–Cu alloy",
+        "topic_tags": [
+          "fatigue",
+          "additive manufacturing",
+          "Al–Zn–Mg–Cu"
+        ],
+        "year": ""
+      },
+      {
+        "id": "c6940a9ebd228d91",
+        "title": "Unveiling the fatigue strength degradation mechanism in surface-strengthened Ti-6Al-4V alloy: the critical role of crack initiation radius ratio",
+        "topic_tags": [
+          "fatigue degradation",
+          "Ti-6Al-4V",
+          "ultrasonic surface rolling"
+        ],
+        "year": ""
+      },
+      {
+        "id": "06a6af07a6fc4f7d",
+        "title": "Physical fatigue increases shipboard firefighting simulation completion time and perceived workload",
+        "topic_tags": [
+          "kelelahan fisik",
+          "pemadam kebakaran",
+          "simulasi kapal"
+        ],
+        "year": ""
+      },
+      {
+        "id": "f6b23ffd111c7d02",
+        "title": "Fractography-informed Gaussian process regression for fatigue prediction of non-magnetic stainless steel in rotary steerable drilling system",
+        "topic_tags": [
+          "fatigue modeling",
+          "fractography",
+          "Gaussian process regression"
+        ],
+        "year": ""
+      },
+      {
+        "id": "9ac9ffc7301449ae",
+        "title": "Fatigue performance analysis of full-scale multi-span and multi-girder orthotropic steel bridge decks: A competitive fatigue failure model",
+        "topic_tags": [
+          "fatigue failure",
+          "orthotropic steel deck",
+          "competitive failure model"
+        ],
+        "year": ""
+      },
+      {
+        "id": "38f944d440943499",
+        "title": "Overview of laminated microstructure and metastable phase effects on fatigue of high-strength steels",
+        "topic_tags": [
+          "ketahanan lelah",
+          "struktur mikro",
+          "baja berkekuatan tinggi"
+        ],
+        "year": ""
+      },
+      {
+        "id": "9b2af610e854b83e",
+        "title": "Prolonged low-frequency force depression recovery response following an isometric triceps extension to volitional fatigue at a high versus low intensity contraction",
+        "topic_tags": [
+          "muscle fatigue",
+          "recovery",
+          "PLFFD"
+        ],
+        "year": "2025"
+      },
+      {
+        "id": "cc340a8d17679496",
+        "title": "System for Activity-aware Fatigue Evaluation (SAFE) framework: Predictive fatigue modelling for occupational tasks",
+        "topic_tags": [
+          "fatigue prediction",
+          "wearable systems",
+          "biomechanical modelling"
+        ],
+        "year": ""
+      },
+      {
+        "id": "9db9de55778e2807",
+        "title": "Fatigue performance assessment of the steel truss gusset plate-to-crossbeam joint considering welding residual stress",
+        "topic_tags": [
+          "kelelahan baja",
+          "stres residu las",
+          "pengobatan pasca-las"
+        ],
+        "year": ""
+      },
+      {
+        "id": "35e352cd51512fcd",
+        "title": "Multimodal fatigue assessment and mechanism analysis under underground coal mine lighting conditions from a human reliability perspective",
+        "topic_tags": [
+          "kelelahan kerja",
+          "pencahayaan bawah tanah",
+          "multimodal assessment"
+        ],
+        "year": ""
+      }
+    ],
+    "executive_synthesis": "Fatigue dapat diukur dan diprediksi melalui berbagai metode, termasuk kinematika berjalan, variabilitas gait, sistem wearable, dan model prediktif berbasis fractografi. Kelelahan fisik memengaruhi kinematika berjalan dan kinerja post-fatigue, sementara stres kognitif menunda persepsi kelelahan. Video entertainment dapat mengurangi kelelahan pasif meskipun meningkatkan beban kognitif. Kelelahan klinis memengaruhi kinerja dan keselamatan pasien, dan exoskeleton dapat mengurangi kelelahan otot. Mekanisme inisiasi retak lelah pada material logam dan Ti-6Al-4V dipengaruhi oleh heterogenitas mikrostruktur dan stres residu las. Model prediktif berbasis prior fisik dan model kompetitif kegagalan fatig menunjukkan akurasi tinggi. Tidak ada korelasi antara fatigue manusia dan material, dan beberapa celah riset tetap ada, seperti pengukuran pemulihan jangka panjang dan dampak psikologis terhadap pemulihan fisiologis.",
+    "generated_at": "2026-10-26T17:29:49.804617+00:00",
+    "included_article_count": 16,
+    "main_themes": [
+      {
+        "article_ids": [
+          "aa4b5ca8a02b1d54"
+        ],
+        "confidence": "tinggi",
+        "description": "Parameter kinematik seperti gait speed, stride length, step width, trunk acceleration, dan heel contact velocity berkurang atau berubah akibat kelelahan fisik, terutama akibat kelelahan otot kunci seperti quadriceps dan plantar flexors. IMU memungkinkan pengukuran real-time tanpa invasivitas.",
+        "name": "kinematika berjalan sebagai indikator kelelahan fisik",
+        "synthesis": "Parameter kinematik berkurang atau berubah akibat kelelahan fisik, terutama akibat kelelahan otot kunci. IMU memungkinkan pengukuran real-time tanpa invasivitas."
+      },
+      {
+        "article_ids": [
+          "a02261260f214b18"
+        ],
+        "confidence": "tinggi",
+        "description": "Variabilitas kinematik gait sebelum kelelahan memprediksi 73-89% variasi kinerja post-fatigue, terutama melalui koordinasi pinggul-kaki dan lutut-ankle. Variabilitas tinggi mungkin mendukung adaptasi motorik.",
+        "name": "variabilitas gait sebagai prediktor kinerja post-fatigue",
+        "synthesis": "Variabilitas kinematik gait sebelum kelelahan memprediksi 73-89% variasi kinerja post-fatigue, terutama melalui koordinasi pinggul-kaki dan lutut-ankle. Variabilitas tinggi mungkin mendukung adaptasi motorik."
+      },
+      {
+        "article_ids": [
+          "81f4e8f11e5000ee"
+        ],
+        "confidence": "tinggi",
+        "description": "Video entertainment mengurangi pertumbuhan kelelahan pasif selama driving otomatis, memperpendek waktu takeover, dan meningkatkan waktu minimum hingga tabrakan, meskipun meningkatkan beban kognitif.",
+        "name": "pengaruh video entertainment terhadap kelelahan dan kinerja takeover",
+        "synthesis": "Video entertainment mengurangi pertumbuhan kelelahan pasif selama driving otomatis, memperpendek waktu takeover, dan meningkatkan waktu minimum hingga tabrakan, meskipun meningkatkan beban kognitif."
+      },
+      {
+        "article_ids": [
+          "a7151a1b25c17f15"
+        ],
+        "confidence": "tinggi",
+        "description": "Stres kognitif menunda persepsi kelelahan, mengurangi segregasi fungsional korteks prefrontal, dan memperburuk kinerja motorik meskipun memperpanjang daya tahan. Tidak memengaruhi perbedaan gender dalam mekanisme kelelahan sentral.",
+        "name": "efek stres kognitif pada persepsi kelelahan dan fungsi otak",
+        "synthesis": "Stres kognitif menunda persepsi kelelahan, mengurangi segregasi fungsional korteks prefrontal, dan memperburuk kinerja motorik meskipun memperpanjang daya tahan. Tidak memengaruhi perbedaan gender dalam mekanisme kelelahan sentral."
+      },
+      {
+        "article_ids": [],
+        "description": "Kelelahan klinis meningkat seiring waktu shift, dipengaruhi oleh jenis shift, gender, usia, dan peran klinis. Kelelahan energi paling signifikan, dan dapat memengaruhi kinerja klinis serta keselamatan pasien. Teknologi informasi kesehatan (HIT) diusulkan sebagai mitigasi.",
+        "name": "kelelahan klinis dan faktor pemicu",
+        "synthesis": "Kelelahan klinis meningkat seiring waktu shift, dipengaruhi oleh jenis shift, gender, usia, dan peran klinis. Kelelahan energi paling signifikan, dan dapat memengaruhi kinerja klinis serta keselamatan pasien. Teknologi informasi kesehatan (HIT) diusulkan sebagai mitigasi."
+      }
+    ],
+    "model": "qwen3-vl:8b-instruct",
+    "research_question_refinement": "Fatigue dalam konteks manusia dan material, dengan fokus pada pengukuran, prediksi, dan mekanisme kelelahan.",
+    "subquestions": [
+      "Bagaimana kelelahan fisik memengaruhi kinematika berjalan?",
+      "Apakah variabilitas gait dapat memprediksi kinerja post-fatigue?",
+      "Bagaimana video entertainment memengaruhi kelelahan dan kinerja takeover?",
+      "Apakah stres kognitif memengaruhi persepsi kelelahan?",
+      "Bagaimana kelelahan klinis memengaruhi kinerja dan keselamatan pasien?",
+      "Apakah exoskeleton dapat mengurangi kelelahan otot?",
+      "Apa mekanisme inisiasi retak lelah pada material logam?",
+      "Bagaimana degradasi kekuatan lelah terjadi pada Ti-6Al-4V?",
+      "Bagaimana kelelahan fisik memengaruhi kinerja simulasi?",
+      "Apakah model prediktif dapat memprediksi keausan material?",
+      "Bagaimana struktur mikro memengaruhi ketahanan lelah?",
+      "Apakah model kompetitif kegagalan fatig lebih akurat?",
+      "Apakah kelelahan otot dapat diprediksi melalui PLFFD?",
+      "Apakah sistem wearable dapat memprediksi kelelahan kerja?",
+      "Apakah stres residu las memengaruhi umur kelelahan material?",
+      "Apakah penilaian multimodal dapat mengukur kelelahan di lingkungan tambang?"
+    ],
+    "taxonomy": {
+      "faceted": {
+        "facets": [
+          {
+            "name": "Dimensi Pengukuran",
+            "values": [
+              {
+                "article_ids": [
+                  "aa4b5ca8a02b1d54",
+                  "a02261260f214b18"
+                ],
+                "description": "Parameter gerakan tubuh yang mengukur kelelahan fisik.",
+                "name": "Kinematik"
+              },
+              {
+                "article_ids": [
+                  "a7151a1b25c17f15",
+                  "81f4e8f11e5000ee"
+                ],
+                "description": "Pengukuran beban kognitif dan persepsi kelelahan.",
+                "name": "Kognitif"
+              },
+              {
+                "article_ids": [
+                  "35e352cd51512fcd"
+                ],
+                "description": "Pengukuran gabungan dari sensor biologis dan perilaku.",
+                "name": "Multimodal"
+              }
+            ]
+          },
+          {
+            "name": "Dimensi Mitigasi",
+            "values": [
+              {
+                "article_ids": [
+                  "cc340a8d17679496"
+                ],
+                "description": "Sistem wearable untuk prediksi dan mitigasi kelelahan.",
+                "name": "Teknologi Wearable"
+              },
+              {
+                "article_ids": [
+                  "f255e9657346b963"
+                ],
+                "description": "Perangkat mekanis untuk mengurangi kelelahan otot.",
+                "name": "Exoskeleton"
+              },
+              {
+                "article_ids": [
+                  "934314358837e2a5"
+                ],
+                "description": "Sistem digital untuk mitigasi kelelahan klinis.",
+                "name": "Teknologi Informasi Kesehatan"
+              }
+            ]
+          }
+        ]
+      },
+      "flat": [
+        {
+          "article_ids": [
+            "aa4b5ca8a02b1d54",
+            "a02261260f214b18"
+          ],
+          "description": "Parameter gait seperti kecepatan, panjang langkah, dan variabilitas.",
+          "name": "Indikator Kinematik Kelelahan"
+        },
+        {
+          "article_ids": [
+            "a7151a1b25c17f15"
+          ],
+          "description": "Stres kognitif menunda persepsi kelelahan dan memperburuk kinerja motorik.",
+          "name": "Pengaruh Stres Kognitif"
+        },
+        {
+          "article_ids": [
+            "cc340a8d17679496",
+            "f6b23ffd111c7d02"
+          ],
+          "description": "Framework seperti SAFE dan Gaussian process regression untuk prediksi kelelahan.",
+          "name": "Model Prediksi Kelelahan"
+        },
+        {
+          "article_ids": [
+            "934314358837e2a5"
+          ],
+          "description": "Penggunaan HIT dan perubahan shift untuk mengurangi kelelahan klinis.",
+          "name": "Mitigasi Kelelahan Klinis"
+        },
+        {
+          "article_ids": [
+            "0c4c91b436215c35",
+            "c6940a9ebd228d91",
+            "9ac9ffc7301449ae",
+            "38f944d440943499"
+          ],
+          "description": "Mekanisme kegagalan material akibat stres residu dan mikrostruktur.",
+          "name": "Degradasi Material Fatigue"
+        }
+      ],
+      "hierarchical": {
+        "nodes": [
+          {
+            "article_ids": [
+              "aa4b5ca8a02b1d54",
+              "a02261260f214b18",
+              "06a6af07a6fc4f7d",
+              "9b2af610e854b83e"
+            ],
+            "description": "Kelelahan akibat aktivitas fisik yang mengurangi kinerja motorik dan kinematik.",
+            "id": "h1",
+            "name": "Kelelahan Fisik",
+            "parent_id": "root"
+          },
+          {
+            "article_ids": [
+              "a7151a1b25c17f15",
+              "81f4e8f11e5000ee",
+              "cc340a8d17679496"
+            ],
+            "description": "Kelelahan yang memengaruhi fungsi kognitif, persepsi, dan kinerja motorik.",
+            "id": "h2",
+            "name": "Kelelahan Kognitif",
+            "parent_id": "root"
+          },
+          {
+            "article_ids": [
+              "934314358837e2a5"
+            ],
+            "description": "Kelelahan dalam konteks layanan klinis yang memengaruhi kinerja dan keselamatan pasien.",
+            "id": "h3",
+            "name": "Kelelahan Klinis",
+            "parent_id": "root"
+          },
+          {
+            "article_ids": [
+              "0c4c91b436215c35",
+              "c6940a9ebd228d91",
+              "f6b23ffd111c7d02",
+              "9ac9ffc7301449ae",
+              "38f944d440943499"
+            ],
+            "description": "Degradasi mekanik material akibat beban siklik.",
+            "id": "h4",
+            "name": "Kelelahan Material",
+            "parent_id": "root"
+          }
+        ],
+        "root": {
+          "id": "root",
+          "name": "Fatigue"
+        }
+      },
+      "matrix": {
+        "column_axis_name": "Dimensi Pembanding",
+        "columns": [
+          "Pengukuran",
+          "Mitigasi",
+          "Konteks"
+        ],
+        "row_axis_name": "Kelompok Konsep",
+        "rows": [
+          {
+            "cells": [
+              {
+                "article_ids": [
+                  "aa4b5ca8a02b1d54"
+                ],
+                "column": "Pengukuran",
+                "summary": "Parameter kinematik berkurang akibat kelelahan fisik."
+              },
+              {
+                "article_ids": [],
+                "column": "Mitigasi",
+                "summary": "Tidak ada mitigasi khusus dalam bukti."
+              },
+              {
+                "article_ids": [
+                  "a02261260f214b18",
+                  "06a6af07a6fc4f7d"
+                ],
+                "column": "Konteks",
+                "summary": "Konteks manusia dan otomatisasi."
+              }
+            ],
+            "name": "Kelelahan Fisik"
+          },
+          {
+            "cells": [
+              {
+                "article_ids": [
+                  "a7151a1b25c17f15"
+                ],
+                "column": "Pengukuran",
+                "summary": "Kinerja kognitif menurun dengan stres kognitif."
+              },
+              {
+                "article_ids": [
+                  "cc340a8d17679496",
+                  "f6b23ffd111c7d02"
+                ],
+                "column": "Mitigasi",
+                "summary": "Penggunaan teknologi wearable dan model prediksi."
+              },
+              {
+                "article_ids": [
+                  "81f4e8f11e5000ee",
+                  "35e352cd51512fcd"
+                ],
+                "column": "Konteks",
+                "summary": "Konteks klinis dan manusia."
+              }
+            ],
+            "name": "Kelelahan Kognitif"
+          },
+          {
+            "cells": [
+              {
+                "article_ids": [
+                  "934314358837e2a5"
+                ],
+                "column": "Pengukuran",
+                "summary": "Kinerja klinis menurun dengan kelelahan."
+              },
+              {
+                "article_ids": [
+                  "934314358837e2a5"
+                ],
+                "column": "Mitigasi",
+                "summary": "Penggunaan HIT dan perubahan shift."
+              },
+              {
+                "article_ids": [
+                  "934314358837e2a5"
+                ],
+                "column": "Konteks",
+                "summary": "Konteks klinis dan layanan kesehatan."
+              }
+            ],
+            "name": "Kelelahan Klinis"
+          },
+          {
+            "cells": [
+              {
+                "article_ids": [
+                  "0c4c91b436215c35",
+                  "c6940a9ebd228d91"
+                ],
+                "column": "Pengukuran",
+                "summary": "Degradasi material terukur melalui parameter mekanik."
+              },
+              {
+                "article_ids": [
+                  "f6b23ffd111c7d02",
+                  "9ac9ffc7301449ae"
+                ],
+                "column": "Mitigasi",
+                "summary": "Penggunaan material tahan lama dan desain struktural."
+              },
+              {
+                "article_ids": [
+                  "38f944d440943499"
+                ],
+                "column": "Konteks",
+                "summary": "Konteks teknik dan material engineering."
+              }
+            ],
+            "name": "Kelelahan Material"
+          }
+        ]
+      },
+      "polyhierarchy": {
+        "edges": [
+          {
+            "from": "p1",
+            "relation": "subkategori dari",
+            "to": "p2"
+          },
+          {
+            "from": "p3",
+            "relation": "subkategori dari",
+            "to": "root"
+          }
+        ],
+        "nodes": [
+          {
+            "article_ids": [
+              "aa4b5ca8a02b1d54",
+              "a02261260f214b18",
+              "06a6af07a6fc4f7d",
+              "9b2af610e854b83e"
+            ],
+            "description": "Kelelahan akibat aktivitas fisik yang mengurangi kinerja motorik dan kinematik.",
+            "id": "p1",
+            "name": "Kelelahan Fisik",
+            "parent_ids": [
+              "p2"
+            ]
+          },
+          {
+            "article_ids": [
+              "a7151a1b25c17f15",
+              "81f4e8f11e5000ee",
+              "934314358837e2a5",
+              "cc340a8d17679496",
+              "35e352cd51512fcd"
+            ],
+            "description": "Kelelahan yang dialami oleh manusia dalam konteks fisik, kognitif, atau klinis.",
+            "id": "p2",
+            "name": "Kelelahan Manusia",
+            "parent_ids": [
+              "root"
+            ]
+          },
+          {
+            "article_ids": [
+              "0c4c91b436215c35",
+              "c6940a9ebd228d91",
+              "f6b23ffd111c7d02",
+              "9ac9ffc7301449ae",
+              "38f944d440943499"
+            ],
+            "description": "Degradasi mekanik material akibat beban siklik.",
+            "id": "p3",
+            "name": "Kelelahan Material",
+            "parent_ids": [
+              "root"
+            ]
+          }
+        ]
+      }
+    },
+    "taxonomy_status": "ok"
+  },
+  "meta": {
+    "research_question": "fatigue",
+    "source_name": "",
+    "search_date": "2026-10-26",
+    "search_query": "",
+    "inclusion": "",
+    "exclusion": ""
+  }
+}

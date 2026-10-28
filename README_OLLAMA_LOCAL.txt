@@ -22,3 +22,5 @@ Catatan penting:
 - Qwen3-VL mendukung input visual, tetapi ekstraksi PDF saat ini memakai teks PDF yang dapat dipilih; OCR PDF hasil scan belum disertakan.
 - Data artikel proyek disimpan di browser (localStorage); PDF asli disimpan pada komputer yang menjalankan server di data/pdfs. Ekspor proyek JSON tetap disarankan untuk backup.
 - Sintesis hanya memasukkan artikel yang ditandai INCLUDE pada screening dan eligibility. Model memberi dukungan analisis, bukan pengganti keputusan akademik.
+
+Taxonomy dibangkitkan melalui panggilan Ollama terpisah selepas sintesis utama supaya struktur taxonomy tidak bersaing dengan seluruh output sintesis dalam satu batas token. Jika taxonomy tidak dapat dibuat, hasil sintesis utama tetap dipertahankan dan halaman Taxonomy menampilkan pesan diagnostik.

@@ -1,0 +1,164 @@
+{
+  "id": "06a6af07a6fc4f7d",
+  "hash": "06a6af07a6fc4f7d6c9ee44c71f9a41b7034b5b2036fd5ae6742ece120413fbc",
+  "filename": "1-s2.0-S0003687026001559-main_compressed.pdf",
+  "uploaded_at": "2026-10-26T16:32:07.833562+00:00",
+  "pages": 12,
+  "text_chars": 18000,
+  "title": "Physical fatigue increases shipboard firefighting simulation completion time and perceived workload",
+  "authors": [
+    "Bronia Glen",
+    "Rhiannon Campbell",
+    "Jodie A. Wills",
+    "Mark Wiggins",
+    "Rohan Edmonds",
+    "Benjamin J.C. Kirk",
+    "Tim L.A. Doyle"
+  ],
+  "year": "",
+  "doi": "10.1016/j.apergo.2026.104877",
+  "abstract": "Studi ini menemukan bahwa kelelahan fisik meningkatkan waktu selesai simulasi pemadam kebakaran di kapal dan beban persepsi kerja, serta mengurangi kekuatan otot setelah simulasi.",
+  "objective": "Menentukan pengaruh kelelahan fisik terhadap kinerja dan kekuatan otot selama simulasi pemadam kebakaran di kapal, serta membandingkan efeknya dengan kondisi panas.",
+  "research_questions": [
+    "Bagaimana kelelahan fisik memengaruhi waktu selesai simulasi pemadam kebakaran di kapal?",
+    "Bagaimana kelelahan fisik memengaruhi beban persepsi kerja dan kekuatan otot setelah simulasi?",
+    "Bagaimana interaksi kelelahan fisik dan panas memengaruhi kinerja?"
+  ],
+  "methods": "Studi menggunakan desain eksperimental dengan 30 peserta yang menjalani simulasi pemadam kebakaran di kapal dalam kondisi segar, lelah, dan lelah + panas, diikuti tes kekuatan otot. Data dianalisis dengan ANOVA berulang.",
+  "context": "Simulasi laboratorium pemadam kebakaran di kapal dengan peserta non-profesional, dalam kondisi fisik segar dan lelah, dengan atau tanpa sauna suit.",
+  "variables": [
+    "kelelahan fisik",
+    "waktu selesai simulasi",
+    "perceived workload (RPE)",
+    "kekuatan otot (IMTP, IPU, handgrip)",
+    "kondisi panas",
+    "kondisi segar"
+  ],
+  "findings": [
+    "Waktu selesai simulasi meningkat 7.2% di bawah kondisi kelelahan dan 8.5% di bawah kondisi kelelahan + panas (p < 0.001).",
+    "Perceived workload (RPE) meningkat 32% di bawah kondisi kelelahan dan 46% di bawah kondisi kelelahan + panas (p < 0.001).",
+    "Kekuatan isometrik mid-thigh pull dan push-up berkurang setelah simulasi di bawah kondisi kelelahan dibandingkan kondisi segar (p < 0.05).",
+    "Kondisi kelelahan + panas menunjukkan penurunan lebih besar dalam kekuatan otot dibandingkan kondisi kelelahan saja.",
+    "Kondisi kelelahan + panas menghasilkan peningkatan HR dan suhu inti lebih tinggi dibandingkan kondisi kelelahan.",
+    "Tidak ada penelitian sebelumnya yang mengukur efek kelelahan fisik pada simulasi pemadam kebakaran di kapal secara kontinu dan terintegrasi dengan pengukuran kekuatan otot pasca-simulasi."
+  ],
+  "limitations": [
+    "Studi menggunakan peserta non-profesional, bukan petugas pemadam kebakaran profesional.",
+    "Simulasi dilakukan di laboratorium, bukan di lingkungan operasional nyata.",
+    "Tidak ada pengukuran kinerja kognitif atau kecepatan reaksi selama simulasi."
+  ],
+  "future_research": [
+    "Memahami interaksi antara kelelahan fisik dan panas dalam konteks operasional nyata.",
+    "Mengembangkan protokol latihan untuk mengurangi efek kelelahan fisik pada kinerja pemadam kebakaran.",
+    "Mengukur efek kelelahan fisik pada kinerja kognitif selama simulasi pemadam kebakaran."
+  ],
+  "topic_tags": [
+    "kelelahan fisik",
+    "pemadam kebakaran",
+    "simulasi kapal",
+    "kekuatan otot",
+    "perceived workload",
+    "panas",
+    "kondisi laboratorium"
+  ],
+  "concepts": [
+    {
+      "name": "kelelahan fisik",
+      "description": "Kondisi di mana individu mengalami penurunan kinerja fisik akibat aktivitas fisik berat sebelumnya.",
+      "parent_concepts": []
+    },
+    {
+      "name": "waktu selesai simulasi",
+      "description": "Jumlah waktu yang dibutuhkan untuk menyelesaikan simulasi pemadam kebakaran.",
+      "parent_concepts": []
+    },
+    {
+      "name": "perceived workload",
+      "description": "Persepsi subjektif tentang beban kerja yang dirasakan individu selama aktivitas.",
+      "parent_concepts": []
+    },
+    {
+      "name": "kekuatan otot",
+      "description": "Kemampuan otot untuk menghasilkan gaya maksimal dalam waktu singkat.",
+      "parent_concepts": []
+    },
+    {
+      "name": "kondisi panas",
+      "description": "Kondisi di mana suhu tubuh dan lingkungan meningkat, memperburuk kelelahan fisik.",
+      "parent_concepts": []
+    },
+    {
+      "name": "simulasi kapal",
+      "description": "Aktivitas simulasi pemadam kebakaran yang dilakukan di lingkungan kapal dengan kondisi fisik tertentu.",
+      "parent_concepts": []
+    }
+  ],
+  "relationships": [
+    {
+      "source": "kelelahan fisik",
+      "target": "waktu selesai simulasi",
+      "relation": "mempengaruhi",
+      "evidence": "Waktu selesai simulasi meningkat 7.2% di bawah kondisi kelelahan (p < 0.001)."
+    },
+    {
+      "source": "kelelahan fisik",
+      "target": "perceived workload",
+      "relation": "mempengaruhi",
+      "evidence": "Perceived workload (RPE) meningkat 32% di bawah kondisi kelelahan (p < 0.001)."
+    },
+    {
+      "source": "kelelahan fisik",
+      "target": "kekuatan otot",
+      "relation": "mempengaruhi",
+      "evidence": "Kekuatan isometrik mid-thigh pull dan push-up berkurang setelah simulasi di bawah kondisi kelelahan (p < 0.05)."
+    },
+    {
+      "source": "kondisi panas",
+      "target": "waktu selesai simulasi",
+      "relation": "mempengaruhi",
+      "evidence": "Waktu selesai simulasi meningkat 8.5% di bawah kondisi kelelahan + panas (p < 0.001)."
+    },
+    {
+      "source": "kondisi panas",
+      "target": "perceived workload",
+      "relation": "mempengaruhi",
+      "evidence": "Perceived workload (RPE) meningkat 46% di bawah kondisi kelelahan + panas (p < 0.001)."
+    },
+    {
+      "source": "kelelahan fisik",
+      "target": "kondisi panas",
+      "relation": "interaksi",
+      "evidence": "Kondisi kelelahan + panas menunjukkan penurunan lebih besar dalam kekuatan otot dibandingkan kondisi kelelahan saja."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "Kelelahan fisik meningkatkan waktu selesai simulasi.",
+      "quote": "simulation TTC increased by 7.2% and 8.5% under Fatigue and Fatigue + Heat conditions respectively (p < 0.001).",
+      "page": 1
+    },
+    {
+      "claim": "Kelelahan fisik meningkatkan beban persepsi kerja.",
+      "quote": "RPE increasing by 32% (Fatigue) and 46% (Fatigue + Heat) (p < 0.001).",
+      "page": 1
+    },
+    {
+      "claim": "Kelelahan fisik mengurangi kekuatan otot setelah simulasi.",
+      "quote": "pre-simulation fatigue reduced both isometric mid-thigh pull and push-up peak forces (measured post-simulation) compared to control strength measures (p < 0.05).",
+      "page": 1
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel secara eksplisit meneliti efek kelelahan fisik pada kinerja simulasi pemadam kebakaran di kapal, yang relevan dengan pertanyaan penelitian 'fatigue'."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-26",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

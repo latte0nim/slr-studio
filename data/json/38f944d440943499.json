@@ -1,0 +1,155 @@
+{
+  "id": "38f944d440943499",
+  "hash": "38f944d4409434997e28360c345fbf3d18118ebf4f3394e437067236480cafa1",
+  "filename": "1-s2.0-S0013794426008878-main_compressed.pdf",
+  "uploaded_at": "2026-10-26T16:49:08.536263+00:00",
+  "pages": 28,
+  "text_chars": 18000,
+  "title": "Overview of laminated microstructure and metastable phase effects on fatigue of high-strength steels",
+  "authors": [
+    "Zhao Zhang",
+    "Bochuan Li",
+    "He Liu",
+    "Wanjia Li",
+    "Motomichi Koyama"
+  ],
+  "year": "",
+  "doi": "10.1016/j.engfracmech.2026.112725",
+  "abstract": "Ulasan tentang bagaimana struktur mikro laminasi dan fase metastabil memengaruhi ketahanan lelah baja berkekuatan tinggi, dengan fokus pada mekanisme TICC dan RICC untuk mengatasi trade-off antara kekuatan tarik dan ketahanan lelah.",
+  "objective": "Mengulas kontribusi struktur mikro laminasi dan fase metastabil terhadap sifat lelah baja berkekuatan tinggi, serta menyarankan strategi desain mikrostruktur untuk meningkatkan ketahanan lelah.",
+  "research_questions": [],
+  "methods": "Ulasan sistematis literatur dengan fokus pada material baja berkekuatan tinggi, analisis mekanisme lelah berdasarkan mikrostruktur, dan perbandingan sifat lelah berbagai jenis baja.",
+  "context": "Aplikasi baja berkekuatan tinggi dalam industri otomotif, pesawat, kapal, dan struktur bangunan dengan fokus pada ketahanan lelah dan desain ringan.",
+  "variables": [
+    "struktur mikro laminasi",
+    "fase metastabil",
+    "kekuatan tarik",
+    "ketahanan lelah",
+    "TICC",
+    "RICC"
+  ],
+  "findings": [
+    "Ketahanan lelah baja berkekuatan tinggi dipengaruhi oleh mikrostruktur, bukan hanya kekuatan tarik.",
+    "Struktur laminasi (seperti dalam baja pearlitik) meningkatkan ketahanan lelah melalui defleksi retak.",
+    "Fase metastabil (TRIP) meningkatkan ketahanan lelah melalui transformasi induksi plastisitas (TICC).",
+    "Kombinasi laminasi dan fase metastabil (TRIP-maraging) menghasilkan ketahanan lelah yang lebih baik dibandingkan baja konvensional.",
+    "Ketahanan lelah normalisasi terhadap kekuatan tarik menunjukkan tren non-monotonik terhadap struktur mikro.",
+    "Distribusi martensit pulau lebih baik daripada martensit berbentuk serat dalam hal ketahanan lelah normalisasi."
+  ],
+  "limitations": [],
+  "future_research": [
+    "Mengoptimalkan desain komposisi/alloy untuk memaksimalkan efek transformasi fase.",
+    "Mempelajari mekanisme interaksi antara TICC dan RICC dalam mikrostruktur laminasi.",
+    "Mengembangkan strategi desain mikrostruktur untuk aplikasi industri spesifik."
+  ],
+  "topic_tags": [
+    "ketahanan lelah",
+    "struktur mikro",
+    "baja berkekuatan tinggi",
+    "TICC",
+    "RICC",
+    "TRIP",
+    "laminasi mikro",
+    "metastabil"
+  ],
+  "concepts": [
+    {
+      "name": "TICC",
+      "description": "Transformasi induksi crack closure yang dihasilkan oleh fase metastabil.",
+      "parent_concepts": []
+    },
+    {
+      "name": "RICC",
+      "description": "Crack closure yang dihasilkan oleh ketidakrataan permukaan retak.",
+      "parent_concepts": []
+    },
+    {
+      "name": "laminated microstructure",
+      "description": "Struktur mikro yang terdiri dari lapisan yang menghambat propagasi retak.",
+      "parent_concepts": []
+    },
+    {
+      "name": "metastable phase",
+      "description": "Fase yang dapat bertransformasi secara induksi deformasi, meningkatkan ketahanan lelah.",
+      "parent_concepts": []
+    },
+    {
+      "name": "fatigue strength normalized by tensile strength",
+      "description": "Ketahanan lelah dibandingkan dengan kekuatan tarik untuk mengatasi trade-off.",
+      "parent_concepts": []
+    },
+    {
+      "name": "TRIP-maraging steel",
+      "description": "Baja dengan struktur mikro laminasi dan fase metastabil yang menggabungkan TICC dan RICC.",
+      "parent_concepts": []
+    }
+  ],
+  "relationships": [
+    {
+      "source": "laminated microstructure",
+      "target": "fatigue crack resistance",
+      "relation": "menghambat",
+      "evidence": "Laminated microstructure defleksi retak dan meningkatkan ketahanan lelah."
+    },
+    {
+      "source": "metastable phase",
+      "target": "TICC",
+      "relation": "menghasilkan",
+      "evidence": "Fase metastabil menghasilkan TICC melalui transformasi induksi plastisitas."
+    },
+    {
+      "source": "TICC",
+      "target": "fatigue strength",
+      "relation": "meningkatkan",
+      "evidence": "TICC memperlambat pertumbuhan retak dan meningkatkan ketahanan lelah."
+    },
+    {
+      "source": "RICC",
+      "target": "fatigue strength",
+      "relation": "meningkatkan",
+      "evidence": "RICC memperlambat pertumbuhan retak melalui ketidakrataan permukaan."
+    },
+    {
+      "source": "TRIP-maraging steel",
+      "target": "fatigue strength normalized by tensile strength",
+      "relation": "meningkatkan",
+      "evidence": "TRIP-maraging steel menunjukkan peningkatan ketahanan lelah normalisasi."
+    },
+    {
+      "source": "martensite morphology",
+      "target": "fatigue crack propagation",
+      "relation": "mempengaruhi",
+      "evidence": "Morphology martensite mempengaruhi pertumbuhan retak melalui defleksi dan kekuatan."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "Ketahanan lelah dipengaruhi oleh mikrostruktur, bukan hanya kekuatan tarik.",
+      "quote": "Fatigue strength shows different dependencies on microstructures such as grain size.",
+      "page": 2
+    },
+    {
+      "claim": "Struktur laminasi meningkatkan ketahanan lelah.",
+      "quote": "Laminated microstructure could be regarded as the key to improving the fatigue crack resistance.",
+      "page": 3
+    },
+    {
+      "claim": "Kombinasi laminasi dan fase metastabil meningkatkan ketahanan lelah.",
+      "quote": "Synergistically activate multiple fatigue resistance mechanisms, namely TICC and RICC.",
+      "page": 1
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel relevan dengan topik ketahanan lelah dan mikrostruktur baja berkekuatan tinggi, dengan temuan spesifik dan metodologi sistematis."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-26",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

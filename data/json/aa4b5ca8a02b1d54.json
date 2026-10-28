@@ -1,0 +1,156 @@
+{
+  "id": "aa4b5ca8a02b1d54",
+  "hash": "aa4b5ca8a02b1d5446850ffb384ac3d1ebe20d2722b00c48a0eae1c9c1e87297",
+  "filename": "1-s2.0-S0003687025001760-main_compressed.pdf",
+  "uploaded_at": "2026-10-26T13:10:57.413211+00:00",
+  "pages": 12,
+  "text_chars": 18000,
+  "title": "Kinematic indicators of physical fatigue during walking: A systematic review of assessment parameters and protocols",
+  "authors": [
+    "Matin Jahani Jirsaraei",
+    "Wenying Ji",
+    "Samuel A. Acuña"
+  ],
+  "year": "2026",
+  "doi": "10.1016/j.apergo.2025.104640",
+  "abstract": "Ulasan sistematis mengidentifikasi parameter kinematik untuk deteksi real-time kelelahan fisik selama berjalan, dengan fokus pada gait speed, stride length, dan step width yang dipengaruhi oleh kelelahan otot kunci seperti quadriceps dan plantar flexors.",
+  "objective": "Mengidentifikasi parameter kinematik yang praktis untuk deteksi real-time kelelahan fisik selama berjalan, serta memahami pengaruh protokol kelelahan terhadap parameter tersebut.",
+  "research_questions": [],
+  "methods": "Pencarian sistematis di 4 database (PubMed, Medline, IEEE Xplore, Web of Science) 2000-2024, dengan kriteria inklusi: studi asli, fokus kelelahan fisik selama berjalan, menggunakan parameter kinematik, dan publikasi dalam bahasa Inggris.",
+  "context": "Lingkungan konstruksi dan pekerjaan fisik lainnya, dengan fokus pada perubahan gait akibat kelelahan fisik yang berpotensi meningkatkan risiko cedera.",
+  "variables": [
+    "gait speed",
+    "stride length",
+    "step width",
+    "trunk acceleration",
+    "heel contact velocity",
+    "kelelahan otot kunci"
+  ],
+  "findings": [
+    "Gait speed, stride length, step width, heel contact velocity, dan trunk acceleration sering diukur dan dipengaruhi oleh kelelahan.",
+    "Kelelahan otot kunci seperti quadriceps dan plantar flexors memiliki dampak paling besar terhadap kinematika berjalan.",
+    "Protokol kelelahan berbeda (walking, cycling, squatting) menghasilkan perubahan kinematik yang berbeda.",
+    "Parameter kinematik dapat diukur secara real-time menggunakan IMU tanpa invasivitas.",
+    "Kelelahan fisik memengaruhi koordinasi neuro-muskular dan meningkatkan risiko jatuh.",
+    "Tidak ada perbedaan signifikan antara kelompok usia muda dan tua dalam kemampuan menyesuaikan gait setelah kelelahan."
+  ],
+  "limitations": [
+    "Kurangnya konsistensi protokol kelelahan antar studi membuat perbandingan sulit.",
+    "Kurangnya studi yang secara eksplisit mengukur kelelahan fisik melalui protokol eksperimental yang valid.",
+    "Fokus pada kelelahan fisik, bukan kelelahan mental, sehingga tidak mencakup aspek kognitif."
+  ],
+  "future_research": [
+    "Mengembangkan protokol kelelahan yang lebih standar untuk memudahkan perbandingan studi.",
+    "Mengintegrasikan parameter kinematik dengan teknologi wearable untuk deteksi real-time di lapangan.",
+    "Mengembangkan model prediktif berbasis kinematik untuk deteksi dini kelelahan fisik."
+  ],
+  "topic_tags": [
+    "kelelahan fisik",
+    "kinematika",
+    "gait",
+    "deteksi real-time",
+    "konstruksi",
+    "IMU",
+    "biomekanika"
+  ],
+  "concepts": [
+    {
+      "name": "kelelahan fisik",
+      "description": "Penurunan kapasitas melakukan pekerjaan fisik karena kelelahan sebelumnya.",
+      "parent_concepts": []
+    },
+    {
+      "name": "kinematika berjalan",
+      "description": "Parameter gerakan tubuh selama berjalan yang dipengaruhi oleh kelelahan fisik.",
+      "parent_concepts": []
+    },
+    {
+      "name": "protokol kelelahan",
+      "description": "Metode yang digunakan untuk menginduksi kelelahan fisik dalam studi.",
+      "parent_concepts": []
+    },
+    {
+      "name": "IMU",
+      "description": "Perangkat wearable yang mengukur gerakan kinematik secara real-time.",
+      "parent_concepts": []
+    },
+    {
+      "name": "risiko jatuh",
+      "description": "Kemungkinan meningkatnya jatuh akibat gangguan keseimbangan dan koordinasi akibat kelelahan.",
+      "parent_concepts": []
+    },
+    {
+      "name": "gait speed",
+      "description": "Kecepatan berjalan yang berkurang akibat kelelahan fisik.",
+      "parent_concepts": []
+    }
+  ],
+  "relationships": [
+    {
+      "source": "kelelahan fisik",
+      "target": "kinematika berjalan",
+      "relation": "mempengaruhi",
+      "evidence": "Kelelahan fisik menyebabkan reorganisasi kinematika selama berjalan."
+    },
+    {
+      "source": "kinematika berjalan",
+      "target": "risiko jatuh",
+      "relation": "mempengaruhi",
+      "evidence": "Perubahan kinematika akibat kelelahan meningkatkan risiko jatuh."
+    },
+    {
+      "source": "IMU",
+      "target": "kinematika berjalan",
+      "relation": "mengukur",
+      "evidence": "IMU digunakan untuk mengukur perubahan kinematika secara real-time."
+    },
+    {
+      "source": "protokol kelelahan",
+      "target": "kinematika berjalan",
+      "relation": "mempengaruhi",
+      "evidence": "Protokol kelelahan berbeda menghasilkan perubahan kinematik yang berbeda."
+    },
+    {
+      "source": "kelelahan fisik",
+      "target": "gait speed",
+      "relation": "mempengaruhi",
+      "evidence": "Gait speed menurun akibat kelelahan fisik."
+    },
+    {
+      "source": "kelelahan fisik",
+      "target": "trunk acceleration",
+      "relation": "mempengaruhi",
+      "evidence": "Trunk acceleration meningkat akibat kelelahan fisik."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "Kelelahan fisik memengaruhi koordinasi neuro-muskular.",
+      "quote": "As individuals experience fatigue, the intricate neuro-muscular coordination and motor control required for walking becomes vulnerable.",
+      "page": 1
+    },
+    {
+      "claim": "Parameter kinematik dapat diukur secara real-time.",
+      "quote": "Kinematic measures—such as gait speed, step width, and trunk acceleration—are non-invasive and more practical for continuous monitoring.",
+      "page": 2
+    },
+    {
+      "claim": "Kelelahan otot kunci memengaruhi kinematika berjalan.",
+      "quote": "Fatigue in key muscles, including the quadriceps and ankle plantar flexors, had the greatest impact on walking kinematics.",
+      "page": 1
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Memenuhi kriteria inklusi: fokus kelelahan fisik selama berjalan, menggunakan parameter kinematik, studi asli, dan publikasi dalam bahasa Inggris."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-26",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

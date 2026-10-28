@@ -1,0 +1,165 @@
+{
+  "id": "934314358837e2a5",
+  "hash": "934314358837e2a5575599bed6780ee219edf02b36e0aeeb11691ab83b9c8188",
+  "filename": "1-s2.0-S0003687025000018-main_compressed.pdf",
+  "uploaded_at": "2026-10-26T13:42:09.660096+00:00",
+  "pages": 12,
+  "text_chars": 18000,
+  "title": "Examining clinicians’ fatigue in a pediatric emergency department",
+  "authors": [
+    "Mustafa Ozkaynak",
+    "Heather L. Smyth",
+    "Cristian Sarabia",
+    "Paul F. Cook",
+    "Rakesh D. Mistry",
+    "Sarah K. Schmidt"
+  ],
+  "year": "2025",
+  "doi": "10.1016/j.apergo.2025.104465",
+  "abstract": "Penelitian ini menganalisis kelelahan klinis di ruang darurat pediatrik menggunakan Skala Fatigue Kerja Swedia (SOFI). Ditemukan kelelahan meningkat seiring waktu shift, dipengaruhi oleh jenis shift, gender, usia, dan peran klinis.",
+  "objective": "Mengukur perubahan kelelahan klinis selama shift dan faktor-faktor yang memengaruhi dimensi kelelahan di ruang darurat pediatrik.",
+  "research_questions": [
+    "Apakah kelelahan klinis berubah selama shift?",
+    "Apa faktor-faktor yang memengaruhi dimensi kelelahan klinis?"
+  ],
+  "methods": "Survei SOFI diberikan dua kali per shift (awal dan akhir) pada 35 klinis di ruang darurat pediatrik. Analisis statistik menggunakan paired t-test dan regresi linear multivariat.",
+  "context": "Ruang darurat pediatrik di fasilitas akademik tingkat tiga, dengan klinis yang bekerja dalam shift 8 jam atau 6 jam.",
+  "variables": [
+    "kelelahan fisik",
+    "kelelahan motivasi",
+    "kelelahan energi",
+    "ketidaknyamanan fisik",
+    "kelelahan tidur",
+    "jenis shift",
+    "gender",
+    "usia",
+    "peran klinis"
+  ],
+  "findings": [
+    "Kelelahan meningkat secara signifikan dari awal hingga akhir shift.",
+    "Dimensi 'kelelahan energi' paling tinggi dan memburuk seiring waktu.",
+    "Kelelahan dipengaruhi oleh jenis shift, gender, usia, dan peran klinis.",
+    "Analisis menunjukkan variasi kebutuhan klinis berdasarkan tingkat kelelahan.",
+    "SOFI digunakan karena valid dan telah digunakan sebelumnya pada klinis.",
+    "Keterlibatan HIT dalam mitigasi kelelahan disarankan untuk pengembangan sistem pendukung klinis."
+  ],
+  "limitations": [
+    "Jumlah sampel kecil (35 klinis).",
+    "Data hanya dikumpulkan dalam dua waktu per shift (awal dan akhir).",
+    "Analisis tidak mempertimbangkan faktor lingkungan atau teknologi EHR secara mendalam."
+  ],
+  "future_research": [
+    "Mengembangkan HIT dan CDS yang disesuaikan dengan tingkat kelelahan klinis.",
+    "Mengukur dampak EHR terhadap kelelahan secara lebih mendalam.",
+    "Mengamati kelelahan dalam konteks shift yang lebih bervariasi."
+  ],
+  "topic_tags": [
+    "kelelahan klinis",
+    "fatigue",
+    "pediatrik",
+    "shift work",
+    "SOFI",
+    "emergency department",
+    "health information technology"
+  ],
+  "concepts": [
+    {
+      "name": "fatigue",
+      "description": "Keadaan kompleks dan nebula yang ditandai dengan kurangnya kewaspadaan dan penurunan kinerja mental dan fisik.",
+      "parent_concepts": []
+    },
+    {
+      "name": "Swedish Occupational Fatigue Inventory",
+      "description": "Alat survei 20 item yang mengukur lima dimensi kelelahan: kelelahan fisik, kelelahan motivasi, kelelahan energi, ketidaknyamanan fisik, dan kelelahan tidur.",
+      "parent_concepts": []
+    },
+    {
+      "name": "shift type",
+      "description": "Klasifikasi shift menjadi hari, sore, atau malam berdasarkan waktu mulai shift.",
+      "parent_concepts": []
+    },
+    {
+      "name": "clinician role",
+      "description": "Peran klinis seperti attending, fellow, atau advanced practice provider.",
+      "parent_concepts": []
+    },
+    {
+      "name": "health information technology",
+      "description": "Teknologi informasi kesehatan, khususnya EHR dan CDS, yang dapat memengaruhi kelelahan klinis.",
+      "parent_concepts": []
+    },
+    {
+      "name": "burnout",
+      "description": "Kondisi stres jangka panjang yang ditandai dengan kelelahan emosional, depersonalisasi, dan kehilangan rasa pencapaian pribadi.",
+      "parent_concepts": []
+    }
+  ],
+  "relationships": [
+    {
+      "source": "fatigue",
+      "target": "burnout",
+      "relation": "related",
+      "evidence": "Fatigue adalah konsekuensi langsung kerja, sedangkan burnout mungkin akibat kelelahan jangka panjang."
+    },
+    {
+      "source": "Swedish Occupational Fatigue Inventory",
+      "target": "fatigue",
+      "relation": "measures",
+      "evidence": "SOFI digunakan untuk mengukur lima dimensi kelelahan."
+    },
+    {
+      "source": "shift type",
+      "target": "fatigue",
+      "relation": "influences",
+      "evidence": "Kelelahan tergantung pada jenis shift, gender, usia, dan peran klinis."
+    },
+    {
+      "source": "health information technology",
+      "target": "fatigue",
+      "relation": "mitigates",
+      "evidence": "HIT dan CDS dapat membantu mengurangi kelelahan dan burnout."
+    },
+    {
+      "source": "fatigue",
+      "target": "clinical performance",
+      "relation": "impairs",
+      "evidence": "Fatigue terkait dengan penurunan kinerja klinis dan kesalahan keputusan."
+    },
+    {
+      "source": "fatigue",
+      "target": "patient safety",
+      "relation": "negatively impacts",
+      "evidence": "Fatigue berhubungan dengan penurunan keselamatan pasien dan hasil klinis buruk."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "Fatigue meningkat seiring waktu shift.",
+      "quote": "The most common finding in fatigue research is that feelings of fatigue increase steadily over time during shift work.",
+      "page": 1
+    },
+    {
+      "claim": "Fatigue berhubungan dengan penurunan kinerja klinis.",
+      "quote": "Fatigue has been associated with impaired clinician performance, and poor health outcomes.",
+      "page": 2
+    },
+    {
+      "claim": "HIT dapat membantu mengurangi kelelahan.",
+      "quote": "HIT, specifically the electronic health record (EHR), is a known contributor to clinician fatigue and burnout... may mitigate fatigue.",
+      "page": 2
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel secara eksplisit meneliti fatigue di ruang darurat pediatrik, menggunakan metode valid (SOFI), dan melaporkan temuan spesifik tentang faktor-faktor yang memengaruhi kelelahan."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-26",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

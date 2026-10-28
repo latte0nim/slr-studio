@@ -1,0 +1,185 @@
+{
+  "id": "0c4c91b436215c35",
+  "hash": "0c4c91b436215c3554db76e9a9d9944d12932e28a9b387dfde8eb468a75ece36",
+  "filename": "1-s2.0-S0142112326005451-main_compressed.pdf",
+  "uploaded_at": "2026-10-26T16:26:04.062925+00:00",
+  "pages": 19,
+  "text_chars": 18000,
+  "title": "Build-direction heterogeneity and T6-induced shift in fatigue failure mechanisms of thick-wall additive friction stir deposited Al–Zn–Mg–Cu alloy",
+  "authors": [
+    "Zhichao Wang",
+    "Zhikang Shen",
+    "Zexi Wu",
+    "Mengjia Xu",
+    "Javier Piazzese",
+    "Michele Chiumenti",
+    "Narges Dialami",
+    "Kalinur Sadyrov",
+    "Keyang Wu",
+    "Guoqiang Huang",
+    "Yuman Zhu",
+    "Wenya Li",
+    "Huijun Li"
+  ],
+  "year": "",
+  "doi": "10.1016/j.ijfatigue.2026.110024",
+  "abstract": "Penelitian ini menganalisis mekanisme awal retak lelah pada logam Al–Zn–Mg–Cu yang diproses dengan additive friction stir deposition (AFSD) dan diuji sebelum dan sesudah T6 heat treatment. Temuan menunjukkan bahwa T6 meningkatkan kekuatan lelah sekitar 52,7% tetapi tidak menghilangkan partikel Mg–Si atau presipitat batas butiran yang tetap menjadi sumber inisiasi retak.",
+  "objective": "Mengidentifikasi mekanisme inisiasi retak lelah pada deposit tebal AFSD Al–Zn–Mg–Cu sebelum dan sesudah T6, serta memahami perubahan mekanisme akibat perlakuan panas.",
+  "research_questions": [
+    "Apakah mekanisme inisiasi retak lelah pada AFSD Al–Zn–Mg–Cu dipengaruhi oleh heterogenitas arah pembuatan atau partikel/precipitat batas butiran?"
+  ],
+  "methods": "Fabrikasi deposit 102 lapis dengan AFSD, uji lelah S–N, uji tarik, pemetaan kekerasan, EBSD, TEM, dan analisis permukaan patahan. T6 diterapkan dengan proses solusi, pendinginan, dan penuaan.",
+  "context": "Penelitian fokus pada logam Al–Zn–Mg–Cu (AA7075) untuk aplikasi struktural berat, dengan konteks fabrikasi additif solid-state dan perlakuan panas T6.",
+  "variables": [
+    "heterogenitas arah pembuatan",
+    "perlakuan T6",
+    "kekuatan lelah",
+    "partikel Mg–Si",
+    "presipitat batas butiran",
+    "lokasi inisiasi retak"
+  ],
+  "findings": [
+    "As-deposited alloy menunjukkan heterogenitas arah pembuatan yang memperkuat inisiasi retak dari zona lemah antar lapisan.",
+    "T6 meningkatkan kekuatan lelah dari 55 MPa menjadi 84 MPa (52,7% peningkatan) karena rekonstruksi presipitat η′.",
+    "Setelah T6, retak lelah tetap terjadi di partikel Mg–Si dan presipitat batas butiran (η/S).",
+    "T6 mengubah mekanisme inisiasi retak dari interlayer/soft-zone menjadi partikel/grain-boundary precipitate.",
+    "Heterogenitas arah pembuatan tetap ada meskipun T6, karena eksposur termal kumulatif tidak merata.",
+    "Fatigue failure masih sensitif terhadap partikel dan presipitat meskipun T6."
+  ],
+  "limitations": [
+    "Tidak dilakukan pengukuran suhu in-situ selama proses AFSD.",
+    "Penelitian fokus pada deposit tebal, bukan komponen kompleks atau geometri lain.",
+    "Tidak semua partikel atau presipitat dapat dihilangkan meskipun T6."
+  ],
+  "future_research": [
+    "Perlu model multiphysics yang lebih detail untuk menghubungkan sejarah termomekanik, evolusi mikrostruktur, dan kinerja lelah.",
+    "Perlu penelitian lebih lanjut tentang pengaruh geometri dan desain komponen terhadap mekanisme inisiasi retak.",
+    "Perlu optimasi proses AFSD dan T6 untuk mengurangi heterogenitas dan partikel berbahaya."
+  ],
+  "topic_tags": [
+    "fatigue",
+    "additive manufacturing",
+    "Al–Zn–Mg–Cu",
+    "T6 treatment",
+    "fatigue crack initiation",
+    "build-direction heterogeneity",
+    "precipitation hardening"
+  ],
+  "concepts": [
+    {
+      "name": "build-direction heterogeneity",
+      "description": "Perbedaan mikrostruktur sepanjang arah pembuatan akibat eksposur termal kumulatif.",
+      "parent_concepts": [
+        "microstructural heterogeneity"
+      ]
+    },
+    {
+      "name": "T6 heat treatment",
+      "description": "Perlakuan panas yang mencakup solusi, pendinginan, dan penuaan untuk memperbaiki presipitat.",
+      "parent_concepts": [
+        "heat treatment",
+        "precipitation hardening"
+      ]
+    },
+    {
+      "name": "fatigue crack initiation",
+      "description": "Proses munculnya retak lelah akibat stres siklik di lokasi lemah atau partikel.",
+      "parent_concepts": [
+        "fatigue",
+        "crack nucleation"
+      ]
+    },
+    {
+      "name": "η′-dominated precipitation",
+      "description": "Presipitat metastabil yang dominan setelah T6, memberikan penguatan.",
+      "parent_concepts": [
+        "precipitation hardening",
+        "microstructure"
+      ]
+    },
+    {
+      "name": "Mg–Si-rich particles",
+      "description": "Partikel yang menjadi sumber inisiasi retak lelah meskipun T6.",
+      "parent_concepts": [
+        "constituent particles",
+        "fatigue failure"
+      ]
+    },
+    {
+      "name": "grain-boundary η/S phases",
+      "description": "Presipitat batas butiran yang tetap aktif sebagai sumber inisiasi retak lelah.",
+      "parent_concepts": [
+        "grain boundary",
+        "precipitation"
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "source": "build-direction heterogeneity",
+      "target": "fatigue crack initiation",
+      "relation": "memicu",
+      "evidence": "Heterogenitas arah pembuatan mempromosikan lokalisasi regangan siklik dan inisiasi retak."
+    },
+    {
+      "source": "T6 heat treatment",
+      "target": "η′-dominated precipitation",
+      "relation": "menghasilkan",
+      "evidence": "T6 meningkatkan presipitat η′-dominated dan homogenisasi lokal."
+    },
+    {
+      "source": "T6 heat treatment",
+      "target": "fatigue crack initiation",
+      "relation": "mengubah mekanisme",
+      "evidence": "T6 mengubah mekanisme inisiasi retak dari interlayer ke partikel/grain-boundary."
+    },
+    {
+      "source": "Mg–Si-rich particles",
+      "target": "fatigue crack initiation",
+      "relation": "menjadi sumber",
+      "evidence": "Partikel Mg–Si tetap menjadi sumber inisiasi retak meskipun T6."
+    },
+    {
+      "source": "grain-boundary η/S phases",
+      "target": "fatigue crack initiation",
+      "relation": "menjadi sumber",
+      "evidence": "Presipitat batas butiran η/S tetap aktif sebagai sumber inisiasi retak."
+    },
+    {
+      "source": "build-direction heterogeneity",
+      "target": "T6 heat treatment",
+      "relation": "tidak sepenuhnya diatasi",
+      "evidence": "T6 tidak menghilangkan heterogenitas arah pembuatan karena eksposur termal kumulatif."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "T6 meningkatkan kekuatan lelah sekitar 52,7%.",
+      "quote": "fatigue strength at 107 cycles from approximately 55 MPa to 84 MPa, representing a 52.7 % improvement",
+      "page": 1
+    },
+    {
+      "claim": "T6 tidak menghilangkan partikel Mg–Si atau presipitat batas butiran.",
+      "quote": "residual Mg–Si-rich particles and grain-boundary η/S precipitates continue to limit the fatigue performance",
+      "page": 1
+    },
+    {
+      "claim": "T6 mengubah mekanisme inisiasi retak dari interlayer ke partikel/grain-boundary.",
+      "quote": "T6 treatment may shift the dominant fatigue crack-initiation mechanism from an interlayer- or soft-zone-controlled mode to a particle- or grain-boundary-precipitate-controlled mode",
+      "page": 2
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel secara eksplisit meneliti mekanisme inisiasi retak lelah pada AFSD Al–Zn–Mg–Cu sebelum dan sesudah T6, yang relevan dengan pertanyaan riset fatigue. Tidak ada kriteria eksklusi yang diberikan oleh pengguna."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-26",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

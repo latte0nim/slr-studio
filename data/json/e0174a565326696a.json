@@ -1,0 +1,120 @@
+{
+  "id": "e0174a565326696a",
+  "hash": "e0174a565326696adcf7ed0a1b9c2399e75274d1d69a1680e57a47693f0d31ad",
+  "filename": "Simultaneous_Allocation_and_Scheduling_of_Quay_Cranes_Yard_Cranes_and_Trucks_in_Dynamical_Integrated_Container_Terminal_Operations.pdf",
+  "uploaded_at": "2026-10-28T01:23:43.696949+00:00",
+  "pages": 16,
+  "text_chars": 18000,
+  "title": "Simultaneous allocation and scheduling of quay cranes, yard cranes, and trucks in dynamical integrated container terminal operations",
+  "authors": [
+    "Rully Tri Cahyono",
+    "Saskia Puspa Kenaka",
+    "Bayu Jayawardhana"
+  ],
+  "year": "2022",
+  "doi": "10.1109/TITS.2021.3083598",
+  "abstract": "Penelitian ini menyajikan pemodelan dinamis operasi terminal kontainer terintegrasi menggunakan kerangka Finite State Machine (FSM) dengan formulasi Discrete-Event System (DES). Model hibrida mengintegrasikan operasi Quay Cranes (QC), Yard Cranes (YC), dan internal trucks (IT) serta pemilihan lokasi penyimpanan. Berbeda dengan pendekatan statis, model ini menggunakan informasi real-time yang terus diperbarui. Hasil simulasi Monte Carlo menunjukkan algoritma Model Predictive Algorithm (MPA) yang diusulkan menghasilkan solusi hampir optimal yang melampaui kebijakan operator terminal dan metode state-of-the-art saat ini sebesar 3-6%.",
+  "objective": "Mengembangkan model dinamis terintegrasi untuk operasi terminal kontainer guna meningkatkan efisiensi alokasi dan penjadwalan sumber daya (QC, YC, IT) serta pemilihan lokasi penyimpanan melalui Model Predictive Algorithm (MPA).",
+  "research_questions": [],
+  "methods": "Penelitian menggunakan pemodelan hibrida berbasis Finite State Machine (FSM) dengan formulasi Discrete-Event System (DES). Data real-time dari terminal kontainer Tanjung Priuk, Jakarta digunakan untuk memvalidasi model. Algoritma Model Predictive Algorithm (MPA) diusulkan untuk menyelesaikan masalah alokasi dan penjadwalan simultan. Validasi dilakukan melalui simulasi Monte Carlo ekstensif menggunakan dataset nyata.",
+  "context": "Operasi terminal kontainer terintegrasi (end-to-end), mencakup seaside, storage, dan transfer. Studi kasus data berasal dari Terminal Kontainer Tanjung Priuk, Jakarta, Indonesia.",
+  "variables": [
+    "Quay Cranes (QC)",
+    "Yard Cranes (YC)",
+    "Internal Trucks (IT)",
+    "Container Yard (CY) storage positions",
+    "Vessel bays",
+    "Real-time state variables"
+  ],
+  "findings": [
+    "Model hibrida DES berhasil mengintegrasikan operasi QC, YC, dan IT serta pemilihan lokasi penyimpanan.",
+    "Pendekatan dinamis menggunakan informasi real-time yang diperbarui secara terus-menerus selama horizon perencanaan.",
+    "Variabel keadaan yang diprediksi dalam model dinamis mengikuti dengan dekat data lapangan aktual dari terminal kontainer.",
+    "Algoritma Model Predictive Algorithm (MPA) menghasilkan solusi hampir optimal untuk masalah operasi terminal terintegrasi.",
+    "Simulasi Monte Carlo menunjukkan MPA melampaui kebijakan operator terminal dan metode literatur saat ini sebesar 3-6%.",
+    "Pendekatan statis yang umum digunakan gagal mengakomodasi perubahan input real-time seperti gangguan kondisi peralatan."
+  ],
+  "limitations": [
+    "Studi kasus data validasi terbatas pada satu lokasi, yaitu Terminal Kontainer Tanjung Priuk, Jakarta.",
+    "Model fokus pada alokasi dan penjadwalan operasional, mungkin tidak mencakup aspek strategis jangka panjang seperti perencanaan kapasitas penuh.",
+    "Validasi dilakukan melalui simulasi Monte Carlo; generalisasi ke semua jenis terminal kontainer tanpa data lapangan tambahan memerlukan penelitian lebih lanjut."
+  ],
+  "future_research": [],
+  "topic_tags": [
+    "Discrete-Event Systems",
+    "Model Predictive Control",
+    "Container Terminal Operations",
+    "Resource Allocation",
+    "Scheduling Optimization",
+    "Finite State Machine"
+  ],
+  "concepts": [
+    {
+      "name": "Discrete-Event System (DES)",
+      "description": "Kerangka pemodelan di mana setiap pekerjaan yang diselesaikan oleh QC, YC, atau IT dianggap sebagai langkah waktu diskrit.",
+      "parent_concepts": [
+        "Finite State Machine"
+      ]
+    },
+    {
+      "name": "Model Predictive Algorithm (MPA)",
+      "description": "Algoritma yang diusulkan untuk mendapatkan solusi hampir optimal dari masalah operasi terminal terintegrasi.",
+      "parent_concepts": []
+    },
+    {
+      "name": "Finite State Machine (FSM)",
+      "description": "Kerangka kerja di mana setiap mesin keadaan direpresentasikan sebagai formulasi sistem peristiwa diskrit untuk pemodelan dinamis.",
+      "parent_concepts": []
+    }
+  ],
+  "relationships": [
+    {
+      "source": "Discrete-Event System (DES)",
+      "target": "Finite State Machine",
+      "relation": "implementation",
+      "evidence": "setiap state machine is represented by a discrete-event system formulation"
+    },
+    {
+      "source": "Model Predictive Algorithm (MPA)",
+      "target": "Integrated container terminal hybrid model",
+      "relation": "solution_method",
+      "evidence": "using the integrated container terminal hybrid model, we proposed a model predictive algorithm (MPA)"
+    },
+    {
+      "source": "Real-time information",
+      "target": "Static modeling approach",
+      "relation": "contrast",
+      "evidence": "in this research we use real-time trucks, crane, and container storage operations information"
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "Model menggunakan informasi real-time yang diperbarui.",
+      "quote": "we use real-time trucks, crane, and container storage operations information",
+      "page": 2
+    },
+    {
+      "claim": "MPA melampaui kebijakan operator dan metode literatur.",
+      "quote": "the MPA outperforms by 3-6% both of the policies currently implemented by the terminal operator and the state-of-the-art method",
+      "page": 2
+    },
+    {
+      "claim": "Variabel keadaan prediksi mengikuti data lapangan.",
+      "quote": "the predicted state variables closely follow the actual field data from a container terminal",
+      "page": 2
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel secara langsung membahas pemodelan dinamis (DES, FSM) dan Model Predictive Control untuk alokasi sumber daya terminal kontainer (QC, YC, IT), yang sesuai dengan fokus RQ tentang efisiensi pengambilan keputusan operasional. Data validasi dari Tanjung Priuk mendukung konteks logistik nyata."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-28",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

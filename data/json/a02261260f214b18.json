@@ -1,0 +1,158 @@
+{
+  "id": "a02261260f214b18",
+  "hash": "a02261260f214b189be9aa68d99de1edeed0e62c346a7fb1bdb5009f45a2f1aa",
+  "filename": "1-s2.0-S0003687025000407-main_compressed.pdf",
+  "uploaded_at": "2026-10-26T13:13:39.277768+00:00",
+  "pages": 8,
+  "text_chars": 18000,
+  "title": "Gait variability predicts post-fatigue obstacle course performance among military cadets: An exploratory study",
+  "authors": [
+    "Sophia Ulman",
+    "Divya Srinivasan",
+    "Maury A. Nussbaum"
+  ],
+  "year": "2025",
+  "doi": "10.1016/j.apergo.2025.104504",
+  "abstract": "Studi eksploratori menemukan bahwa variabilitas gait sebelum kelelahan dapat memprediksi kinerja post-fatigue dalam obstacle course. Ukuran variabilitas sendi kinematik memprediksi 73-89% variasi kinerja post-fatigue.",
+  "objective": "Mengukur seberapa jauh variabilitas gait sebelum kelelahan terkait kemampuan individu menjalani obstacle course setelah kelelahan.",
+  "research_questions": [
+    "Seberapa jauh variabilitas gait sebelum kelelahan terkait kemampuan individu menjalani obstacle course setelah kelelahan?"
+  ],
+  "methods": "Desain ulang ukuran, 24 cadet militer diuji gait dan obstacle course sebelum dan sesudah protokol kelelahan. Variabilitas gait diukur dari karakteristik stride, sudut sendi, dan koordinasi antar sendi. Analisis regresi linear digunakan untuk memprediksi kinerja post-fatigue.",
+  "context": "Militer, cadet ROTC, uji kelelahan dengan beban, obstacle course dinamis, pengukuran kinematik gait.",
+  "variables": [
+    "variabilitas gait (GV)",
+    "kinerja post-fatigue (HCT, MJH, MJD)",
+    "sudut sendi",
+    "koordinasi antar sendi",
+    "kelelahan (RPE, HR)"
+  ],
+  "findings": [
+    "Variabilitas sendi kinematik memprediksi 73-89% variasi kinerja post-fatigue.",
+    "Variabilitas pinggul dan koordinasi pinggul-kaki selama fase swing signifikan.",
+    "Variabilitas lutut-ankle selama fase stance dan swing signifikan.",
+    "Kinerja post-fatigue menurun setelah protokol kelelahan.",
+    "Variabilitas gait diukur selama 2 menit berjalan beban.",
+    "Kinerja post-fatigue diukur dari 5 percobaan, hanya satu digunakan untuk analisis."
+  ],
+  "limitations": [
+    "Jumlah sampel kecil (n=24).",
+    "Hanya satu sisi tubuh dianalisis (kiri).",
+    "Keterbatasan dalam pengukuran kinerja post-fatigue (hanya satu percobaan)."
+  ],
+  "future_research": [
+    "Mengembangkan alat prediksi kinerja berbasis variabilitas gait.",
+    "Mengamati populasi yang lebih heterogen.",
+    "Menggunakan metode pengukuran yang lebih realistis dalam lingkungan lapangan."
+  ],
+  "topic_tags": [
+    "fatigue",
+    "gait variability",
+    "military",
+    "obstacle course",
+    "kinematic prediction",
+    "motor adaptability"
+  ],
+  "concepts": [
+    {
+      "name": "gait variability",
+      "description": "ukuran variasi dalam gerakan gait, termasuk karakteristik stride dan koordinasi antar sendi.",
+      "parent_concepts": [
+        "motor variability"
+      ]
+    },
+    {
+      "name": "post-fatigue performance",
+      "description": "kinerja individu setelah mengalami protokol kelelahan.",
+      "parent_concepts": []
+    },
+    {
+      "name": "inter-joint coordination",
+      "description": "koordinasi antar sendi dalam gerakan gait, diukur melalui sudut koppel.",
+      "parent_concepts": []
+    },
+    {
+      "name": "fatigue protocol",
+      "description": "protokol kelelahan yang melibatkan berjalan beban dengan peningkatan kecepatan.",
+      "parent_concepts": []
+    },
+    {
+      "name": "motor variability",
+      "description": "variabilitas dalam gerakan motorik yang mungkin membantu adaptasi terhadap kelelahan.",
+      "parent_concepts": []
+    },
+    {
+      "name": "obstacle course",
+      "description": "tugas dinamis yang melibatkan melompati rintangan dan melompat jauh.",
+      "parent_concepts": []
+    }
+  ],
+  "relationships": [
+    {
+      "source": "gait variability",
+      "target": "post-fatigue performance",
+      "relation": "predicts",
+      "evidence": "Variabilitas sendi kinematik memprediksi 73-89% variasi kinerja post-fatigue."
+    },
+    {
+      "source": "inter-joint coordination",
+      "target": "post-fatigue performance",
+      "relation": "predicts",
+      "evidence": "Koordinasi pinggul-kaki dan lutut-ankle selama fase swing dan stance signifikan."
+    },
+    {
+      "source": "fatigue protocol",
+      "target": "post-fatigue performance",
+      "relation": "causes",
+      "evidence": "Protokol kelelahan menyebabkan penurunan kinerja post-fatigue."
+    },
+    {
+      "source": "motor variability",
+      "target": "adaptability",
+      "relation": "enables",
+      "evidence": "Variabilitas tinggi memungkinkan eksplorasi solusi motorik alternatif."
+    },
+    {
+      "source": "gait variability",
+      "target": "motor variability",
+      "relation": "subset",
+      "evidence": "Variabilitas gait adalah bagian dari konstruksi motor variability."
+    },
+    {
+      "source": "post-fatigue performance",
+      "target": "obstacle course",
+      "relation": "measured in",
+      "evidence": "Kinerja post-fatigue diukur dalam tugas obstacle course."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "Variabilitas sendi kinematik memprediksi 73-89% variasi kinerja post-fatigue.",
+      "quote": "Measures of joint kinematic variability predicted 73–89% of the variance in post-fatigue performance.",
+      "page": 1
+    },
+    {
+      "claim": "Variabilitas pinggul dan koordinasi pinggul-kaki selama fase swing signifikan.",
+      "quote": "the significant predictors were sagittal plane variability of 1) hip angle and hip-knee coordination during swing phase",
+      "page": 1
+    },
+    {
+      "claim": "Koordinasi lutut-ankle selama fase stance dan swing signifikan.",
+      "quote": "and 2) knee-ankle coordination during both stance and swing phase.",
+      "page": 1
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel relevan dengan topik fatigue dan meneliti prediksi kinerja post-fatigue berdasarkan variabilitas gait. Kriteria inklusi tidak ditentukan, sehingga artikel termasuk."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-26",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

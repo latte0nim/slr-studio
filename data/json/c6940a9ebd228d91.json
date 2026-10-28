@@ -1,0 +1,152 @@
+{
+  "id": "c6940a9ebd228d91",
+  "hash": "c6940a9ebd228d9116533cf10d4c945e9321084ee4bf8877579a9e80365f0814",
+  "filename": "1-s2.0-S1350630726007971-main_compressed.pdf",
+  "uploaded_at": "2026-10-26T16:28:50.953926+00:00",
+  "pages": 13,
+  "text_chars": 18000,
+  "title": "Unveiling the fatigue strength degradation mechanism in surface-strengthened Ti-6Al-4V alloy: the critical role of crack initiation radius ratio",
+  "authors": [
+    "Wenwen Xu",
+    "Yilong Liang",
+    "Xiaoqian Yang",
+    "Peng Chen",
+    "Xu Huang",
+    "Guigui Peng",
+    "Xing Ran",
+    "Mingyu Zhu"
+  ],
+  "year": "",
+  "doi": "10.1016/j.engfailanal.2026.111322",
+  "abstract": "Penelitian ini mengidentifikasi mekanisme degradasi kekuatan fatique pada Ti-6Al-4V setelah USRP, dengan fokus pada rasio jari-jari inisiasi retak (A). Ditemukan bahwa ketika A meningkat dari 0 hingga 0.26, batas fatique meningkat 34%, namun saat A > 0.27, kekuatan fatique menurun 29% akibat konsentrasi stres di antar fase α/β.",
+  "objective": "Mengidentifikasi mekanisme degradasi kekuatan fatique pada Ti-6Al-4V setelah USRP dan menetapkan kriteria optimal untuk menghindari over-strengthening.",
+  "research_questions": [],
+  "methods": "Uji fatique tingkat tinggi (HCF) pada spesimen Ti-6Al-4V dengan USRP, karakterisasi mikrostruktur, kekerasan, stres residual, dan analisis TEM untuk mengidentifikasi lokasi inisiasi retak.",
+  "context": "Aerospace material, Ti-6Al-4V, diperkuat dengan USRP, fokus pada mekanisme degradasi fatique akibat pergeseran lokasi inisiasi retak.",
+  "variables": [
+    "crack initiation radius ratio (A)",
+    "compressive residual stress",
+    "hardness depth",
+    "fatigue limit",
+    "stress triaxiality",
+    "microstructure"
+  ],
+  "findings": [
+    "Ketika A meningkat dari 0 hingga 0.26, batas fatique meningkat 34%.",
+    "Ketika A > 0.27, kekuatan fatique menurun 29% akibat konsentrasi stres di antar fase α/β.",
+    "Teknik USRP menghasilkan lapisan nanostruktur dan stres residual kompresif, namun dapat menyebabkan degradasi fatique jika A terlalu tinggi.",
+    "Ketika A > 0.27, stres triaksialitas tinggi di ujung retak menghambat emisi dan perkalian dislokasi.",
+    "Optimal process window ditemukan pada A = 0.20–0.27 untuk performa fatique puncak.",
+    "TEM menunjukkan bahwa konsentrasi stres antar fase α/β memicu patahan ambang."
+  ],
+  "limitations": [],
+  "future_research": [],
+  "topic_tags": [
+    "fatigue degradation",
+    "Ti-6Al-4V",
+    "ultrasonic surface rolling",
+    "crack initiation",
+    "residual stress",
+    "microstructure"
+  ],
+  "concepts": [
+    {
+      "name": "crack initiation radius ratio (A)",
+      "description": "Rasio antara kedalaman inisiasi retak (d) dan jari-jari spesimen (r), digunakan untuk mengukur lokasi inisiasi retak.",
+      "parent_concepts": []
+    },
+    {
+      "name": "stress triaxiality",
+      "description": "Kondisi stres di ujung retak yang mempengaruhi perilaku dislokasi dan propagasi retak.",
+      "parent_concepts": []
+    },
+    {
+      "name": "compressive residual stress",
+      "description": "Stres kompresif yang tersisa di permukaan material setelah pemrosesan, yang dapat meningkatkan kekuatan fatique.",
+      "parent_concepts": []
+    },
+    {
+      "name": "microstructure",
+      "description": "Struktur mikroskopis material, termasuk fase α dan β, yang memengaruhi perilaku fatique.",
+      "parent_concepts": []
+    },
+    {
+      "name": "fatigue limit",
+      "description": "Tingkat stres maksimum yang dapat diterapkan tanpa kegagalan dalam jangka waktu tertentu (10^7 siklus).",
+      "parent_concepts": []
+    },
+    {
+      "name": "ultrasonic surface rolling processing (USRP)",
+      "description": "Teknik permukaan yang menggunakan getaran ultrasonik untuk menghasilkan nanostruktur dan stres residual kompresif.",
+      "parent_concepts": []
+    }
+  ],
+  "relationships": [
+    {
+      "source": "crack initiation radius ratio (A)",
+      "target": "fatigue limit",
+      "relation": "pengaruh",
+      "evidence": "Ketika A meningkat dari 0 hingga 0.26, batas fatique meningkat 34%."
+    },
+    {
+      "source": "stress triaxiality",
+      "target": "dislocation emission",
+      "relation": "menghambat",
+      "evidence": "Elevated stress triaxiality at the crack tip suppresses dislocation emission."
+    },
+    {
+      "source": "microstructure",
+      "target": "fatigue performance",
+      "relation": "mempengaruhi",
+      "evidence": "Struktur mikroskopis memengaruhi konsentrasi stres antar fase α/β."
+    },
+    {
+      "source": "compressive residual stress",
+      "target": "fatigue strength",
+      "relation": "menguntungkan",
+      "evidence": "Compressive residual stress counteracts external tensile stress and reduces effective shear stress for dislocation slip."
+    },
+    {
+      "source": "ultrasonic surface rolling processing (USRP)",
+      "target": "crack initiation radius ratio (A)",
+      "relation": "mempengaruhi",
+      "evidence": "USRP mengubah lokasi inisiasi retak, yang diukur dengan A."
+    },
+    {
+      "source": "crack initiation radius ratio (A)",
+      "target": "interfacial stress concentration",
+      "relation": "mempengaruhi",
+      "evidence": "When A exceeds a critical value Ac (≈0.27), interfacial stress concentration promotes brittle cleavage fracture."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "Ketika A meningkat dari 0 hingga 0.26, batas fatique meningkat 34%.",
+      "quote": "as A increases from 0 to 0.26, the fatigue limit increases by 34 %.",
+      "page": 1
+    },
+    {
+      "claim": "Ketika A > 0.27, kekuatan fatique menurun 29% akibat konsentrasi stres di antar fase α/β.",
+      "quote": "fatigue strength decreases by 29 %, despite deeper hardened and residual stress fields. ... promoting interfacial stress concentration and brittle cleavage fracture.",
+      "page": 1
+    },
+    {
+      "claim": "Teknik USRP menghasilkan lapisan nanostruktur dan stres residual kompresif, namun dapat menyebabkan degradasi fatique jika A terlalu tinggi.",
+      "quote": "USRP induces gradient nanostructures and compressive residual stress fields to enhance fatigue performance. However, counterintuitive degradation in high-cycle fatigue strength has been observed.",
+      "page": 1
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel secara eksplisit membahas mekanisme degradasi fatique pada Ti-6Al-4V setelah USRP, dengan fokus pada rasio jari-jari inisiasi retak (A), yang relevan dengan pertanyaan penelitian tentang fatigue."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-26",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

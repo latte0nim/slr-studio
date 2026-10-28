@@ -1,0 +1,146 @@
+{
+  "id": "a7151a1b25c17f15",
+  "hash": "a7151a1b25c17f157fd41220fa4fab7d192d30d63d2a8fc9d998154c10b2c61b",
+  "filename": "1-s2.0-S0003687026001213-main_compressed.pdf",
+  "uploaded_at": "2026-10-26T13:39:10.154849+00:00",
+  "pages": 10,
+  "text_chars": 18000,
+  "title": "The distracting role of stress: Impaired executive attention and delayed fatigue perception",
+  "authors": [
+    "Oshin Tyagi",
+    "Ranjana K. Mehta"
+  ],
+  "year": "",
+  "doi": "10.1016/j.apergo.2026.104843",
+  "abstract": "Stress delays fatigue perception and reduces PFC functional segregation during intermittent exercise, without affecting sex differences in central fatigue mechanisms.",
+  "objective": "To identify the influence of cognitive stress on central fatigue and associated functional changes in cognitive and motor brain areas in men and women.",
+  "research_questions": [],
+  "methods": "30 young adults performed intermittent elbow flexion contractions with/without mental math stress task; fNIRS measured PFC/M1 connectivity; EMG, RPE, and force data collected.",
+  "context": "Laboratory-based neuroergonomic study on healthy young adults; relevant to occupational safety in high-stress environments.",
+  "variables": [
+    "cognitive stress",
+    "fatigue perception",
+    "PFC-M1 connectivity",
+    "motor performance",
+    "sex differences",
+    "functional integration/segregation"
+  ],
+  "findings": [
+    "Stress prolonged endurance despite reduced motor performance.",
+    "Stress stunted perception of effort during exercise.",
+    "Stress reduced functional segregation in the prefrontal cortex.",
+    "Stress did not contribute to sex differences in central fatigue mechanisms.",
+    "Functional integration between PFC and M1 decreased under stress.",
+    "No change in motor outcomes for women under stress."
+  ],
+  "limitations": [],
+  "future_research": [],
+  "topic_tags": [
+    "fatigue",
+    "cognitive stress",
+    "neuroergonomics",
+    "prefrontal cortex",
+    "functional connectivity",
+    "exercise performance"
+  ],
+  "concepts": [
+    {
+      "name": "central fatigue",
+      "description": "Exercise-induced impairment in corticospinal pathway reducing neural drive to neuromuscular junction.",
+      "parent_concepts": []
+    },
+    {
+      "name": "functional segregation",
+      "description": "Measure of task-related specialization between brain areas; reduced under stress.",
+      "parent_concepts": []
+    },
+    {
+      "name": "perception of effort",
+      "description": "Subjective measure of exertion; stunted by stress.",
+      "parent_concepts": []
+    },
+    {
+      "name": "cognitive stress",
+      "description": "Physiological and psychological response to high mental workload.",
+      "parent_concepts": []
+    },
+    {
+      "name": "fNIRS",
+      "description": "Functional near-infrared spectroscopy used to monitor cortical activation and connectivity.",
+      "parent_concepts": []
+    },
+    {
+      "name": "motor performance",
+      "description": "Measured by force steadiness and variability; impaired under stress.",
+      "parent_concepts": []
+    }
+  ],
+  "relationships": [
+    {
+      "source": "cognitive stress",
+      "target": "perception of effort",
+      "relation": "reduces",
+      "evidence": "Stress stunted the perception of effort for exercise."
+    },
+    {
+      "source": "cognitive stress",
+      "target": "functional segregation",
+      "relation": "reduces",
+      "evidence": "Stress reduced functional segregation of the PFC."
+    },
+    {
+      "source": "cognitive stress",
+      "target": "motor performance",
+      "relation": "impairs",
+      "evidence": "Stress impaired motor performance (lower force steadiness)."
+    },
+    {
+      "source": "cognitive stress",
+      "target": "central fatigue",
+      "relation": "does not affect",
+      "evidence": "Stress did not contribute to the sex differences in central mechanisms of fatigue."
+    },
+    {
+      "source": "functional integration",
+      "target": "motor performance",
+      "relation": "associated with",
+      "evidence": "Functional integration between PFC and M1 decreased under stress."
+    },
+    {
+      "source": "fatigue perception",
+      "target": "endurance",
+      "relation": "delayed",
+      "evidence": "Stress prolonged endurance despite poorer motor performance."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "Stress prolonged endurance despite poorer motor performance.",
+      "quote": "Stress prolonged endurance among both men and women.",
+      "page": 1
+    },
+    {
+      "claim": "Stress stunted perception of effort.",
+      "quote": "Stress also stunted the perception of effort for exercise.",
+      "page": 1
+    },
+    {
+      "claim": "Stress reduced functional segregation of the PFC.",
+      "quote": "Stress also stunted the perception of effort for exercise and reduced functional segregation of the PFC.",
+      "page": 1
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel secara eksplisit membahas fatigue dan efek stres kognitif, sesuai dengan topik penelitian. Tidak ada kriteria eksklusi yang diberikan, sehingga termasuk."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-26",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

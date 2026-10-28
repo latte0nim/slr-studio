@@ -1,0 +1,131 @@
+{
+  "id": "fd34269489be3a09",
+  "hash": "fd34269489be3a098a95c9a548621e691bad9f83ba75a6907741f6c32d1c9845",
+  "filename": "Discrete-Event_Systems_Modeling_and_the_Model_Predictive_Allocation_Algorithm_for_Integrated_Berth_and_Quay_Crane_Allocation.pdf",
+  "uploaded_at": "2026-10-28T01:18:24.951454+00:00",
+  "pages": 12,
+  "text_chars": 18000,
+  "title": "Discrete-Event Systems Modeling and the Model Predictive Allocation Algorithm for Integrated Berth and Quay Crane Allocation",
+  "authors": [
+    "Rully Tri Cahyono",
+    "Engel Jacob Flonk",
+    "Bayu Jayawardhana"
+  ],
+  "year": "2019",
+  "doi": "10.1109/TITS.2019.2910283",
+  "abstract": "Artikel mengusulkan kerangka pemodelan dinamis berbasis sistem peristiwa diskrit (DES) dan algoritma alokasi prediktif model (MPA) untuk menyelesaikan masalah alokasi terpadu dermaga dan derek pelabuhan (I-BCAP). Metode ini menggunakan prinsip kontrol prediktif dengan cakrawala pergeseran. Validasi dilakukan melalui simulasi Monte Carlo, data nyata dari Tanjung Priuk, dan eksperimen lapangan.",
+  "objective": "Menyelesaikan masalah alokasi terpadu dermaga dan derek pelabuhan (I-BCAP) secara real-time untuk meningkatkan efisiensi operasional terminal kontainer dengan meminimalkan biaya penanganan dan tunggu.",
+  "research_questions": [
+    "Bagaimana pendekatan pemodelan dinamis berbasis sistem peristiwa diskrit dapat diterapkan untuk alokasi dermaga dan derek pelabuhan?",
+    "Seberapa efektif algoritma alokasi prediktif model (MPA) dibandingkan metode konvensional seperti FCFS & DBQA?"
+  ],
+  "methods": "Penelitian menggunakan pemodelan dinamis berbasis sistem peristiwa diskrit (DES), mengusulkan Algoritma Alokasi Prediktif Model (MPA) dengan prinsip kontrol prediktif dan cakrawala bergulir. Validasi dilakukan melalui: 1) Simulasi Monte Carlo ekstensif dengan dataset realistis; 2) Dataset nyata dari terminal kontainer Tanjung Priuk, Jakarta; 3) Eksperimen lapangan di terminal yang sama.",
+  "context": "Operasional terminal kontainer umum (seaport container terminals), khususnya proses operasi laut (seaside operations) untuk penugasan dermaga dan derek pelabuhan (QC).",
+  "variables": [
+    "Alokasi Dermaga (Berth Allocation)",
+    "Alokasi DEREK Pelabuhan (Quay Crane Allocation)",
+    "Biaya Penanganan (Handling Cost)",
+    "Biaya Tunggu (Waiting Cost)",
+    "Waktu Putaran Kapal (Turnaround Time)",
+    "Informasi Real-time"
+  ],
+  "findings": [
+    "Algoritma MPA dapat mengurangi total biaya penanganan dan tunggu sekitar 6%–9% dibandingkan metode First-Come First-Served (FCFS) dikombinasikan dengan strategi alokasi derek berbasis kepadatan (DBQA).",
+    "Metode yang diusulkan melampaui kinerja metode state-of-the-art berbasis optimasi kawanan partikel hibrida (HPSO) dan algoritma genetik (GA) dalam literatur terkini.",
+    "Eksperimen lapangan menunjukkan peningkatan efisiensi sekitar 6% dibandingkan metode alokasi yang ada di terminal.",
+    "Pemodelan DES mampu menangkap dinamika operasi dermaga secara real-time, berbeda dengan pendekatan pemrograman linier campuran yang bersifat statis atau konservatif.",
+    "Simulasi Monte Carlo menunjukkan peningkatan hingga 20% pada dataset aktual tunggal dan hingga 9% pada simulasi skala besar.",
+    "Model dinamis belum sepenuhnya menangkap semua elemen dalam operasi pelabuhan, menyebabkan perbedaan minor antara model validasi dan data proses dermaga aktual."
+  ],
+  "limitations": [
+    "Model dinamis belum menangkap semua elemen dalam operasi pelabuhan, yang mengurangi kemampuan prediktif model dan membatasi potensi metode alokasi prediktif.",
+    "Perbedaan minor antara model validasi dan data aktual menunjukkan bahwa model perlu ditingkatkan untuk mencakup lebih banyak variabel operasional.",
+    "Penelitian ini berfokus pada terminal kontainer umum; generalisasi ke jenis terminal lain mungkin memerlukan penyesuaian parameter."
+  ],
+  "future_research": [
+    "Mendiskusikan kemungkinan peningkatan model dinamis untuk menangkap lebih banyak elemen dalam operasi pelabuhan di masa depan.",
+    "Meneliti penerapan metode ini pada berbagai jenis terminal kontainer dengan karakteristik operasional yang berbeda.",
+    "Mengembangkan algoritma yang lebih robust terhadap ketidakpastian tinggi dalam waktu kedatangan kapal."
+  ],
+  "topic_tags": [
+    "Discrete-Event Systems",
+    "Model Predictive Control",
+    "Berth Allocation",
+    "Quay Crane Allocation",
+    "Port Operations",
+    "Optimization Algorithms"
+  ],
+  "concepts": [
+    {
+      "name": "Discrete-Event Systems (DES)",
+      "description": "Kelas sistem dinamis yang memiliki ruang keadaan diskrit dan transisi keadaan didorong oleh peristiwa diskrit asinkronus, cocok untuk operasi terminal dengan kedatangan kapal yang tidak periodik.",
+      "parent_concepts": [
+        "Dynamical Systems"
+      ]
+    },
+    {
+      "name": "Model Predictive Allocation (MPA)",
+      "description": "Algoritma alokasi yang menggunakan prinsip kontrol prediktif dengan cakrawala pergeseran untuk menyelesaikan masalah alokasi terpadu dermaga dan derek pelabuhan secara real-time.",
+      "parent_concepts": [
+        "Model Predictive Control"
+      ]
+    },
+    {
+      "name": "Integrated Berth and Quay Crane Allocation (I-BCAP)",
+      "description": "Masalah optimasi yang menggabungkan penugasan posisi dermaga dan penjadwalan derek pelabuhan untuk kapal yang masuk ke pelabuhan.",
+      "parent_concepts": [
+        "Berth Allocation Problem"
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "source": "Discrete-Event Systems (DES)",
+      "target": "Model Predictive Allocation (MPA)",
+      "relation": "foundation",
+      "evidence": "Kerangka pemodelan DES digunakan sebagai dasar untuk mengusulkan algoritma alokasi prediktif model."
+    },
+    {
+      "source": "First-Come First-Served (FCFS)",
+      "target": "Model Predictive Allocation (MPA)",
+      "relation": "comparison",
+      "evidence": "MPA menunjukkan pengurangan biaya 6%-9% dibandingkan metode FCFS yang umum digunakan."
+    },
+    {
+      "source": "Monte Carlo Simulations",
+      "target": "Validation of MPA",
+      "relation": "evaluation_method",
+      "evidence": "Validasi dilakukan menggunakan simulasi Monte Carlo dengan dataset realistis untuk mengevaluasi kinerja algoritma."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "MPA mengurangi biaya penanganan dan tunggu.",
+      "quote": "total handling and waiting cost is reduced by approximately 6%–9%",
+      "page": 2
+    },
+    {
+      "claim": "FCFS tidak selalu efisien.",
+      "quote": "It has been known that the FCFS method, which is simple and is easily adopted to the incoming ships, is not always efficient and applicable",
+      "page": 2
+    },
+    {
+      "claim": "MPA menggunakan prinsip kontrol prediktif.",
+      "quote": "we propose the MPA algorithm for solving the I-BCAP using the model predictive control (MPC) principle with a rolling event horizon",
+      "page": 2
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel secara langsung membahas pemodelan dinamis, kontrol prediktif, dan alokasi sumber daya (dermaga/derek) pada terminal kontainer. Temuan spesifik mengenai pengurangan biaya dan validasi lapangan sangat relevan dengan RQ review tentang efisiensi pengambilan keputusan operasional dan logistik."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-28",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

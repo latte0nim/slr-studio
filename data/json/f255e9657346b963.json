@@ -1,0 +1,171 @@
+{
+  "id": "f255e9657346b963",
+  "hash": "f255e9657346b963ecff6fbf17898fde76b7d7a41158286665348caa98bc5239",
+  "filename": "1-s2.0-S0003687026000232-main_compressed.pdf",
+  "uploaded_at": "2026-10-26T13:45:11.417017+00:00",
+  "pages": 11,
+  "text_chars": 18000,
+  "title": "Effects of a passive neck support exoskeleton on neck-shoulder muscle fatigue and motion during live veterinary surgeries",
+  "authors": [
+    "Bowen Zheng",
+    "Xuelong Fan",
+    "Sun Young Kim",
+    "Denny Yu"
+  ],
+  "year": "2026",
+  "doi": "10.1016/j.apergo.2026.104745",
+  "abstract": "Penelitian ini mengevaluasi efek exoskeleton leher pasif pada kelelahan otot leher-shoulder dan postur selama operasi hewan. Studi menggunakan desain crossover pada 10 ahli bedah hewan, dengan pengukuran EMG dan IMU. Temuan menunjukkan penurunan aktivitas otot dan kelelahan otot dengan exoskeleton, tanpa mengurangi rentang gerak leher.",
+  "objective": "Mengevaluasi efektivitas exoskeleton leher pasif dalam mengurangi kelelahan otot dan ketidaknyamanan leher-shoulder selama operasi hewan, tanpa membatasi gerak leher.",
+  "research_questions": [
+    "Apakah penggunaan exoskeleton leher pasif mengurangi ketidaknyamanan, aktivitas otot, dan kelelahan otot di daerah leher-shoulder tanpa membatasi rentang gerak leher?",
+    "Apakah exoskeleton meningkatkan aktivitas otot di punggung bawah?"
+  ],
+  "methods": "Desain crossover pada 10 ahli bedah hewan, menggunakan EMG dan IMU untuk mengukur aktivitas otot dan postur. Data dikumpulkan selama 1 jam pertama operasi, dengan normalisasi terhadap nilai dasar individu.",
+  "context": "Operasi hewan hidup di klinik hewan, dengan fokus pada postur leher fleksi dan kelelahan otot leher-shoulder. Penelitian dilakukan di Purdue University College of Veterinary Medicine.",
+  "variables": [
+    "aktivitas otot (%MVE)",
+    "kelelahan otot (MPF)",
+    "ketidaknyamanan leher dan punggung",
+    "postur leher (kinematik)",
+    "rentang gerak leher",
+    "durasi operasi"
+  ],
+  "findings": [
+    "Exoskeleton mengurangi aktivitas otot trapezius dan deltoid selama operasi.",
+    "Kelelahan otot (MPF) menurun signifikan dengan exoskeleton.",
+    "Ketidaknyamanan leher dan punggung berkurang dengan exoskeleton.",
+    "Rentang gerak leher tidak terbatasi oleh exoskeleton.",
+    "Aktivitas otot punggung bawah tidak meningkat dengan exoskeleton.",
+    "Data EMG dan IMU menunjukkan perbaikan biomekanik dan fisiologis."
+  ],
+  "limitations": [
+    "Hanya menganalisis 1 jam pertama operasi, bukan seluruh prosedur.",
+    "Sensor EMG dan IMU memiliki keterbatasan dalam pengukuran postur dinamis.",
+    "Studi hanya melibatkan 10 ahli bedah hewan, dengan variasi kecil dalam pengalaman."
+  ],
+  "future_research": [
+    "Evaluasi lebih lanjut pada berbagai jenis operasi hewan dan lingkungan bedah.",
+    "Penelitian tentang efek jangka panjang exoskeleton pada kelelahan otot.",
+    "Pengembangan exoskeleton yang lebih ringan dan fleksibel untuk operasi hewan."
+  ],
+  "topic_tags": [
+    "exoskeleton",
+    "kelelahan otot",
+    "operasi hewan",
+    "postur leher",
+    "biomekanik",
+    "ergonomi"
+  ],
+  "concepts": [
+    {
+      "name": "kelelahan otot",
+      "description": "penurunan kemampuan otot untuk berkontraksi akibat aktivitas fisik berkelanjutan.",
+      "parent_concepts": [
+        "fisiologi otot"
+      ]
+    },
+    {
+      "name": "postur leher",
+      "description": "posisi leher yang mempengaruhi beban otot dan risiko kelelahan.",
+      "parent_concepts": [
+        "ergonomi"
+      ]
+    },
+    {
+      "name": "exoskeleton",
+      "description": "perangkat mekanis pasif yang memberikan dukungan fisik pada tubuh.",
+      "parent_concepts": [
+        "alat bantu ergonomi"
+      ]
+    },
+    {
+      "name": "EMG",
+      "description": "metode pengukuran aktivitas otot melalui sinyal listrik.",
+      "parent_concepts": [
+        "biomekanik"
+      ]
+    },
+    {
+      "name": "kinematik",
+      "description": "pengukuran gerakan tubuh dan posisi otot.",
+      "parent_concepts": [
+        "biomekanik"
+      ]
+    },
+    {
+      "name": "ketidaknyamanan",
+      "description": "rasa tidak nyaman fisik yang diukur secara subjektif.",
+      "parent_concepts": [
+        "kesehatan kerja"
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "source": "exoskeleton",
+      "target": "kelelahan otot",
+      "relation": "mengurangi",
+      "evidence": "Exoskeleton mengurangi aktivitas otot dan kelelahan otot."
+    },
+    {
+      "source": "postur leher",
+      "target": "kelelahan otot",
+      "relation": "mempengaruhi",
+      "evidence": "Postur leher fleksi meningkatkan beban otot dan kelelahan."
+    },
+    {
+      "source": "EMG",
+      "target": "kelelahan otot",
+      "relation": "mengukur",
+      "evidence": "EMG digunakan untuk mengukur aktivitas otot dan kelelahan."
+    },
+    {
+      "source": "exoskeleton",
+      "target": "postur leher",
+      "relation": "mempengaruhi",
+      "evidence": "Exoskeleton membantu menjaga postur leher lebih netral."
+    },
+    {
+      "source": "ketidaknyamanan",
+      "target": "kelelahan otot",
+      "relation": "terkait",
+      "evidence": "Ketidaknyamanan leher berkorelasi dengan kelelahan otot."
+    },
+    {
+      "source": "kinematik",
+      "target": "postur leher",
+      "relation": "mengukur",
+      "evidence": "IMU digunakan untuk mengukur kinematik postur leher."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "Exoskeleton mengurangi aktivitas otot trapezius dan deltoid.",
+      "quote": "a passive arm-support exoskeleton has been shown to reduce elevated-arm exposure and peak muscle activity in the trapezius and deltoid muscles",
+      "page": 2
+    },
+    {
+      "claim": "Kelelahan otot menurun dengan exoskeleton.",
+      "quote": "the trunk device significantly decreasing EMG fatigue rates",
+      "page": 2
+    },
+    {
+      "claim": "Rentang gerak leher tidak terbatasi oleh exoskeleton.",
+      "quote": "without restricting the neck joint range of motion",
+      "page": 2
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel secara eksplisit mengevaluasi efek exoskeleton pada kelelahan otot dan postur leher selama operasi hewan, dengan data empiris dan metode yang jelas. Relevan dengan pertanyaan riset fatigue."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-26",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

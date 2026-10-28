@@ -1,0 +1,158 @@
+{
+  "id": "9b2af610e854b83e",
+  "hash": "9b2af610e854b83e5049204f4f0155eadf9d9142f22eb40132f78d8e9165105a",
+  "filename": "1-s2.0-S0003687025000882-main_compressed.pdf",
+  "uploaded_at": "2026-10-26T16:52:48.721936+00:00",
+  "pages": 7,
+  "text_chars": 18000,
+  "title": "Prolonged low-frequency force depression recovery response following an isometric triceps extension to volitional fatigue at a high versus low intensity contraction",
+  "authors": [
+    "Sanjay Veerasammy",
+    "Justin B. Davidson",
+    "Jared-Isaac Friedel",
+    "James R. Potvin",
+    "A. Russell Tupling",
+    "Steven L. Fischer"
+  ],
+  "year": "2025",
+  "doi": "10.1016/j.apergo.2025.104552",
+  "abstract": "Studi ini mengevaluasi pemulihan PLFFD setelah kontraksi isometrik triceps pada intensitas tinggi (70% MVF) dan rendah (20% MVF). Hasil menunjukkan perbedaan awal dalam rasio 20/100 Hz, tetapi pemulihan selanjutnya sama antara intensitas.",
+  "objective": "Menginvestigasi pemulihan PLFFD dalam 1 jam setelah kelelahan volunter berdasarkan intensitas kontraksi isometrik triceps.",
+  "research_questions": [
+    "Does the intensity of sustained isometric triceps brachii contraction to fatigue affect PLFFD at volitional fatigue, and during 60 min of recovery?"
+  ],
+  "methods": "Studi eksperimental dengan 28 peserta (14 laki-laki, 14 perempuan) melakukan kontraksi isometrik triceps hingga kelelahan volunter pada intensitas 70% dan 20% MVF. Rasio 20/100 Hz diukur sebelum dan selama 60 menit pemulihan.",
+  "context": "Penelitian dilakukan di laboratorium kinesiologi, melibatkan mahasiswa universitas sehat, dengan fokus pada pemulihan kelelahan otot setelah kontraksi isometrik.",
+  "variables": [
+    "intensitas kontraksi",
+    "rasio 20/100 Hz",
+    "waktu pemulihan",
+    "motor unit tingkat rendah dan tinggi"
+  ],
+  "findings": [
+    "Rasio 20/100 Hz awal lebih tinggi setelah intensitas tinggi.",
+    "Pemulihan rasio 20/100 Hz sama antara intensitas tinggi dan rendah setelah 4 menit.",
+    "Perbedaan awal kemungkinan disebabkan potentiasi pasca-aktivasi.",
+    "Pemulihan PLFFD mungkin tidak bergantung pada intensitas kontraksi yang menyebabkan kelelahan.",
+    "Model SPiTFiRe belum divalidasi secara empiris terkait pemulihan motor unit.",
+    "Tidak ada perbedaan signifikan dalam pemulihan rasio 20/100 Hz setelah 60 menit."
+  ],
+  "limitations": [
+    "Tidak ada data tentang pemulihan jangka panjang.",
+    "Tidak ada kontrol terhadap faktor motivasi atau kelelahan psikologis.",
+    "Hanya melibatkan populasi mahasiswa sehat, tidak mewakili populasi kerja umum."
+  ],
+  "future_research": [
+    "Memvalidasi model SPiTFiRe terkait laju pemulihan motor unit.",
+    "Mengukur pemulihan jangka panjang PLFFD.",
+    "Mengkaji dampak kelelahan psikologis terhadap pemulihan PLFFD."
+  ],
+  "topic_tags": [
+    "muscle fatigue",
+    "recovery",
+    "PLFFD",
+    "motor unit",
+    "isometric contraction",
+    "ergonomics"
+  ],
+  "concepts": [
+    {
+      "name": "PLFFD",
+      "description": "Penurunan kemampuan menghasilkan gaya pada frekuensi rendah dibanding frekuensi tinggi setelah kelelahan otot.",
+      "parent_concepts": []
+    },
+    {
+      "name": "Motor Unit",
+      "description": "Unit saraf otot yang mengontrol satu atau lebih sel otot, dengan tingkat ambang yang berbeda.",
+      "parent_concepts": []
+    },
+    {
+      "name": "Size Principle",
+      "description": "Prinsip bahwa motor unit dengan ambang rendah (slow twitch) diterbitkan lebih awal dibanding unit ambang tinggi (fast twitch).",
+      "parent_concepts": []
+    },
+    {
+      "name": "Recovery Rate",
+      "description": "Kecepatan pemulihan kemampuan menghasilkan gaya setelah kelelahan.",
+      "parent_concepts": []
+    },
+    {
+      "name": "Transcutaneous Stimulation",
+      "description": "Metode pemberian rangsangan listrik ke otot melalui kulit untuk mengukur kemampuan menghasilkan gaya tanpa keterlibatan pusat.",
+      "parent_concepts": []
+    },
+    {
+      "name": "Volitional Fatigue",
+      "description": "Kelelahan yang terjadi ketika individu tidak mampu melanjutkan kontraksi meskipun masih mampu secara fisiologis.",
+      "parent_concepts": []
+    }
+  ],
+  "relationships": [
+    {
+      "source": "PLFFD",
+      "target": "Motor Unit",
+      "relation": "dipengaruhi oleh",
+      "evidence": "PLFFD diukur melalui rasio 20/100 Hz yang mencerminkan perbedaan pemulihan antar motor unit."
+    },
+    {
+      "source": "Motor Unit",
+      "target": "Size Principle",
+      "relation": "mengikuti",
+      "evidence": "Motor unit ambang rendah diterbitkan lebih awal sesuai prinsip ukuran."
+    },
+    {
+      "source": "PLFFD",
+      "target": "Recovery Rate",
+      "relation": "mengukur",
+      "evidence": "Rasio 20/100 Hz digunakan untuk mengukur laju pemulihan PLFFD."
+    },
+    {
+      "source": "Transcutaneous Stimulation",
+      "target": "PLFFD",
+      "relation": "metode pengukuran",
+      "evidence": "Stimulasi transkutan digunakan untuk mengukur PLFFD tanpa bias pusat."
+    },
+    {
+      "source": "Size Principle",
+      "target": "Motor Unit",
+      "relation": "mengatur",
+      "evidence": "Prinsip ukuran menentukan urutan penerbitan motor unit berdasarkan ambang."
+    },
+    {
+      "source": "Recovery Rate",
+      "target": "PLFFD",
+      "relation": "komponen",
+      "evidence": "Recovery rate diukur melalui pemulihan rasio 20/100 Hz setelah kelelahan."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "Perbedaan awal rasio 20/100 Hz kemungkinan disebabkan potentiasi pasca-aktivasi.",
+      "quote": "Initial differences in the 20/100 Hz ratio within the first 0–4 min are likely explained by post-activation potentiation.",
+      "page": 1
+    },
+    {
+      "claim": "Pemulihan PLFFD mungkin tidak bergantung pada intensitas kontraksi.",
+      "quote": "The practical impact is that recovery of prolonged frequency fatigue may not depend on the intensity of the contraction that caused the fatigue.",
+      "page": 1
+    },
+    {
+      "claim": "Model SPiTFiRe belum divalidasi secara empiris terkait pemulihan motor unit.",
+      "quote": "However, we know little about the recovery rates of different motor units, and this is a significant gap in our ability to advance the use of models to predict recovery requirements.",
+      "page": 2
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel secara eksplisit menjawab pertanyaan penelitian tentang pemulihan PLFFD berdasarkan intensitas kontraksi, dengan temuan empiris dan metode yang jelas. Cocok untuk systematic review tentang fatigue."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-26",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

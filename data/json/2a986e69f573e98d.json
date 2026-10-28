@@ -1,0 +1,132 @@
+{
+  "id": "2a986e69f573e98d",
+  "hash": "2a986e69f573e98dfe2169d00616d3ac1aa39340c6e43dc701d79fac69550ee0",
+  "filename": "Enhancing_Intermittent_Spare_Part_Demand_Forecasting_A_Novel_Ensemble_Approach_with_Focal_Loss_and_SMOTE.pdf",
+  "uploaded_at": "2026-10-27T12:46:19.452765+00:00",
+  "pages": 25,
+  "text_chars": 18000,
+  "title": "Enhancing Intermittent Spare Part Demand Forecasting: A Novel Ensemble Approach with Focal Loss and SMOTE",
+  "authors": [
+    "Saskia Puspa Kenaka",
+    "Andi Cakravastia",
+    "Anas Ma’ruf",
+    "Rully Tri Cahyono"
+  ],
+  "year": "2025",
+  "doi": "10.3390/logistics9010025",
+  "abstract": "Manajemen inventaris suku cadang intermiten memerlukan peramalan permintaan yang akurat. Sifat sporadis dan tidak teratur dari permintaan, ditandai dengan interval panjang antara kejadian, menghasilkan ketidakseimbangan data yang signifikan. Model yang diusulkan mengintegrasikan Synthetic Minority Oversampling Technique (SMOTE) untuk menyeimbangkan dataset dan menggunakan focal loss untuk meningkatkan sensitivitas model pembelajaran mendalam terhadap kejadian permintaan langka.",
+  "objective": "Menyusun pendekatan peramalan ensemble baru yang mengintegrasikan SMOTE dan focal loss untuk mengatasi tantangan ketidakseimbangan data dalam peramalan permintaan suku cadang intermiten, serta memvalidasi efektivitasnya dalam meningkatkan akurasi prediksi.",
+  "research_questions": [],
+  "methods": "Penelitian menggunakan pendekatan empiris dengan membandingkan kinerja Mean Squared Error (MSE) dan Area Under the Curve (AUC). Metode yang diusulkan mengintegrasikan Synthetic Minority Oversampling Technique (SMOTE) untuk menyeimbangkan dataset dengan menghasilkan sampel sintetis untuk kelas minoritas, serta menggunakan focal loss untuk memodifikasi fungsi kerugian agar model lebih fokus pada kejadian langka. Validasi dilakukan menggunakan data permintaan dunia nyata.",
+  "context": "Industri suku cadang intermiten dan suku cadang lambat gerak (slow-moving), khususnya dalam konteks manajemen inventaris untuk meminimalkan downtime dan mengoptimalkan alokasi sumber daya, seperti yang disebutkan terkait industri minyak dan gas.",
+  "variables": [
+    "Permintaan Suku Cadang Intermiten",
+    "Ketidakseimbangan Data",
+    "Akurasi Peramalan (MSE)",
+    "Sensitivitas Model (AUC)"
+  ],
+  "findings": [
+    "Model ensemble mencapai pengurangan MSE sebesar 47%.",
+    "Model ensemble menunjukkan peningkatan AUC sebesar 32%.",
+    "SMOTE meningkatkan representasi kejadian permintaan langka dengan menghasilkan sampel sintetis.",
+    "Focal loss memodifikasi fungsi kerugian untuk memprioritaskan kejadian langka selama pelatihan model.",
+    "Pendekatan ini efektif mengatasi ketidakseimbangan data pada suku cadang intermiten.",
+    "Metode hibrida menawarkan solusi praktis untuk manajemen inventaris dan pengurangan risiko downtime."
+  ],
+  "limitations": [
+    "Studi ini berfokus pada validasi empiris dengan data permintaan dunia nyata, namun generalisasi ke semua jenis industri mungkin memerlukan penyesuaian lebih lanjut.",
+    "Implementasi metode hibrida sering kali memerlukan penalaan hati-hati untuk menghindari overfitting.",
+    "Perlu penelitian lebih lanjut untuk mengembangkan metode inovatif yang menargetkan karakteristik spesifik permintaan intermiten di berbagai sektor."
+  ],
+  "future_research": [
+    "Mengembangkan metode inovatif untuk menyelesaikan masalah ketidakseimbangan data dengan menyesuaikan solusi pada karakteristik permintaan intermiten yang spesifik.",
+    "Menerapkan pendekatan serupa pada domain lain di luar suku cadang industri, seperti kesehatan atau keuangan, untuk memvalidasi kegunaan universalnya.",
+    "Meneliti integrasi teknik tambahan selain SMOTE dan focal loss untuk meningkatkan akurasi peramalan dalam skenario data yang sangat terbatas."
+  ],
+  "topic_tags": [
+    "Intermittent Demand",
+    "Spare Part Management",
+    "Ensemble Learning",
+    "SMOTE",
+    "Focal Loss",
+    "Inventory Optimization",
+    "Data Imbalance"
+  ],
+  "concepts": [
+    {
+      "name": "Intermittent Demand",
+      "description": "Permintaan yang sporadis dan tidak teratur, ditandai dengan interval panjang antara kejadian permintaan.",
+      "parent_concepts": []
+    },
+    {
+      "name": "Data Imbalance",
+      "description": "Ketidakseimbangan data di mana periode tanpa permintaan jauh lebih banyak daripada periode permintaan.",
+      "parent_concepts": []
+    },
+    {
+      "name": "SMOTE",
+      "description": "Teknik oversampling sintetis yang menghasilkan sampel baru untuk kelas minoritas guna menyeimbangkan dataset.",
+      "parent_concepts": []
+    },
+    {
+      "name": "Focal Loss",
+      "description": "Fungsi kerugian yang memodifikasi cara kesalahan dihukum agar model lebih fokus pada kejadian langka.",
+      "parent_concepts": []
+    },
+    {
+      "name": "Ensemble Learning",
+      "description": "Pendekatan peramalan yang menggabungkan beberapa model untuk meningkatkan akurasi prediksi.",
+      "parent_concepts": []
+    }
+  ],
+  "relationships": [
+    {
+      "source": "SMOTE",
+      "target": "Data Imbalance",
+      "relation": "mitigates",
+      "evidence": "SMOTE enhances the representation of rare demand occurrences by generating synthetic samples for the minority class."
+    },
+    {
+      "source": "Focal Loss",
+      "target": "Ensemble Learning",
+      "relation": "enhances",
+      "evidence": "Focal loss complements SMOTE by modifying the loss function to prioritize rare events during training."
+    },
+    {
+      "source": "Intermittent Demand",
+      "target": "Data Imbalance",
+      "relation": "causes",
+      "evidence": "The sporadic and irregular nature of demand, characterized by long intervals between occurrences, results in a significant data imbalance."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "Model ensemble meningkatkan akurasi peramalan secara signifikan.",
+      "quote": "The ensemble model achieved a 47% reduction in MSE and a 32% increase in AUC",
+      "page": 1
+    },
+    {
+      "claim": "SMOTE menyeimbangkan dataset dengan menghasilkan sampel sintetis.",
+      "quote": "SMOTE enhances the representation of rare demand occurrences by generating synthetic samples for the minority class",
+      "page": 2
+    },
+    {
+      "claim": "Focal loss memprioritaskan kejadian langka selama pelatihan model.",
+      "quote": "focal loss complements SMOTE by modifying the loss function to prioritize rare events during training",
+      "page": 2
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel ini secara langsung membahas peramalan permintaan suku cadang intermiten dan menerapkan pendekatan pembelajaran mesin (SMOTE, focal loss) yang relevan dengan pertanyaan penelitian tentang efisiensi pengambilan keputusan operasional. Meskipun tidak secara eksplisit membahas model predictive control atau discrete-event systems dalam konteks terminal peti kemas, metode ensemble yang diusulkan dapat diterapkan pada alokasi sumber daya. Tidak ada alasan untuk mengecualikannya berdasarkan kriteria umum."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-27",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

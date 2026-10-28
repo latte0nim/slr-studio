@@ -1,0 +1,149 @@
+{
+  "id": "9db9de55778e2807",
+  "hash": "9db9de55778e280754f8d08860226b997a772df087e0ef45cd9f2e92e8c76130",
+  "filename": "1-s2.0-S2352012426021612-main_compressed.pdf",
+  "uploaded_at": "2026-10-26T17:00:01.876411+00:00",
+  "pages": 14,
+  "text_chars": 18000,
+  "title": "Fatigue performance assessment of the steel truss gusset plate-to-crossbeam joint considering welding residual stress",
+  "authors": [
+    "Zhao Xindong",
+    "Liu Yongjian",
+    "Chen Hongming",
+    "Ma Wenjie",
+    "Jiang Lei",
+    "Liu Zhenbei"
+  ],
+  "year": "",
+  "doi": "10.1016/j.istruc.2026.113211",
+  "abstract": "Penelitian ini mengevaluasi dampak stres residu hasil las terhadap kinerja kelelahan pada sambungan gusset plate ke crossbeam di jembatan baja truss, menggunakan metode mekanika kerusakan. Hasil menunjukkan stres residu mengurangi umur kelelahan 39,6%, sementara PWHT meningkatkannya 23,6%.",
+  "objective": "Mengembangkan kerangka penilaian umur kelelahan yang mempertimbangkan stres residu las dan pengobatan pasca-las (PWHT) pada sambungan gusset plate ke crossbeam di jembatan baja truss.",
+  "research_questions": [],
+  "methods": "Simulasi termomekanik koupling, model pemanas ganda-ellipsoidal, model kerusakan Norton-Bailey, dan metode mekanika kerusakan berbasis elemen hingga.",
+  "context": "Jembatan baja truss, sambungan gusset plate ke crossbeam, stres residu las, pengobatan pasca-las (PWHT), dan analisis kelelahan.",
+  "variables": [
+    "stres residu las",
+    "pengobatan pasca-las (PWHT)",
+    "umur kelelahan",
+    "lokasi awal retakan",
+    "metode mekanika kerusakan"
+  ],
+  "findings": [
+    "Stres residu las mencapai kekuatan leleh baja.",
+    "PWHT mengurangi stres residu hingga 71–80%.",
+    "Retakan awal bergeser dari atas lubang akses las ke sisi sambungan.",
+    "Umur kelelahan dengan PWHT adalah 2.1 × 10⁶ siklus, memenuhi standar desain.",
+    "Stres residu mengurangi umur kelelahan 39,6%.",
+    "PWHT meningkatkan umur kelelahan 23,6%."
+  ],
+  "limitations": [],
+  "future_research": [],
+  "topic_tags": [
+    "kelelahan baja",
+    "stres residu las",
+    "pengobatan pasca-las",
+    "mekanika kerusakan",
+    "jembatan truss",
+    "analisis numerik"
+  ],
+  "concepts": [
+    {
+      "name": "stres residu las",
+      "description": "Stres yang tersisa di material setelah proses las, memengaruhi kinerja kelelahan.",
+      "parent_concepts": []
+    },
+    {
+      "name": "pengobatan pasca-las (PWHT)",
+      "description": "Proses pemanasan pasca-las untuk mengurangi stres residu.",
+      "parent_concepts": []
+    },
+    {
+      "name": "mekanika kerusakan",
+      "description": "Metode untuk memodelkan proses kerusakan dari awal hingga kegagalan.",
+      "parent_concepts": []
+    },
+    {
+      "name": "umur kelelahan",
+      "description": "Jumlah siklus beban sebelum kegagalan akibat kelelahan.",
+      "parent_concepts": []
+    },
+    {
+      "name": "lokasi retakan awal",
+      "description": "Titik di mana retakan mulai terbentuk akibat beban siklik.",
+      "parent_concepts": []
+    },
+    {
+      "name": "simulasi termomekanik",
+      "description": "Metode koupling antara simulasi suhu dan mekanik untuk memodelkan stres residu.",
+      "parent_concepts": []
+    }
+  ],
+  "relationships": [
+    {
+      "source": "stres residu las",
+      "target": "umur kelelahan",
+      "relation": "pengaruh negatif",
+      "evidence": "Stres residu mengurangi umur kelelahan 39,6%."
+    },
+    {
+      "source": "pengobatan pasca-las (PWHT)",
+      "target": "stres residu las",
+      "relation": "pengurangan",
+      "evidence": "PWHT mengurangi stres residu hingga 71–80%."
+    },
+    {
+      "source": "mekanika kerusakan",
+      "target": "lokasi retakan awal",
+      "relation": "pengaruh",
+      "evidence": "Mekanika kerusakan memungkinkan penentuan lokasi awal retakan."
+    },
+    {
+      "source": "simulasi termomekanik",
+      "target": "stres residu las",
+      "relation": "pengukuran",
+      "evidence": "Simulasi termomekanik digunakan untuk menghitung distribusi stres residu."
+    },
+    {
+      "source": "pengobatan pasca-las (PWHT)",
+      "target": "umur kelelahan",
+      "relation": "pengaruh positif",
+      "evidence": "PWHT meningkatkan umur kelelahan 23,6%."
+    },
+    {
+      "source": "stres residu las",
+      "target": "lokasi retakan awal",
+      "relation": "pengaruh",
+      "evidence": "Stres residu menyebabkan pergeseran lokasi retakan awal."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "Stres residu las mencapai kekuatan leleh baja.",
+      "quote": "The initial welding residual stress reaches the yield strength of the steel.",
+      "page": 1
+    },
+    {
+      "claim": "PWHT mengurangi stres residu hingga 71–80%.",
+      "quote": "PWHT significantly reduces the residual stress level, corresponding to a stress relief ratio exceeding 71–80%.",
+      "page": 1
+    },
+    {
+      "claim": "Stres residu mengurangi umur kelelahan 39,6%.",
+      "quote": "welding residual stress reduces the fatigue life by 39.6%.",
+      "page": 1
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel secara eksplisit membahas kelelahan baja, stres residu las, dan pengobatan pasca-las, yang relevan dengan pertanyaan penelitian tentang kelelahan."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-26",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

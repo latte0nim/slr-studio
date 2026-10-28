@@ -1,0 +1,151 @@
+{
+  "id": "81f4e8f11e5000ee",
+  "hash": "81f4e8f11e5000eebbddfe1100d89b6b26ae61c13a559381ef45fad67838a114",
+  "filename": "1-s2.0-S0003687025001802-main_compressed.pdf",
+  "uploaded_at": "2026-10-26T13:15:57.750557+00:00",
+  "pages": 8,
+  "text_chars": 18000,
+  "title": "Video entertainment to mitigate safety risks during prolonged automated driving: Impacts on cognitive load, fatigue, and takeover performance",
+  "authors": [
+    "Jun Ma",
+    "Lizhuo Zang",
+    "Jiateng Li",
+    "Zaiyan Gong",
+    "Yue Fei",
+    "Jin Lu"
+  ],
+  "year": "",
+  "doi": "10.1016/j.apergo.2025.104644",
+  "abstract": "Studi simulasi menguji efek video entertainment terhadap kognitif load, kelelahan, dan kinerja takeover selama driving otomatis. Hasil menunjukkan video mengurangi kelelahan dan meningkatkan kinerja takeover, meskipun meningkatkan kognitif load.",
+  "objective": "Menginvestigasi apakah video entertainment dapat mengurangi risiko kelelahan pasif selama driving otomatis dan meningkatkan kinerja takeover.",
+  "research_questions": [],
+  "methods": "Desain eksperimen 2x4 dalam-subjek dengan 32 peserta. Ukur kognitif load (pupil diameter, NASA-TLX), kelelahan (blink frequency, KSS), dan kinerja takeover (TOT, max acceleration, min TTC). Analisis menggunakan LMM.",
+  "context": "Penelitian dilakukan di simulator driving otomatis tingkat 3, dengan peserta mengalami durasi otomatis 15-60 menit, dalam kondisi dengan atau tanpa video entertainment.",
+  "variables": [
+    "video entertainment",
+    "durasi driving otomatis",
+    "kognitif load",
+    "kelelahan",
+    "kinerja takeover"
+  ],
+  "findings": [
+    "Video entertainment meningkatkan kognitif load.",
+    "Video mengurangi pertumbuhan kelelahan seiring waktu.",
+    "Video memperpendek waktu takeover.",
+    "Video meningkatkan waktu minimum hingga tabrakan.",
+    "Kelelahan diukur melalui frekuensi blink dan skor KSS.",
+    "Kognitif load diukur melalui diameter pupil dan NASA-TLX."
+  ],
+  "limitations": [],
+  "future_research": [],
+  "topic_tags": [
+    "fatigue",
+    "automated driving",
+    "video entertainment",
+    "cognitive load",
+    "takeover performance",
+    "NDRTs"
+  ],
+  "concepts": [
+    {
+      "name": "passive task-related fatigue",
+      "description": "Kelelahan akibat kondisi underloaded selama driving otomatis.",
+      "parent_concepts": [
+        "task-related fatigue"
+      ]
+    },
+    {
+      "name": "non-driving related tasks",
+      "description": "Aktivitas yang tidak terkait dengan mengemudi, seperti menonton video.",
+      "parent_concepts": []
+    },
+    {
+      "name": "takeover performance",
+      "description": "Kinerja pengemudi saat mengambil kendali kembali dari sistem otomatis.",
+      "parent_concepts": []
+    },
+    {
+      "name": "cognitive load",
+      "description": "Beban kognitif yang diukur melalui diameter pupil dan skor NASA-TLX.",
+      "parent_concepts": []
+    },
+    {
+      "name": "fatigue",
+      "description": "Kelelahan yang diukur melalui frekuensi blink dan skor KSS.",
+      "parent_concepts": []
+    },
+    {
+      "name": "linear mixed effects models",
+      "description": "Metode statistik untuk menganalisis data berulang dengan efek acak peserta.",
+      "parent_concepts": []
+    }
+  ],
+  "relationships": [
+    {
+      "source": "video entertainment",
+      "target": "passive task-related fatigue",
+      "relation": "mitigate",
+      "evidence": "Video entertainment effectively suppressed the growth of fatigue with longer ADT."
+    },
+    {
+      "source": "video entertainment",
+      "target": "takeover performance",
+      "relation": "improve",
+      "evidence": "Video entertainment reduced safety risks by shortening takeover time and increasing minimum time to collision."
+    },
+    {
+      "source": "cognitive load",
+      "target": "fatigue",
+      "relation": "influence",
+      "evidence": "Higher cognitive load usually leads to pupil dilation and higher NASA-TLX scores."
+    },
+    {
+      "source": "passive task-related fatigue",
+      "target": "takeover performance",
+      "relation": "negatively affect",
+      "evidence": "Prolonged disengagement may induce PTR fatigue, which may negatively impact takeover performance."
+    },
+    {
+      "source": "video entertainment",
+      "target": "cognitive load",
+      "relation": "increase",
+      "evidence": "Video entertainment not only increased cognitive load, but also effectively suppressed the growth of fatigue."
+    },
+    {
+      "source": "fatigue",
+      "target": "takeover performance",
+      "relation": "negatively affect",
+      "evidence": "Fatigue may negatively affect vigilance and impair takeover performance."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "Video entertainment effectively suppressed the growth of fatigue with longer ADT.",
+      "quote": "video entertainment not only increased cognitive load, but also effectively suppressed the growth of fatigue with longer ADT",
+      "page": 1
+    },
+    {
+      "claim": "Video entertainment reduced safety risks by shortening takeover time.",
+      "quote": "These findings suggest that video entertainment can improve comfort and takeover safety under prolonged automated driving scenarios by mitigating PTR fatigue.",
+      "page": 1
+    },
+    {
+      "claim": "Higher cognitive load usually leads to pupil dilation.",
+      "quote": "Higher cognitive load usually leads to pupil dilation and higher NASA-TLX scores",
+      "page": 2
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel secara eksplisit meneliti fatigue dan kinerja takeover dalam konteks driving otomatis, yang relevan dengan pertanyaan riset 'fatigue'."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-26",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

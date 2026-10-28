@@ -1,0 +1,152 @@
+{
+  "id": "cc340a8d17679496",
+  "hash": "cc340a8d17679496be4c636e1147c5eceefe215dd1f1b1d755887f3f05ad542c",
+  "filename": "1-s2.0-S0003687026001341-main_compressed.pdf",
+  "uploaded_at": "2026-10-26T16:54:53.157694+00:00",
+  "pages": 17,
+  "text_chars": 18000,
+  "title": "System for Activity-aware Fatigue Evaluation (SAFE) framework: Predictive fatigue modelling for occupational tasks",
+  "authors": [
+    "Patricia O'Sullivan",
+    "Matteo Menolotto",
+    "Brendan O'Flynn",
+    "Dimitrios-Sokratis Komaris"
+  ],
+  "year": "",
+  "doi": "10.1016/j.apergo.2026.104856",
+  "abstract": "SAFE framework integrates wearable sensing, biomechanical modelling, and task detection to monitor operator endurance. Validated with 10 participants, it predicts fatigue using IMUs, pressure insoles, and torque-based models, correlating strongly with subjective ratings.",
+  "objective": "To develop and validate a wearable framework (SAFE) that predicts operator endurance and ergonomic risk using biomechanical modelling and task classification.",
+  "research_questions": [],
+  "methods": "Offline lab study with 10 participants performing industry tasks. Used IMUs, pressure insoles, torque-based endurance model, task classification, and custom app. Validated against motion capture and subjective fatigue ratings.",
+  "context": "Laboratory setting with 10 participants performing industry-type tasks. Focus on occupational ergonomics and fatigue prediction using wearable sensors.",
+  "variables": [
+    "endurance time",
+    "endurance consumption",
+    "task classification",
+    "subjective fatigue rating",
+    "joint angles",
+    "external load"
+  ],
+  "findings": [
+    "IMU-derived joint angles validated against motion capture with acceptable error ranges.",
+    "Framework distinguished high- and low-risk tasks (P < .05).",
+    "Strong correlation between predicted endurance and subjective fatigue (r ≥ .878, P < .001).",
+    "Task classification via pressure insoles enabled task-specific endurance coefficients.",
+    "Framework outputs include predicted ET and CE for real-time monitoring.",
+    "System adaptable to dynamic tasks and individual parameters."
+  ],
+  "limitations": [],
+  "future_research": [
+    "Deploy SAFE for real-time online operator monitoring.",
+    "Integrate mobility during tasks for future deployment.",
+    "Use perceived exertion to tune model outputs for better validity."
+  ],
+  "topic_tags": [
+    "fatigue prediction",
+    "wearable systems",
+    "biomechanical modelling",
+    "ergonomic risk",
+    "task classification",
+    "endurance modelling"
+  ],
+  "concepts": [
+    {
+      "name": "endurance time",
+      "description": "Estimated time before fatigue onset under current task demands.",
+      "parent_concepts": []
+    },
+    {
+      "name": "endurance consumption",
+      "description": "Instantaneous measure of endurance used during activity.",
+      "parent_concepts": []
+    },
+    {
+      "name": "task classification",
+      "description": "Identification of task type using sensor data to adapt fatigue predictions.",
+      "parent_concepts": []
+    },
+    {
+      "name": "torque-based endurance model",
+      "description": "Mechanistic model using empirical data to predict endurance under dynamic, loaded conditions.",
+      "parent_concepts": []
+    },
+    {
+      "name": "subjective fatigue rating",
+      "description": "Participant-reported perceived exertion used for validation and model tuning.",
+      "parent_concepts": []
+    },
+    {
+      "name": "wearable sensing",
+      "description": "Use of IMUs and pressure insoles to capture biomechanical data for fatigue prediction.",
+      "parent_concepts": []
+    }
+  ],
+  "relationships": [
+    {
+      "source": "torque-based endurance model",
+      "target": "endurance time",
+      "relation": "predicts",
+      "evidence": "Model computes predicted ET using torque and task parameters."
+    },
+    {
+      "source": "task classification",
+      "target": "endurance time",
+      "relation": "influences",
+      "evidence": "Task classification enables task-specific endurance coefficients for accurate predictions."
+    },
+    {
+      "source": "subjective fatigue rating",
+      "target": "endurance consumption",
+      "relation": "validates",
+      "evidence": "Strong correlation (r ≥ .878) between subjective ratings and endurance consumption."
+    },
+    {
+      "source": "IMU-derived joint angles",
+      "target": "endurance time",
+      "relation": "informs",
+      "evidence": "Joint angles validated against motion capture and used in endurance model."
+    },
+    {
+      "source": "pressure insoles",
+      "target": "task classification",
+      "relation": "enables",
+      "evidence": "Pressure insoles used to classify tasks and detect rest."
+    },
+    {
+      "source": "wearable sensing",
+      "target": "task classification",
+      "relation": "supports",
+      "evidence": "Wearables stream data for task classification and endurance prediction."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "IMU-derived joint angles were validated against motion capture.",
+      "quote": "Validation against motion capture confirmed that IMU-derived joint angles were within acceptable error ranges for endurance estimation.",
+      "page": 1
+    },
+    {
+      "claim": "Framework correlated strongly with subjective fatigue ratings.",
+      "quote": "The framework produced endurance metrics that correlated strongly with subjective fatigue ratings (rmm≥.878, P < .001).",
+      "page": 1
+    },
+    {
+      "claim": "Framework enables task-specific endurance predictions.",
+      "quote": "Task classification via pressure insole data enabled the application of task-specific endurance coefficients.",
+      "page": 1
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel secara langsung membahas fatigue dalam konteks kerja dan menggunakan pendekatan wearable untuk prediksi, sesuai dengan fokus sistematis review tentang fatigue."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-26",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

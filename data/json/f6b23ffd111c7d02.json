@@ -1,0 +1,148 @@
+{
+  "id": "f6b23ffd111c7d02",
+  "hash": "f6b23ffd111c7d02e3e410b57dbc962db01c89e94ed894e8b27339cbd00b4c18",
+  "filename": "1-s2.0-S0142112326005360-main_compressed.pdf",
+  "uploaded_at": "2026-10-26T16:40:32.638882+00:00",
+  "pages": 19,
+  "text_chars": 18000,
+  "title": "Fractography-informed Gaussian process regression for fatigue prediction of non-magnetic stainless steel in rotary steerable drilling system",
+  "authors": [
+    "Shuang Li",
+    "Dong Guo",
+    "Yongyou Yang",
+    "Haifeng Zhao"
+  ],
+  "year": "",
+  "doi": "10.1016/j.ijfatigue.2026.110015",
+  "abstract": "Penelitian ini mengusulkan metode model probabilitas keausan berbasis fractography untuk baja tahan karat non-magnetik, menggunakan regresi Gaussian proses dengan prior fisik yang diambil dari analisis fractografi, meningkatkan akurasi prediksi di bawah kondisi sampel kecil.",
+  "objective": "Mengembangkan model prediksi keausan probabilistik berbasis fractography untuk baja tahan karat non-magnetik dalam sistem pengeboran rotary steerable, dengan memanfaatkan data eksperimen dan prior fisik dari mekanisme kerusakan.",
+  "research_questions": [],
+  "methods": "Metode regresi Gaussian proses yang diintegrasikan dengan prior fisik dari analisis fractografi dan mekanisme pertumbuhan retak. Data uji keausan digunakan sebagai supervisi, sementara prior fisik memberikan kendali mekanisme. Uji ablasasi dilakukan untuk mengevaluasi efektivitas prior fisik.",
+  "context": "Aplikasi industri dalam sistem pengeboran rotary steerable di lapangan minyak dan gas, menggunakan baja tahan karat non-magnetik yang terpapar beban siklik tinggi di lingkungan suhu tinggi.",
+  "variables": [
+    "keausan",
+    "suhu",
+    "frekuensi beban",
+    "prior fisik dari fractografi",
+    "data eksperimen",
+    "prediksi interval keausan"
+  ],
+  "findings": [
+    "Metode FI-GPR mengurangi error rata-rata absolut dari 0.22 menjadi 0.17.",
+    "Cakupan probabilitas interval prediksi meningkat dari 74% menjadi 93%.",
+    "Metode ini lebih tahan terhadap ukuran sampel kecil dibanding metode umum.",
+    "Prior fisik dari fractografi lebih spesifik dan relevan dibanding prior teoritis umum.",
+    "Model menunjukkan generalisasi lebih baik di bawah kondisi data terbatas.",
+    "Keragaman data keausan mencapai 0.11 hingga 0.67 pada tingkat stres tertentu."
+  ],
+  "limitations": [],
+  "future_research": [],
+  "topic_tags": [
+    "fatigue modeling",
+    "fractography",
+    "Gaussian process regression",
+    "non-magnetic stainless steel",
+    "high cycle fatigue",
+    "probabilistic modeling"
+  ],
+  "concepts": [
+    {
+      "name": "Fractography-informed modeling",
+      "description": "Pemodelan yang memanfaatkan informasi morfologi retak dari analisis fractografi untuk membangun prior fisik.",
+      "parent_concepts": []
+    },
+    {
+      "name": "Gaussian Process Regression",
+      "description": "Metode regresi probabilistik yang memodelkan hubungan antara input dan output dengan distribusi probabilitas.",
+      "parent_concepts": []
+    },
+    {
+      "name": "Physics-informed prior",
+      "description": "Prior fisik yang dibangun dari mekanisme kerusakan mikroskopis, bukan dari model teoritis umum.",
+      "parent_concepts": []
+    },
+    {
+      "name": "High-cycle fatigue",
+      "description": "Keausan yang terjadi pada siklus beban tinggi, umumnya di atas 10^4 siklus.",
+      "parent_concepts": []
+    },
+    {
+      "name": "Small-sample regime",
+      "description": "Kondisi di mana jumlah data eksperimen terbatas, membutuhkan pendekatan yang lebih efisien dan robust.",
+      "parent_concepts": []
+    },
+    {
+      "name": "Fatigue life prediction",
+      "description": "Prediksi umur keausan material berdasarkan data eksperimen dan model fisik atau data-driven.",
+      "parent_concepts": []
+    }
+  ],
+  "relationships": [
+    {
+      "source": "Fractography-informed modeling",
+      "target": "Gaussian Process Regression",
+      "relation": "menggunakan",
+      "evidence": "Metode FI-GPR menggabungkan prior fisik dari fractografi dengan GPR untuk prediksi keausan."
+    },
+    {
+      "source": "Physics-informed prior",
+      "target": "Gaussian Process Regression",
+      "relation": "mengontrol",
+      "evidence": "Prior fisik diterapkan sebagai kendali mekanisme dalam GPR."
+    },
+    {
+      "source": "High-cycle fatigue",
+      "target": "Fatigue life prediction",
+      "relation": "diprediksi",
+      "evidence": "Model ini dirancang untuk memprediksi keausan tingkat tinggi pada baja tahan karat."
+    },
+    {
+      "source": "Small-sample regime",
+      "target": "Gaussian Process Regression",
+      "relation": "diterapkan pada",
+      "evidence": "Metode ini dirancang untuk bekerja di bawah kondisi sampel kecil."
+    },
+    {
+      "source": "Fractography-informed modeling",
+      "target": "Physics-informed prior",
+      "relation": "menghasilkan",
+      "evidence": "Fractography digunakan untuk mengidentifikasi mekanisme kerusakan dan mengekstrak prior fisik."
+    },
+    {
+      "source": "Gaussian Process Regression",
+      "target": "Fatigue life prediction",
+      "relation": "menghasilkan",
+      "evidence": "GPR digunakan untuk memprediksi keausan dengan data eksperimen dan prior fisik."
+    }
+  ],
+  "evidence_quotes": [
+    {
+      "claim": "Metode FI-GPR mengurangi error rata-rata absolut.",
+      "quote": "the mean absolute error from 0.22 to 0.17",
+      "page": 1
+    },
+    {
+      "claim": "Cakupan probabilitas interval prediksi meningkat.",
+      "quote": "the prediction interval coverage probability from 74% to 93%",
+      "page": 1
+    },
+    {
+      "claim": "Metode ini lebih tahan terhadap ukuran sampel kecil.",
+      "quote": "reduced sensitivity to sample size",
+      "page": 1
+    }
+  ],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel secara eksplisit membahas prediksi keausan (fatigue) dengan pendekatan berbasis fractografi dan GPR, relevan dengan pertanyaan riset 'fatigue'."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-26",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}

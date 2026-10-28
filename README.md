@@ -117,3 +117,11 @@ Jalankan `start_windows.bat`. Pada pertama kali, file `.env` akan dibuat dan dib
 - Taxonomy hierarchical dan poly-hierarchical ditampilkan sebagai diagram node-panah; faceted taxonomy ditampilkan sebagai kolom facet dan nilai.
 - Halaman Co-occurrence membangun jaringan istilah dari kata kunci/konsep pada artikel yang diekstrak, dengan filter minimum kemunculan dan unduh SVG. Visualisasi ini terinspirasi analisis co-occurrence VOSviewer tetapi bukan aplikasi VOSviewer resmi.
 - Jalankan ulang Review Synthesis setelah pembaruan untuk meminta AI mengisi field `hierarchical` dan `faceted` pada data taxonomy.
+
+Taxonomy dibangkitkan melalui panggilan Ollama terpisah selepas sintesis utama supaya struktur taxonomy tidak bersaing dengan seluruh output sintesis dalam satu batas token. Jika taxonomy tidak dapat dibuat, hasil sintesis utama tetap dipertahankan dan halaman Taxonomy menampilkan pesan diagnostik.
+
+
+## Pembaruan workflow
+- PDF asli tetap disimpan di `data/pdfs/`, tetapi tidak ada preview PDF di antarmuka.
+- Hasil ekstraksi terstruktur disimpan per artikel di `data/json/` untuk audit dan penggunaan ulang.
+- Saat analisis berjalan, antarmuka menampilkan persentase progres, nama file aktif, tahap proses, dan log status dari backend. Persentase adalah progres tahap/file (bukan estimasi waktu).

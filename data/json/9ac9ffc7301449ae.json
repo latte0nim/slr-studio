@@ -1,0 +1,133 @@
+{
+  "id": "9ac9ffc7301449ae",
+  "hash": "9ac9ffc7301449aecfa728463002d487adc069b79ba18e64e1f221f9290dd433",
+  "filename": "1-s2.0-S1350630726009805-main_compressed.pdf",
+  "uploaded_at": "2026-10-26T16:42:46.257529+00:00",
+  "pages": 20,
+  "text_chars": 18000,
+  "title": "Fatigue performance analysis of full-scale multi-span and multi-girder orthotropic steel bridge decks: A competitive fatigue failure model",
+  "authors": [
+    "Haibo Yang",
+    "Shuobin Chen",
+    "Zhihao Chen",
+    "Ping Wang",
+    "Hongliang Qian"
+  ],
+  "year": "",
+  "doi": "10.1016/j.engfailanal.2026.111505",
+  "abstract": "Penelitian ini mengembangkan model kegagalan fatig yang kompetitif untuk mengevaluasi mode kegagalan fatig dominan dan retakan campuran multi-situs pada deck baja ortotropik skala penuh. Model ini memprediksi kehidupan fatig dengan akurasi rata-rata error <15% untuk tegangan struktural dan <26% untuk panjang retakan.",
+  "objective": "Mengembangkan model kegagalan fatig kompetitif untuk memprediksi mode kegagalan dominan dan kehidupan fatig pada deck baja ortotropik skala penuh, serta mengevaluasi efek akumulasi kerusakan fatig.",
+  "research_questions": [],
+  "methods": "Uji fatig skala penuh pada model deck baja ortotropik multi-span dan multi-girder, disertai model kompetitif kegagalan fatig berbasis simulasi elemen hingga dan analisis tegangan nodal.",
+  "context": "Jembatan baja ortotropik dengan struktur multi-span dan multi-girder, fokus pada koneksi las kritis seperti U-rib ke crossbeam dan deck ke U-rib.",
+  "variables": [
+    "tegangan struktural",
+    "panjang retakan",
+    "kehidupan fatig",
+    "mode kegagalan fatig dominan",
+    "efek akumulasi kerusakan fatig",
+    "desain cutout lengkung"
+  ],
+  "findings": [
+    "Model kegagalan fatig kompetitif dapat menentukan mode kegagalan dominan dan retakan campuran multi-situs dengan akurasi tinggi.",
+    "Akurasi prediksi kehidupan fatig menggunakan model ini memiliki standar deviasi 4.56, lebih baik dibanding pendekatan konvensional.",
+    "Tegangan fatig pada koneksi deck-U-rib berkurang 32.95%, sementara pada crossbeam meningkat 22.99%.",
+    "Penambahan cutout lengkung meningkatkan ketahanan fatig secara signifikan.",
+    "Efek akumulasi kerusakan fatig di bawah beban multi-level dapat diidentifikasi dan diukur.",
+    "Kriteria pengaruh tegangan geser dapat diturunkan dari model ini."
+  ],
+  "limitations": [],
+  "future_research": [],
+  "topic_tags": [
+    "fatigue failure",
+    "orthotropic steel deck",
+    "competitive failure model",
+    "fatigue life prediction",
+    "cumulative damage",
+    "welding details"
+  ],
+  "concepts": [
+    {
+      "name": "competitive fatigue failure model",
+      "description": "Model yang membandingkan semua mode kegagalan fatig untuk mengidentifikasi mode dominan dan memprediksi kehidupan struktur.",
+      "parent_concepts": []
+    },
+    {
+      "name": "fatigue crack initiation",
+      "description": "Proses munculnya retakan fatig pada posisi kritis seperti ujung las.",
+      "parent_concepts": []
+    },
+    {
+      "name": "Miner's linear cumulative damage theory",
+      "description": "Teori yang menyatakan kegagalan terjadi ketika akumulasi kerusakan mencapai 1.0.",
+      "parent_concepts": []
+    },
+    {
+      "name": "structural stress",
+      "description": "Tegangan yang dihitung berdasarkan keseimbangan mekanik dan teori fraktur, bukan tegangan hotspot atau efektif.",
+      "parent_concepts": []
+    },
+    {
+      "name": "multi-site mixed-mode fatigue cracks",
+      "description": "Retakan fatig yang muncul di berbagai lokasi dengan mode berbeda, saling mempengaruhi.",
+      "parent_concepts": []
+    },
+    {
+      "name": "arc-shaped cutouts",
+      "description": "Desain lubang lengkung pada crossbeam yang meningkatkan ketahanan fatig.",
+      "parent_concepts": []
+    }
+  ],
+  "relationships": [
+    {
+      "source": "competitive fatigue failure model",
+      "target": "fatigue crack initiation",
+      "relation": "mengidentifikasi",
+      "evidence": "Model ini dapat menentukan mode kegagalan dominan dan retakan campuran multi-situs."
+    },
+    {
+      "source": "structural stress",
+      "target": "fatigue life prediction",
+      "relation": "menggunakan",
+      "evidence": "Tegangan struktural dihitung untuk memprediksi kehidupan fatig."
+    },
+    {
+      "source": "Miner's linear cumulative damage theory",
+      "target": "fatigue failure",
+      "relation": "dasar teori",
+      "evidence": "Kegagalan fatig dianggap terjadi ketika akumulasi kerusakan mencapai 1.0."
+    },
+    {
+      "source": "multi-site mixed-mode fatigue cracks",
+      "target": "competitive fatigue failure model",
+      "relation": "objek analisis",
+      "evidence": "Model ini menangani evolusi bersamaan dari berbagai mode kegagalan."
+    },
+    {
+      "source": "arc-shaped cutouts",
+      "target": "fatigue resistance",
+      "relation": "mengoptimalkan",
+      "evidence": "Penambahan cutout lengkung meningkatkan ketahanan fatig secara signifikan."
+    },
+    {
+      "source": "structural stress",
+      "target": "Miner's linear cumulative damage theory",
+      "relation": "komponen",
+      "evidence": "Tegangan struktural digunakan dalam model akumulasi kerusakan."
+    }
+  ],
+  "evidence_quotes": [],
+  "screening_suggestion": {
+    "decision": "include",
+    "reason": "Artikel secara eksplisit menangani fatigue pada deck baja ortotropik skala penuh, mengembangkan model kompetitif, dan menyajikan data uji dengan akurasi prediksi yang diukur. Relevan dengan pertanyaan riset fatigue."
+  },
+  "screening_decision": "pending",
+  "eligibility_decision": "pending",
+  "source_name": "Upload manual",
+  "search_query": "",
+  "search_date": "2026-10-26",
+  "analysis_version": 1,
+  "extraction_status": "ok",
+  "pdf_stored": true,
+  "json_stored": true
+}
