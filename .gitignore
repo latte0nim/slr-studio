@@ -3,3 +3,4 @@ __pycache__/
 .env
 data/pdfs/*.pdf
 !data/pdfs/.gitkeep
+data/json/

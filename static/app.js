@@ -72,7 +72,7 @@
     if (busy) $(PANELS[kind].text).textContent = text;
   }
   function renderProcessProgress(snapshot, kind = 'analysis') {
-    if (!snapshot) return;
+    if (!snapshot || snapshot.pending) return; // pekerjaan belum terdaftar di server: pertahankan teks awal
     const p = PANELS[kind];
     const percent = Math.max(0, Math.min(100, Number(snapshot.percent) || 0));
     $(p.percent).textContent = `${percent}%`;
@@ -86,7 +86,7 @@
     $(p.usage).textContent = snapshot.usage ? liveUsageText(snapshot.usage) : '';
     const logBox = $(p.log);
     const logs = Array.isArray(snapshot.logs) ? snapshot.logs : [];
-    logBox.innerHTML = logs.slice(-25).map(item => `<div class="process-log-item"><time>${esc(item.time || '')}</time><span>${esc(item.message || '')}</span></div>`).join('') || '<div class="process-log-item">Menunggu log proses…</div>';
+    logBox.innerHTML = logs.slice(-30).map(item => `<div class="process-log-item${item.live ? ' is-live' : ''}"><time>${esc(item.time || '')}</time><span>${esc(item.message || '')}</span></div>`).join('') || '<div class="process-log-item">Menunggu log proses…</div>';
     logBox.scrollTop = logBox.scrollHeight;
   }
   function newJobId() {
@@ -102,7 +102,7 @@
           if (active) renderProcessProgress(snapshot, kind);
         } catch (_) { /* backend may still be starting */ }
         if (!active) break;
-        await new Promise(resolve => { wake = resolve; setTimeout(resolve, 800); });
+        await new Promise(resolve => { wake = resolve; setTimeout(resolve, 500); });
       }
     })();
     return async () => { active = false; if (wake) wake(); await loop; };
@@ -140,6 +140,16 @@
 
   // ---- Popup pemakaian token + status tarif peak/off-peak (muncul saat chip diklik) ----
   let healthInfo = null;
+  let serverLimits = {maxFiles: 8, maxFileMb: 12};
+  function applyServerLimits() {
+    const note = $('#upload-limits-note'), small = $('#upload-limits-small');
+    if (note) note.textContent = `Maks. ${serverLimits.maxFiles} PDF per batch · ${serverLimits.maxFileMb} MB per PDF`;
+    if (small) small.textContent = `PDF berbasis teks · batch maksimum ${serverLimits.maxFiles} dokumen`;
+  }
+  async function sha256Hex(file) {
+    const digest = await crypto.subtle.digest('SHA-256', await file.arrayBuffer());
+    return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, '0')).join('');
+  }
   function usageTzLabel() {
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
     if (tz === 'Asia/Jakarta') return 'WIB';
@@ -211,7 +221,15 @@
         <div><span>Total token</span><strong>${nf.format(u.prompt_tokens + u.completion_tokens)}</strong></div>
         <div><span>Estimasi biaya</span><strong>${esc(costText)}</strong></div>
       </div>
-      <p class="usage-note">Biaya dihitung per panggilan memakai tarif saat panggilan terjadi. Data tersimpan di browser untuk proyek ini dan ikut ekspor/impor.</p>`;
+      <p class="usage-note">Biaya dihitung per panggilan memakai tarif saat panggilan terjadi. Data tersimpan di browser untuk proyek ini dan ikut ekspor/impor.</p>${donateBlockHtml(u.cost_usd > 0 ? idr : 0, nf)}`;
+  }
+  // ---- Ajakan bantu bayar API via QRIS (opsional, tampil di bawah popup token) ----
+  function donateBlockHtml(idr, nf) {
+    const rounded = idr >= 1 ? Math.max(100, Math.round(idr / 100) * 100) : 0;
+    const msg = rounded
+      ? `Habis token sekitar Rp${nf.format(rounded)} nih ngab. Kalau mau bantu bayar API biar server tetep tancap gas, bisa scan QRIS di bawah ya!`
+      : 'Server ini jalan pakai API berbayar. Kalau mau bantu bayar API biar tetep tancap gas, bisa scan QRIS di bawah ya!';
+    return `<div class="donate-box"><b class="donate-title">// traktir server</b><p>${esc(msg)}</p><img class="donate-qris" src="/static/qris.png" alt="QRIS untuk bantu bayar API" loading="lazy" onerror="this.closest('.donate-box').hidden=true"><small>Sukarela, tidak wajib. Makasih banyak ngab!</small></div>`;
   }
   async function refreshHealthInfo() {
     try { healthInfo = await api('/api/health'); } catch (_) { healthInfo = null; }
@@ -462,7 +480,7 @@
       <p class="citation-note">Dihasilkan ${esc(prettyDate(s.generated_at))} menggunakan model ${esc(s.model || 'lokal')}. Sintesis dibangun dari artikel yang secara manual ditandai INCLUDE pada dua tahap. Chip artikel menunjukkan judul singkat sumber dukungan; tetap buka PDF asli untuk mengonfirmasi klaim.</p>`;
   }
 
-  function svgText(text, x, y, size=12, weight=600, fill='#6C151E') {
+  function svgText(text, x, y, size=12, weight=600, fill='#d6d4cb') {
     return `<text x="${x}" y="${y}" text-anchor="middle" font-size="${size}" font-weight="${weight}" fill="${fill}">${esc(String(text || '').slice(0,38))}</text>`;
   }
   function renderHierarchySvg(root, nodes, edges, poly=false) {
@@ -480,9 +498,9 @@
       let changed=true; for(let pass=0;pass<all.length&&changed;pass++){changed=false;links.forEach(e=>{if(depth[e.a]!==undefined&&depth[e.b]===undefined){depth[e.b]=depth[e.a]+1;changed=true;}});}
       all.forEach((n,i)=>{const d=depth[i]||0;const same=all.map((_,j)=>j).filter(j=>(depth[j]||0)===d);const rank=same.indexOf(i);pos.push({x:(rank+1)*w/(same.length+1),y:45+d*105});});
     }
-    let svg=`<svg class="taxonomy-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Diagram taxonomy"><defs><marker id="tax-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#0F3D3A"/></marker></defs>`;
-    links.forEach(e=>{const a=pos[e.a],b=pos[e.b];svg+=`<path d="M${a.x} ${a.y+20} L${b.x} ${b.y-20}" stroke="#0F3D3A" stroke-width="1.5" fill="none" marker-end="url(#tax-arrow)" opacity=".8"/>`;});
-    all.forEach((n,i)=>{const q=pos[i],name=n.name||n.label||n.id||'Konsep';svg+=`<g><rect x="${q.x-75}" y="${q.y-22}" width="150" height="44" rx="9" fill="${i===0?'#6C151E':'#F5DABF'}" stroke="${i===0?'#6C151E':'#0F3D3A'}"/><text x="${q.x}" y="${q.y+4}" text-anchor="middle" font-size="11" font-weight="700" fill="${i===0?'#fff':'#0F3D3A'}">${esc(String(name).slice(0,25))}</text></g>`;});
+    let svg=`<svg class="taxonomy-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Diagram taxonomy"><defs><marker id="tax-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#8b8b82"/></marker></defs>`;
+    links.forEach(e=>{const a=pos[e.a],b=pos[e.b];svg+=`<path d="M${a.x} ${a.y+20} L${b.x} ${b.y-20}" stroke="#8b8b82" stroke-width="1.5" fill="none" marker-end="url(#tax-arrow)"/>`;});
+    all.forEach((n,i)=>{const q=pos[i],name=n.name||n.label||n.id||'Konsep';svg+=`<g><rect x="${q.x-85}" y="${q.y-22}" width="170" height="44" fill="${i===0?'#f3f1e7':'#141413'}" stroke="${i===0?'#f3f1e7':'#8b8b82'}"/><text x="${q.x}" y="${q.y+4}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="${i===0?'#0d0d0c':'#d6d4cb'}">${esc(String(name).slice(0,25))}</text></g>`;});
     return svg+'</svg>';
   }
   function renderCooccurrence() {
@@ -497,9 +515,9 @@
     const min=Number($('#cooccurrence-min')?.value||2), top=Object.entries(freq).filter(([t,n])=>n>=min).sort((a,b)=>b[1]-a[1]).slice(0,35);const keep=new Set(top.map(x=>x[0]));const edges=Object.entries(pairs).map(([k,v])=>({terms:k.split('|||'),v})).filter(e=>e.v>=min&&e.terms.every(t=>keep.has(t))).sort((a,b)=>b.v-a.v).slice(0,75);
     if(!top.length){canvas.innerHTML='<div class="empty-state">Belum ada kata kunci berulang. Coba ubah minimum kemunculan menjadi 1 atau jalankan ulang sintesis.</div>';meta.textContent=`${docs.length} artikel diperiksa`;return;}
     const w=900,h=560,cx=w/2,cy=h/2,max=Math.max(...top.map(x=>x[1]));const pos={};top.forEach(([t,n],i)=>{const angle=(2*Math.PI*i/top.length)-Math.PI/2;const r=70+Math.min(170,top.length*5);pos[t]={x:cx+Math.cos(angle)*r,y:cy+Math.sin(angle)*r,n};});
-    let svg=`<svg class="cooccur-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Co-occurrence network"><rect width="100%" height="100%" fill="#fffaf4" rx="14"/>`;
-    edges.forEach(e=>{const a=pos[e.terms[0]],b=pos[e.terms[1]];if(a&&b)svg+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#0F3D3A" stroke-opacity=".35" stroke-width="${Math.min(5,1+e.v)}"/>`;});
-    top.forEach(([t,n],i)=>{const q=pos[t],r=9+14*n/max;svg+=`<g><circle cx="${q.x}" cy="${q.y}" r="${r}" fill="${i%3===0?'#6C151E':i%3===1?'#0F3D3A':'#C98560'}" fill-opacity=".9" stroke="#fff" stroke-width="2"/><text x="${q.x}" y="${q.y+r+13}" text-anchor="middle" font-size="${Math.min(12,9+n/max*3)}" font-weight="600" fill="#342b28">${esc(t.slice(0,24))}</text></g>`;});
+    let svg=`<svg class="cooccur-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${w} ${h}" role="img" aria-label="Co-occurrence network"><rect width="100%" height="100%" fill="#0d0d0c"/>`;
+    edges.forEach(e=>{const a=pos[e.terms[0]],b=pos[e.terms[1]];if(a&&b)svg+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#8b8b82" stroke-opacity=".5" stroke-width="${Math.min(5,1+e.v)}"/>`;});
+    top.forEach(([t,n],i)=>{const q=pos[t],r=9+14*n/max;svg+=`<g><circle cx="${q.x}" cy="${q.y}" r="${r}" fill="${i%3===0?'#f3f1e7':i%3===1?'#9fd09f':'#dcb85c'}" fill-opacity=".95" stroke="#0d0d0c" stroke-width="2"/><text x="${q.x}" y="${q.y+r+13}" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="${Math.min(11,9+n/max*2)}" font-weight="500" fill="#d6d4cb">${esc(t.slice(0,24))}</text></g>`;});
     canvas.innerHTML=svg+'</svg>';meta.textContent=`${docs.length} artikel · ${top.length} istilah · ${edges.length} hubungan co-occurrence`;
   }
 
@@ -520,22 +538,22 @@
       box.innerHTML = `<div class="synth-eyebrow">FACETED TAXONOMY</div><h2 class="taxonomy-title">Klasifikasi berdasarkan beberapa facet</h2><p class="taxonomy-help">Setiap kolom menunjukkan dimensi atribut yang berbeda untuk mendeskripsikan studi atau konsep.</p>${facets.length ? `<div class="facet-diagram">${facets.map((facet,i)=>`<div class="facet-column"><div class="facet-head">${esc(facet.name||'Facet '+(i+1))}</div>${list(facet.values).map(v=>`<div class="facet-value"><strong>${esc(v.name||'Kategori')}</strong><small>${esc(v.description||'')}</small><span>${list(v.article_ids).length} artikel</span></div>`).join('')}</div>`).join('')}</div>` : '<div class="empty-state">Belum ada facet yang dihasilkan. Jalankan ulang sintesis untuk membuat klasifikasi multi-dimensi.</div>'}`;
     } else if (activeTaxonomy === 'flat') {
       const data = list(s.taxonomy.flat);
-      box.innerHTML = `<div class="synth-eyebrow">FLAT / LIST TAXONOMY</div><h2 style="font-family:Manrope,sans-serif;font-size:17px;margin:0 0 15px">Kategori pada level yang sama</h2>${data.length ? `<div class="taxonomy-list">${data.map((x,i)=>`<div class="taxonomy-item"><div class="taxonomy-index">KATEGORI ${String(i+1).padStart(2,'0')}</div><h3>${esc(x.name || 'Kategori')}</h3><p>${esc(x.description || '')}</p><span class="evidence-count">${list(x.article_ids).length} artikel pendukung</span><div class="source-chips">${citationChips(x.article_ids)}</div></div>`).join('')}</div>` : '<div class="empty-state">Model tidak menghasilkan daftar kategori. Periksa data sintesis atau coba ulangi.</div>'}`;
+      box.innerHTML = `<div class="synth-eyebrow">FLAT / LIST TAXONOMY</div><h2 style="font-size:17px;margin:0 0 15px">Kategori pada level yang sama</h2>${data.length ? `<div class="taxonomy-list">${data.map((x,i)=>`<div class="taxonomy-item"><div class="taxonomy-index">KATEGORI ${String(i+1).padStart(2,'0')}</div><h3>${esc(x.name || 'Kategori')}</h3><p>${esc(x.description || '')}</p><span class="evidence-count">${list(x.article_ids).length} artikel pendukung</span><div class="source-chips">${citationChips(x.article_ids)}</div></div>`).join('')}</div>` : '<div class="empty-state">Model tidak menghasilkan daftar kategori. Periksa data sintesis atau coba ulangi.</div>'}`;
     } else if (activeTaxonomy === 'poly') {
       const data = s.taxonomy.polyhierarchy || {};
       const nodes = list(data.nodes);
       const nodeNames = Object.fromEntries(nodes.map(n => [n.id, n.name]));
-      box.innerHTML = `<div class="synth-eyebrow">POLY-HIERARCHICAL TAXONOMY</div><h2 style="font-family:Manrope,sans-serif;font-size:17px;margin:0 0 7px">Satu konsep dapat memiliki beberapa parent</h2><p style="color:#89958c;font-size:11px;margin:0 0 15px">Relasi parent berasal dari struktur model dan harus diverifikasi secara konseptual.</p>${nodes.length ? `${renderHierarchySvg(null,nodes,list(data.edges),true)}<div class="poly-tree">${nodes.map(n=>`<div class="poly-node"><h3>${esc(n.name || n.id)}</h3><p>${esc(n.description || '')}</p><div class="poly-parents">Parent: ${list(n.parent_ids).length ? list(n.parent_ids).map(id=>esc(nodeNames[id] || id)).join(' · ') : 'Tidak ditentukan'}</div><div class="source-chips">${citationChips(n.article_ids)}</div></div>`).join('')}</div>` : '<div class="empty-state">Belum ada node poly-hierarchy pada hasil sintesis.</div>'}`;
+      box.innerHTML = `<div class="synth-eyebrow">POLY-HIERARCHICAL TAXONOMY</div><h2 style="font-size:17px;margin:0 0 7px">Satu konsep dapat memiliki beberapa parent</h2><p style="color:#8b8b82;font-size:11px;margin:0 0 15px">Relasi parent berasal dari struktur model dan harus diverifikasi secara konseptual.</p>${nodes.length ? `${renderHierarchySvg(null,nodes,list(data.edges),true)}<div class="poly-tree">${nodes.map(n=>`<div class="poly-node"><h3>${esc(n.name || n.id)}</h3><p>${esc(n.description || '')}</p><div class="poly-parents">Parent: ${list(n.parent_ids).length ? list(n.parent_ids).map(id=>esc(nodeNames[id] || id)).join(' · ') : 'Tidak ditentukan'}</div><div class="source-chips">${citationChips(n.article_ids)}</div></div>`).join('')}</div>` : '<div class="empty-state">Belum ada node poly-hierarchy pada hasil sintesis.</div>'}`;
     } else {
       const m = s.taxonomy.matrix || {};
       const cols = list(m.columns);
       const rows = list(m.rows);
-      box.innerHTML = `<div class="synth-eyebrow">MATRICES TAXONOMY</div><h2 style="font-family:Manrope,sans-serif;font-size:17px;margin:0 0 7px">Klasifikasi silang antar dimensi</h2><p style="font-size:11px;color:#89958c;margin:0 0 15px">Baris: ${esc(m.row_axis_name || 'Dimensi baris')} · Kolom: ${esc(m.column_axis_name || 'Dimensi kolom')}</p>${rows.length && cols.length ? `<div class="matrix-wrap"><table class="matrix-table"><thead><tr><th>${esc(m.row_axis_name || 'Kategori')}</th>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr><td>${esc(row.name || 'Baris')}</td>${cols.map(col=>{const cell=list(row.cells).find(c=>c.column===col);return `<td>${esc(cell ? cell.summary || '—' : '—')}${cell && list(cell.article_ids).length ? `<span class="matrix-cell-evidence">${list(cell.article_ids).length} artikel</span><div class="source-chips">${citationChips(cell.article_ids)}</div>` : ''}</td>`}).join('')}</tr>`).join('')}</tbody></table></div>` : '<div class="empty-state">Belum ada matriks taxonomy pada hasil sintesis.</div>'}`;
+      box.innerHTML = `<div class="synth-eyebrow">MATRICES TAXONOMY</div><h2 style="font-size:17px;margin:0 0 7px">Klasifikasi silang antar dimensi</h2><p style="font-size:11px;color:#8b8b82;margin:0 0 15px">Baris: ${esc(m.row_axis_name || 'Dimensi baris')} · Kolom: ${esc(m.column_axis_name || 'Dimensi kolom')}</p>${rows.length && cols.length ? `<div class="matrix-wrap"><table class="matrix-table"><thead><tr><th>${esc(m.row_axis_name || 'Kategori')}</th>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr><td>${esc(row.name || 'Baris')}</td>${cols.map(col=>{const cell=list(row.cells).find(c=>c.column===col);return `<td>${esc(cell ? cell.summary || '—' : '—')}${cell && list(cell.article_ids).length ? `<span class="matrix-cell-evidence">${list(cell.article_ids).length} artikel</span><div class="source-chips">${citationChips(cell.article_ids)}</div>` : ''}</td>`}).join('')}</tr>`).join('')}</tbody></table></div>` : '<div class="empty-state">Belum ada matriks taxonomy pada hasil sintesis.</div>'}`;
     }
   }
 
   function typeColor(type) {
-    const colours = {concept:'#4c8063', factor:'#d3a06b', outcome:'#718ea1', context:'#8b8fbc', method:'#ad8c6b'};
+    const colours = {concept:'#f3f1e7', factor:'#dcb85c', outcome:'#9fd09f', context:'#86b4d8', method:'#e8906e'};
     return colours[type] || colours.concept;
   }
   function downloadSvg(selector, filename) { const svg=$(selector); if(!svg){toast('Diagram belum tersedia.','error');return;} const blob=new Blob([svg.outerHTML],{type:'image/svg+xml;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=filename;a.click();URL.revokeObjectURL(url); }
@@ -566,15 +584,15 @@
       if (Math.abs(tx-sx)>Math.abs(ty-sy)) { sx += tx>sx ? nodeW/2-3 : -nodeW/2+3; tx += tx>sx ? -nodeW/2+3 : nodeW/2-3; }
       else { sy += ty>sy ? nodeH/2-2 : -nodeH/2+2; ty += ty>sy ? -nodeH/2+2 : nodeH/2-2; }
       const midx=(sx+tx)/2, midy=(sy+ty)/2;
-      return `<g><path d="M ${sx} ${sy} L ${tx} ${ty}" stroke="#9aafa0" stroke-width="1.35" fill="none" marker-end="url(#arrowhead)"/><rect x="${midx-53}" y="${midy-11}" width="106" height="22" rx="6" fill="#fff" stroke="#e1e9df"/><text x="${midx}" y="${midy+3}" font-family="DM Sans,sans-serif" font-size="9" fill="#75847a" text-anchor="middle">${esc((e.label||'hubungan').slice(0,32))}</text></g>`;
+      return `<g><path d="M ${sx} ${sy} L ${tx} ${ty}" stroke="#8b8b82" stroke-width="1.35" fill="none" marker-end="url(#arrowhead)"/><rect x="${midx-67}" y="${midy-11}" width="134" height="22" fill="#0d0d0c" stroke="#46463f"/><text x="${midx}" y="${midy+3}" font-family="IBM Plex Mono,monospace" font-size="9" fill="#8b8b82" text-anchor="middle">${esc((e.label||'hubungan').slice(0,24))}</text></g>`;
     }).join('');
     const nodeSvg = nodes.map(n=>{
       const p=positions[n.id], color=typeColor(n.type);
       const label=String(n.label || n.id); const lines=label.length>25?[label.slice(0,24)+'…']: [label];
       const evidence=list(n.article_ids).length;
-      return `<g><rect x="${p.x}" y="${p.y}" width="${nodeW}" height="${nodeH}" rx="10" fill="#fff" stroke="#dfe9dd" stroke-width="1.2"/><rect x="${p.x}" y="${p.y}" width="5" height="${nodeH}" rx="2.5" fill="${color}"/><text x="${p.x+15}" y="${p.y+25}" font-family="DM Sans,sans-serif" font-size="11" font-weight="700" fill="#304239">${esc(lines[0])}</text><text x="${p.x+15}" y="${p.y+43}" font-family="DM Mono,monospace" font-size="8" letter-spacing=".5" fill="#8a978d">${esc(String(n.type||'concept').toUpperCase())} · ${evidence} artikel</text></g>`;
+      return `<g><rect x="${p.x}" y="${p.y}" width="${nodeW}" height="${nodeH}" fill="#141413" stroke="#46463f" stroke-width="1.2"/><rect x="${p.x}" y="${p.y}" width="5" height="${nodeH}" fill="${color}"/><text x="${p.x+15}" y="${p.y+25}" font-family="IBM Plex Mono,monospace" font-size="10" font-weight="700" fill="#f3f1e7">${esc(lines[0])}</text><text x="${p.x+15}" y="${p.y+43}" font-family="IBM Plex Mono,monospace" font-size="9" fill="#8b8b82">${esc(String(n.type||'concept').toUpperCase())} · ${evidence} artikel</text></g>`;
     }).join('');
-    canvas.innerHTML = `<svg id="system-map-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="System map hasil sintesis"><defs><marker id="arrowhead" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L6,3.5 L0,7 Z" fill="#9aafa0"/></marker></defs>${edgeSvg}${nodeSvg}</svg>`;
+    canvas.innerHTML = `<svg id="system-map-svg" viewBox="0 0 ${width} ${height}" role="img" aria-label="System map hasil sintesis"><defs><marker id="arrowhead" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L6,3.5 L0,7 Z" fill="#8b8b82"/></marker></defs>${edgeSvg}${nodeSvg}</svg>`;
     $('#system-map-meta').textContent = `${nodes.length} node · ${edges.length} hubungan · ${s.included_article_count || currentCounts().included} artikel terpilih`;
     const typeNames = {concept:'Konsep',factor:'Faktor',outcome:'Outcome',context:'Konteks',method:'Metode'};
     const types = [...new Set(nodes.map(n=>n.type||'concept'))];
@@ -586,6 +604,7 @@
     try {
       const h = await api('/api/health');
       healthInfo = h; updateUsageDot();
+      if (h.max_files_per_batch) { serverLimits = {maxFiles: h.max_files_per_batch, maxFileMb: h.max_file_mb || 12}; applyServerLimits(); }
       if (h.ai_configured) {
         pill.className = 'status-pill status-ok';
         pill.innerHTML = '<span class="status-dot"></span> Model siap · ' + esc(h.model);
@@ -604,11 +623,35 @@
     if (isBusy) return;
     clearGlobalMessage();
     const input = $('#pdf-files');
-    const files = Array.from(input.files || []);
+    let files = Array.from(input.files || []);
     if (!files.length) { globalMessage('Pilih setidaknya satu PDF.', 'error'); return; }
-    if (files.length > 8) { globalMessage('Maksimal 8 PDF per batch. Pilih atau unggah batch yang lebih kecil.', 'error'); return; }
-    const bad = files.filter(f=>f.size>12*1024*1024 || (!f.name.toLowerCase().endsWith('.pdf') && f.type!=='application/pdf'));
-    if (bad.length) { globalMessage(`Periksa file: ${bad.map(f=>f.name).join(', ')}. Setiap file harus PDF dan maksimal 12 MB.`, 'error'); return; }
+    const bad = files.filter(f=>f.size>serverLimits.maxFileMb*1024*1024 || (!f.name.toLowerCase().endsWith('.pdf') && f.type!=='application/pdf'));
+    if (bad.length) { globalMessage(`Periksa file: ${bad.map(f=>f.name).join(', ')}. Setiap file harus PDF dan maksimal ${serverLimits.maxFileMb} MB.`, 'error'); return; }
+    // Cek duplikat di browser sebelum upload: PDF yang hash-nya sudah ada di proyek tidak dikirim ke AI (hemat biaya).
+    const skipped = [];
+    if (window.crypto && crypto.subtle) {
+      const known = new Set(state.articles.map(a => a.hash).filter(Boolean));
+      const fresh = [];
+      for (const f of files) {
+        let hash = null;
+        try { hash = await sha256Hex(f); } catch (_) { /* file tidak terbaca: biarkan server memeriksa */ }
+        if (hash && known.has(hash)) { skipped.push(f.name); continue; }
+        if (hash) known.add(hash);
+        fresh.push(f);
+      }
+      files = fresh;
+    }
+    if (skipped.length) {
+      state.identifiedTotal = (state.identifiedTotal || 0) + skipped.length;
+      state.duplicateCount = (state.duplicateCount || 0) + skipped.length;
+      saveState(); renderAll();
+    }
+    if (!files.length) {
+      input.value = ''; renderSelectedFiles();
+      globalMessage(`${skipped.length} file sudah ada di proyek ini (hash sama), jadi tidak diproses ulang dan tidak memakai AI.`, 'success');
+      return;
+    }
+    if (files.length > serverLimits.maxFiles) { globalMessage(`Maksimal ${serverLimits.maxFiles} PDF per batch. Pilih atau unggah batch yang lebih kecil.`, 'error'); return; }
     saveMetaFromForm(false);
     const meta = getMetaFromForm();
     const data = new FormData();
@@ -640,6 +683,7 @@
       saveState(); renderAll();
       let message = `${added} artikel berhasil dianalisis.`;
       if (duplicates) message += ` ${duplicates} duplikat dikenali dan tidak ditambahkan lagi.`;
+      if (skipped.length) message += ` ${skipped.length} file dilewati karena sudah ada di proyek (tanpa biaya AI).`;
       if (list(response.errors).length) message += ' Beberapa file tidak berhasil dianalisis.';
       message += usageText(response.usage);
       if (list(response.errors).length) {
@@ -667,7 +711,7 @@
     renderProcessProgress({percent:0, stage:'Mengirim data ke server', indeterminate:true, logs:[]}, 'synthesis');
     const jobId = newJobId();
     const stopPolling = startProgressPolling('synthesis', jobId);
-    $('#run-synthesis').textContent = '✳ Menyintesis…';
+    $('#run-synthesis').textContent = '* Menyintesis…';
     try {
       const data = await api('/api/synthesize', {
         method:'POST', headers:{'Content-Type':'application/json'},
@@ -682,7 +726,7 @@
       addUsage(error.usage);
       globalMessage(error.message, 'error');
       toast(error.message, 'error');
-    } finally { await stopPolling(); setBusy(false); $('#run-synthesis').textContent = '✳ Jalankan sintesis'; }
+    } finally { await stopPolling(); setBusy(false); $('#run-synthesis').textContent = '* Jalankan sintesis'; }
   }
 
   function renderSelectedFiles() {

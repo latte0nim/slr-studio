@@ -2,6 +2,9 @@ import os
 import json
 import hashlib
 import re
+import time
+import uuid
+import threading
 import urllib.request
 import urllib.error
 from dotenv import load_dotenv
@@ -64,30 +67,188 @@ else:
     CONFIG_ERROR = "Ollama belum dikonfigurasi. Periksa OLLAMA_URL dan OLLAMA_MODEL di file .env."
 APP_USERNAME = os.getenv("APP_USERNAME", "slr-user").strip() or "slr-user"
 APP_PASSWORD = os.getenv("APP_PASSWORD", "").strip()
-MAX_FILES_PER_BATCH = 8
-MAX_FILE_BYTES = 12 * 1024 * 1024
-# Smaller cap helps 8K-context local models avoid overflowing the prompt window.
-MAX_TEXT_CHARS = int(os.getenv("MAX_TEXT_CHARS", "18000"))
+
+
+def _env_int(name, default, minimum=1):
+    try:
+        return max(minimum, int(os.getenv(name, str(default)).strip()))
+    except ValueError:
+        return default
+
+
+def _env_bool(name, default):
+    value = os.getenv(name)
+    if value is None or not value.strip():
+        return default
+    return value.strip().lower() in ("1", "true", "yes", "ya", "on")
+
+
+# Batas bawaan mengikuti provider: model lokal 8B berkonteks sempit => batas ketat; API => longgar.
+# Semuanya bisa ditimpa lewat .env.
+IS_API = LLM_PROVIDER == "deepseek"
+MAX_FILES_PER_BATCH = _env_int("MAX_FILES_PER_BATCH", 20 if IS_API else 8)
+MAX_FILE_MB = _env_int("MAX_FILE_MB", 30 if IS_API else 12)
+MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024
+MAX_TEXT_CHARS_HARD = 200000  # pengaman: skripsi/buku tidak boleh membengkakkan tagihan
+MAX_TEXT_CHARS = min(_env_int("MAX_TEXT_CHARS", 80000 if IS_API else 18000, minimum=1000), MAX_TEXT_CHARS_HARD)
+SYNTH_BATCH_SIZE = _env_int("SYNTH_BATCH_SIZE", 12 if IS_API else 4, minimum=2)      # artikel per batch sintesis
+REDUCE_GROUP_SIZE = _env_int("REDUCE_GROUP_SIZE", 8 if IS_API else 4, minimum=2)     # ringkasan per penggabungan
+LLM_OUTPUT_SCALE = float(os.getenv("LLM_OUTPUT_SCALE", "1.75" if IS_API else "1"))   # pengali batas token output (hanya plafon)
+KEEP_SERVER_PDFS = _env_bool("KEEP_SERVER_PDFS", True)   # salin PDF asli ke data/pdfs
+KEEP_SERVER_JSON = _env_bool("KEEP_SERVER_JSON", True)   # salin hasil ekstraksi ke data/json
+app.config["MAX_CONTENT_LENGTH"] = MAX_FILES_PER_BATCH * MAX_FILE_BYTES + 5 * 1024 * 1024
 PDF_STORE = BASE_DIR / "data" / "pdfs"  # Original files retained; preview UI/route removed.
 JSON_STORE = BASE_DIR / "data" / "json"
-PDF_STORE.mkdir(parents=True, exist_ok=True)
-JSON_STORE.mkdir(parents=True, exist_ok=True)
-ANALYSIS_PROGRESS = {"active": False, "percent": 0, "current": 0, "total": 0, "filename": "", "stage": "Menunggu proses", "logs": [], "usage": None}
+class Progress:
+    """Progres satu pekerjaan (analisis/sintesis) yang dibaca frontend lewat polling.
+    Persen = langkah selesai + pecahan langkah berjalan, tidak pernah turun, dan baru 100% saat benar-benar selesai."""
+
+    def __init__(self, kind, total_steps=1):
+        self.kind = kind
+        self.lock = threading.Lock()
+        self.started = time.time()
+        self.ended = None
+        self.touched = self.started
+        self.active = True
+        self.percent = 0.0
+        self.stage = "Menyiapkan"
+        self.current = 0
+        self.total = 0
+        self.filename = ""
+        self.logs = []
+        self.usage = None
+        self.indeterminate = True
+        self.total_steps = max(1, int(total_steps))
+        self.done_steps = 0
+        self.frac = 0.0
+        self.frac_lo, self.frac_span = 0.0, 0.95
+
+    def _recompute(self):
+        raw = (self.done_steps + self.frac) / self.total_steps * 100
+        self.percent = max(self.percent, min(99.0, raw))
+        self.touched = time.time()
+
+    def set(self, stage=None, current=None, total=None, filename=None, indeterminate=None):
+        with self.lock:
+            if stage is not None: self.stage = str(stage)
+            if current is not None: self.current = int(current)
+            if total is not None: self.total = int(total)
+            if filename is not None: self.filename = str(filename)
+            if indeterminate is not None: self.indeterminate = bool(indeterminate)
+            self.touched = time.time()
+
+    def log(self, message):
+        with self.lock:
+            self._drop_live_flag()
+            self.logs.append({"time": datetime.now().astimezone().strftime("%H:%M:%S"), "message": str(message)[:500]})
+            self.logs = self.logs[-150:]
+            self.touched = time.time()
+
+    def _drop_live_flag(self):
+        if self.logs and self.logs[-1].get("live"):
+            self.logs[-1].pop("live", None)
+
+    def live(self, message):
+        """Satu baris log yang diperbarui terus selama AI menulis; diganti baris final lewat finish_live()."""
+        with self.lock:
+            stamp = datetime.now().astimezone().strftime("%H:%M:%S")
+            if self.logs and self.logs[-1].get("live"):
+                self.logs[-1].update({"time": stamp, "message": str(message)[:500]})
+            else:
+                self.logs.append({"time": stamp, "message": str(message)[:500], "live": True})
+                self.logs = self.logs[-150:]
+            self.touched = time.time()
+
+    def finish_live(self, message):
+        with self.lock:
+            stamp = datetime.now().astimezone().strftime("%H:%M:%S")
+            if self.logs and self.logs[-1].get("live"):
+                self.logs[-1] = {"time": stamp, "message": str(message)[:500]}
+            else:
+                self.logs.append({"time": stamp, "message": str(message)[:500]})
+            self.touched = time.time()
+
+    def set_phase(self, lo, span):
+        """Rentang pecahan langkah yang dipakai selama AI menulis (mis. 0.08 sampai 0.90)."""
+        with self.lock:
+            self.frac_lo, self.frac_span = float(lo), float(span)
+
+    def set_fraction(self, fraction):
+        with self.lock:
+            self.frac = max(self.frac, min(1.0, float(fraction)))
+            self._recompute()
+
+    def stream_fraction(self, ratio):
+        with self.lock:
+            self.frac = max(self.frac, self.frac_lo + self.frac_span * max(0.0, min(1.0, ratio)))
+            self.frac = min(self.frac, 0.99)
+            self._recompute()
+
+    def complete_step(self):
+        with self.lock:
+            self.done_steps = min(self.total_steps, self.done_steps + 1)
+            self.frac = 0.0
+            self.frac_lo, self.frac_span = 0.0, 0.95
+            self._recompute()
+
+    def finish(self, ok=True, stage=None):
+        with self.lock:
+            self.active = False
+            self.ended = time.time()
+            self.indeterminate = False
+            if ok:
+                self.percent = 100.0
+            self.stage = stage or ("Selesai" if ok else "Gagal")
+            self.touched = time.time()
+
+    def snapshot(self):
+        with self.lock:
+            end = self.ended or time.time()
+            return {
+                "active": self.active,
+                "percent": int(self.percent),
+                "current": self.current,
+                "total": self.total,
+                "filename": self.filename,
+                "stage": self.stage,
+                "indeterminate": self.indeterminate and self.active,
+                "elapsed": int(end - self.started),
+                "logs": [dict(item) for item in self.logs],
+                "usage": dict(self.usage) if isinstance(self.usage, dict) else None,
+            }
 
 
-def progress_update(percent=None, current=None, total=None, filename=None, stage=None, log=None, active=None):
-    """In-memory progress snapshot polled by the frontend while analysis is running."""
-    global ANALYSIS_PROGRESS
-    if percent is not None: ANALYSIS_PROGRESS["percent"] = max(0, min(100, int(percent)))
-    if current is not None: ANALYSIS_PROGRESS["current"] = int(current)
-    if total is not None: ANALYSIS_PROGRESS["total"] = int(total)
-    if filename is not None: ANALYSIS_PROGRESS["filename"] = str(filename)
-    if stage is not None: ANALYSIS_PROGRESS["stage"] = str(stage)
-    if active is not None: ANALYSIS_PROGRESS["active"] = bool(active)
-    if log:
-        ANALYSIS_PROGRESS.setdefault("logs", []).append({"time": datetime.now().astimezone().strftime("%H:%M:%S"), "message": str(log)[:400]})
-        ANALYSIS_PROGRESS["logs"] = ANALYSIS_PROGRESS["logs"][-80:]
+PROGRESS_JOBS = {}
+PROGRESS_LOCK = threading.Lock()
 
+
+def new_progress(job_id, kind, total_steps=1):
+    job_id = (job_id or "").strip()[:80] or uuid.uuid4().hex
+    progress = Progress(kind, total_steps)
+    with PROGRESS_LOCK:
+        now = time.time()
+        for key in [k for k, v in PROGRESS_JOBS.items() if now - v.touched > 3600]:
+            PROGRESS_JOBS.pop(key, None)
+        while len(PROGRESS_JOBS) >= 40:  # batasi memori: buang yang paling lama tak tersentuh
+            PROGRESS_JOBS.pop(min(PROGRESS_JOBS, key=lambda k: PROGRESS_JOBS[k].touched), None)
+        PROGRESS_JOBS[f"{kind}:{job_id}"] = progress
+    return progress
+
+
+def progress_snapshot(kind, job_id):
+    with PROGRESS_LOCK:
+        progress = PROGRESS_JOBS.get(f"{kind}:{(job_id or '').strip()[:80]}")
+    # "pending": pekerjaan belum terdaftar (request masih tiba); frontend mempertahankan teks awalnya.
+    return progress.snapshot() if progress else {"pending": True, "active": False, "percent": 0, "logs": []}
+
+
+def fmt_int(value):
+    return f"{int(value):,}".replace(",", ".")
+
+
+def format_idr(value):
+    value = float(value or 0)
+    return f"{value:.1f}" if value < 10 else f"{value:,.0f}".replace(",", ".")
 
 
 def new_usage():
@@ -185,19 +346,91 @@ def extract_json(text):
     return json.loads(text)
 
 
-def llm_json(prompt, max_output_tokens=3000, usage=None):
-    """Call the active provider (Ollama / DeepSeek) for JSON, retrying empty or malformed outputs safely."""
+def read_llm_stream(response, token_limit, progress, label):
+    """Baca jawaban streaming (DeepSeek SSE / Ollama NDJSON), perbarui progres live, dan
+    kembalikan dict berbentuk sama dengan respons non-streaming supaya sisa kode tidak berubah."""
+    started = time.time()
+    last_push = 0.0
+    chunks = 0
+    text_parts, reasoning_parts = [], []
+    finish_reason, usage_raw, final_event = None, None, None
+    got_first = False
+    for line in response:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            if IS_API:
+                if not line.startswith(b"data:"):
+                    continue  # komentar keep-alive SSE
+                body = line[5:].strip()
+                if body == b"[DONE]":
+                    break
+                event = json.loads(body)
+                if event.get("usage"):
+                    usage_raw = event["usage"]
+                choice = (event.get("choices") or [None])[0]
+                if choice:
+                    delta = choice.get("delta") or {}
+                    if delta.get("content"):
+                        text_parts.append(delta["content"]); chunks += 1
+                    if delta.get("reasoning_content"):
+                        reasoning_parts.append(delta["reasoning_content"])
+                    if choice.get("finish_reason"):
+                        finish_reason = choice["finish_reason"]
+            else:
+                event = json.loads(line)
+                message = event.get("message") or {}
+                if message.get("content"):
+                    text_parts.append(message["content"]); chunks += 1
+                if message.get("thinking"):
+                    reasoning_parts.append(message["thinking"])
+                if event.get("done"):
+                    final_event = event
+        except json.JSONDecodeError:
+            continue  # baris stream rusak: abaikan, jangan gagalkan seluruh panggilan
+        if progress is not None and chunks and not got_first:
+            got_first = True
+            progress.set(stage=f"{label} · AI menulis", indeterminate=False)
+        now = time.time()
+        if progress is not None and chunks and now - last_push >= 0.6:
+            last_push = now
+            progress.live(f"{label}: AI menulis… ≈{fmt_int(chunks)} token · {int(now - started)} dtk")
+            # Panjang jawaban final tidak diketahui; jawaban JSON umumnya ~setengah plafon. Bar tidak pernah
+            # melewati batas fase sebelum panggilan benar-benar selesai.
+            progress.stream_fraction(chunks / max(1, token_limit * 0.5))
+    content = "".join(text_parts)
+    reasoning = "".join(reasoning_parts)
+    if IS_API:
+        usage_raw = usage_raw or {"completion_tokens": chunks}
+        return {
+            "choices": [{"message": {"content": content, "reasoning_content": reasoning}, "finish_reason": finish_reason or "unknown"}],
+            "usage": usage_raw,
+        }
+    final_event = final_event or {}
+    return {
+        "message": {"content": content, "thinking": reasoning},
+        "done_reason": final_event.get("done_reason", "unknown"),
+        "prompt_eval_count": final_event.get("prompt_eval_count", 0),
+        "eval_count": final_event.get("eval_count", chunks),
+    }
+
+
+def llm_json(prompt, max_output_tokens=3000, usage=None, progress=None, label="Panggilan AI"):
+    """Call the active provider (Ollama / DeepSeek) for JSON, retrying empty or malformed outputs safely.
+    Dengan `progress`, jawaban dibaca streaming dan dilaporkan live; tanpa itu, satu respons utuh (mis. /api/test-ai)."""
     if not AI_CONFIGURED:
         raise RuntimeError(CONFIG_ERROR)
 
-    if LLM_PROVIDER == "deepseek":
-        base_token_limit = max(512, int(max_output_tokens))
+    if IS_API:
+        base_token_limit = max(512, int(max_output_tokens * LLM_OUTPUT_SCALE))
     else:
         base_token_limit = max(512, min(
             int(max_output_tokens),
             OLLAMA_MAX_OUTPUT_TOKENS,
             max(1024, OLLAMA_NUM_CTX // 2),
         ))
+    stream = progress is not None
     last_problem = "Respons bukan JSON valid."
     malformed_text = ""
 
@@ -242,17 +475,19 @@ def llm_json(prompt, max_output_tokens=3000, usage=None):
                 {"role": "user", "content": prompt + "\n\nPENTING: keluarkan isi JSON sekarang; jangan menghasilkan langkah penalaran."},
             ]
 
-        if LLM_PROVIDER == "deepseek":
+        if IS_API:
             token_limit = base_token_limit if attempt == 0 else base_token_limit + 700
             payload = {
                 "model": MODEL,
                 "messages": request_messages,
                 "thinking": {"type": "disabled"},  # V4 menyalakan thinking secara default => boros token
                 "response_format": {"type": "json_object"},
-                "stream": False,
+                "stream": stream,
                 "temperature": 0,
                 "max_tokens": token_limit,
             }
+            if stream:
+                payload["stream_options"] = {"include_usage": True}
             headers = {"Content-Type": "application/json", "Authorization": f"Bearer {DEEPSEEK_API_KEY}"}
         else:
             token_limit = base_token_limit if attempt == 0 else min(
@@ -264,7 +499,7 @@ def llm_json(prompt, max_output_tokens=3000, usage=None):
                 "messages": request_messages,
                 "think": False,
                 "format": "json",
-                "stream": False,
+                "stream": stream,
                 "keep_alive": "5m",
                 "options": {
                     "temperature": 0,
@@ -279,12 +514,18 @@ def llm_json(prompt, max_output_tokens=3000, usage=None):
             headers=headers,
             method="POST",
         )
+        call_started = time.time()
+        if progress is not None:
+            progress.set(stage=f"{label} · menunggu respons AI" + (" (percobaan ulang)" if attempt else ""), indeterminate=True)
         try:
             with urllib.request.urlopen(req, timeout=600) as response:
-                raw = json.loads(response.read().decode("utf-8"))
+                if stream:
+                    raw = read_llm_stream(response, token_limit, progress, label)
+                else:
+                    raw = json.loads(response.read().decode("utf-8"))
         except urllib.error.HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")[:1600]
-            if LLM_PROVIDER == "deepseek":
+            if IS_API:
                 hints = {
                     400: "Permintaan ditolak (cek DEEPSEEK_MODEL / format permintaan).",
                     401: "API key salah atau belum aktif (cek DEEPSEEK_API_KEY).",
@@ -306,7 +547,7 @@ def llm_json(prompt, max_output_tokens=3000, usage=None):
                 ) from exc
             raise RuntimeError(f"Permintaan Ollama gagal (HTTP {exc.code}). Detail: {detail}") from exc
         except urllib.error.URLError as exc:
-            if LLM_PROVIDER == "deepseek":
+            if IS_API:
                 raise RuntimeError(
                     f"Tidak dapat terhubung ke DeepSeek API ({AI_URL}). Cek koneksi internet. Detail: {exc.reason}"
                 ) from exc
@@ -321,9 +562,11 @@ def llm_json(prompt, max_output_tokens=3000, usage=None):
         except json.JSONDecodeError as exc:
             raise RuntimeError(f"Respons API {PROVIDER_LABEL} sendiri bukan JSON valid.") from exc
 
+        call_usage = new_usage()
+        add_usage(call_usage, raw)
         add_usage(usage, raw)  # token tetap dihitung walau output kosong/rusak
 
-        if LLM_PROVIDER == "deepseek":
+        if IS_API:
             choice = (raw.get("choices") or [{}])[0]
             message = choice.get("message") or {}
             done_reason = choice.get("finish_reason", "unknown")
@@ -335,6 +578,16 @@ def llm_json(prompt, max_output_tokens=3000, usage=None):
             eval_count = raw.get("eval_count", "unknown")
             thinking_length = len(message.get("thinking") or "")
         output_text = (message.get("content") or "").strip()
+
+        if progress is not None:
+            seconds = int(time.time() - call_started)
+            cost_text = f"≈ Rp{format_idr(call_usage['cost_idr'])}" if IS_API else "lokal"
+            cache = f" (cache {fmt_int(call_usage['cache_hit_tokens'])})" if call_usage["cache_hit_tokens"] else ""
+            progress.finish_live(
+                f"{label} selesai · {fmt_int(call_usage['prompt_tokens'])} masuk{cache} → "
+                f"{fmt_int(call_usage['completion_tokens'])} keluar token · {seconds} dtk · {cost_text}"
+            )
+
         if not output_text:
             last_problem = (
                 f"Respons konten kosong; done_reason={done_reason}; thinking_length={thinking_length}; "
@@ -342,6 +595,8 @@ def llm_json(prompt, max_output_tokens=3000, usage=None):
                 "Model mungkin menghabiskan batas output untuk thinking."
             )
             malformed_text = ""
+            if progress is not None and attempt == 0:
+                progress.log(f"{label}: ⚠ respons kosong (done_reason={done_reason}). Mengulang sekali…")
             continue
         try:
             parsed = extract_json(output_text)
@@ -354,6 +609,9 @@ def llm_json(prompt, max_output_tokens=3000, usage=None):
                 f"{type(exc).__name__}: {str(exc)[:240]}; output_chars={len(output_text)}; "
                 f"done_reason={done_reason}; eval_count={eval_count}"
             )
+            if progress is not None and attempt == 0:
+                why = f"output terpotong di batas {fmt_int(token_limit)} token" if done_reason in ("length", "max_tokens") else "JSON tidak valid"
+                progress.log(f"{label}: ⚠ {why}. Memperbaiki dengan satu panggilan ulang…")
 
     raise RuntimeError(
         f"{PROVIDER_LABEL} belum menghasilkan JSON valid setelah dua percobaan. "
@@ -630,14 +888,24 @@ def health():
         "env_file_found": ENV_FILE.is_file(),
         "password_protected": bool(APP_PASSWORD),
         "max_files_per_batch": MAX_FILES_PER_BATCH,
-        "max_file_mb": MAX_FILE_BYTES // (1024 * 1024),
+        "max_file_mb": MAX_FILE_MB,
+        "max_text_chars": MAX_TEXT_CHARS,
+        "synth_batch_size": SYNTH_BATCH_SIZE,
+        "keep_server_pdfs": KEEP_SERVER_PDFS,
+        "keep_server_json": KEEP_SERVER_JSON,
     })
 
 
 @app.get("/api/analysis-progress")
 @auth_guard
 def analysis_progress():
-    return jsonify(ANALYSIS_PROGRESS)
+    return jsonify(progress_snapshot("analysis", request.args.get("job_id", "")))
+
+
+@app.get("/api/synthesis-progress")
+@auth_guard
+def synthesis_progress():
+    return jsonify(progress_snapshot("synthesis", request.args.get("job_id", "")))
 
 
 @app.get("/api/test-ai")
@@ -673,9 +941,11 @@ def analyze_pdfs():
     if not AI_CONFIGURED:
         return jsonify({"error": CONFIG_ERROR}), 503
 
-    progress_update(percent=0, current=0, total=len(files), filename="", stage="Menyiapkan batch", log=f"Batch dimulai: {len(files)} PDF diterima.", active=True)
     usage = new_usage()
-    ANALYSIS_PROGRESS["usage"] = usage  # objek yang sama dimutasi => polling progres otomatis live
+    progress = new_progress(request.form.get("job_id", ""), "analysis", total_steps=len(files))
+    progress.usage = usage  # objek yang sama dimutasi => polling progres otomatis live
+    progress.set(stage="Menyiapkan batch", current=0, total=len(files))
+    progress.log(f"Batch dimulai: {len(files)} PDF diterima · model {MODEL} ({PROVIDER_LABEL}) · teks maks {fmt_int(MAX_TEXT_CHARS)} karakter/PDF")
     research_question = request.form.get("research_question", "").strip()[:1000]
     inclusion = request.form.get("inclusion", "").strip()[:3000]
     exclusion = request.form.get("exclusion", "").strip()[:3000]
@@ -686,25 +956,35 @@ def analyze_pdfs():
     results, errors = [], []
     for file_index, file in enumerate(files, start=1):
         filename = secure_filename(file.filename or "article.pdf") or "article.pdf"
-        base_percent = int(((file_index - 1) / max(1, len(files))) * 100)
-        progress_update(percent=base_percent, current=file_index, filename=filename, stage="Membaca PDF", log=f"[{file_index}/{len(files)}] Membaca file {filename}.")
+        label = f"[{file_index}/{len(files)}] {filename}"
+        progress.set(stage=f"{label} · membaca PDF", current=file_index, filename=filename, indeterminate=False)
+        progress.log(f"{label}: membaca file.")
         pdf_bytes = file.read()
         if len(pdf_bytes) > MAX_FILE_BYTES:
-            errors.append({"filename": filename, "error": f"File melebihi batas {MAX_FILE_BYTES // (1024 * 1024)} MB."})
+            errors.append({"filename": filename, "error": f"File melebihi batas {MAX_FILE_MB} MB."})
+            progress.log(f"{label}: dilewati, melebihi {MAX_FILE_MB} MB.")
+            progress.complete_step()
             continue
         if not pdf_bytes.startswith(b"%PDF"):
             errors.append({"filename": filename, "error": "Berkas tidak memiliki signature PDF yang valid."})
+            progress.log(f"{label}: dilewati, bukan PDF yang valid.")
+            progress.complete_step()
             continue
         digest = hashlib.sha256(pdf_bytes).hexdigest()
         try:
-            progress_update(percent=min(99, base_percent + 3), current=file_index, filename=filename, stage="Ekstraksi teks PDF", log=f"Mengekstrak teks dari {filename}.")
+            progress.set_fraction(0.03)
             pages, text = read_pdf(pdf_bytes)
             if len(text.strip()) < 100:
                 errors.append({"filename": filename, "error": "Teks PDF sangat sedikit/tidak terbaca. Kemungkinan PDF hasil scan; versi ini belum memiliki OCR otomatis. Jalankan OCR terlebih dahulu lalu upload ulang."})
+                progress.log(f"{label}: dilewati, teks tidak terbaca (kemungkinan hasil scan).")
                 continue
-            progress_update(percent=min(99, base_percent + 7), current=file_index, filename=filename, stage="Menyusun JSON terstruktur", log=f"Teks siap ({len(text):,} karakter, {pages} halaman). Menjalankan {PROVIDER_LABEL} untuk menyusun JSON.")
+            progress.set_fraction(0.08)
+            progress.log(f"{label}: teks siap ({fmt_int(len(text))} karakter, {pages} halaman).")
+            progress.set_phase(0.08, 0.82)
             prompt = article_prompt(filename, pages, text, research_question, inclusion, exclusion)
-            data = llm_json(prompt, max_output_tokens=3000, usage=usage)
+            data = llm_json(prompt, max_output_tokens=3000, usage=usage, progress=progress, label=label)
+            progress.set(stage=f"{label} · memvalidasi dan menyimpan", indeterminate=False)
+            progress.set_fraction(0.95)
             if not isinstance(data, dict):
                 raise RuntimeError("Format ekstraksi AI tidak valid.")
             title = safe_string(data.get("title")) or os.path.splitext(filename)[0]
@@ -745,24 +1025,38 @@ def analyze_pdfs():
             decision = record["screening_suggestion"].get("decision", "review") if isinstance(record["screening_suggestion"], dict) else "review"
             if decision not in ("include", "exclude", "review"):
                 record["screening_suggestion"] = {"decision": "review", "reason": "Rekomendasi model perlu dicek manual."}
-            # Retain original PDF for traceability; the application does not display a PDF preview.
-            stored_pdf = PDF_STORE / f"{digest}.pdf"
-            if not stored_pdf.exists():
-                stored_pdf.write_bytes(pdf_bytes)
-            record["pdf_stored"] = True
-            # Persist the structured extraction so it can be reused without re-running Ollama.
-            record["json_stored"] = True
-            json_path = JSON_STORE / f"{record_id}.json"
-            json_path.write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
-            progress_update(percent=min(99, int((file_index / max(1, len(files))) * 100)), current=file_index, filename=filename, stage="JSON tersimpan", log=f"JSON tervalidasi dan disimpan untuk {filename}.")
+            # Salinan di server bersifat opsional (KEEP_SERVER_PDFS / KEEP_SERVER_JSON); hasil kerja utama
+            # tetap ada di proyek browser dan file ekspor.
+            record["pdf_stored"] = KEEP_SERVER_PDFS
+            record["json_stored"] = KEEP_SERVER_JSON
+            if KEEP_SERVER_PDFS:
+                PDF_STORE.mkdir(parents=True, exist_ok=True)
+                stored_pdf = PDF_STORE / f"{digest}.pdf"
+                if not stored_pdf.exists():
+                    stored_pdf.write_bytes(pdf_bytes)
+            if KEEP_SERVER_JSON:
+                JSON_STORE.mkdir(parents=True, exist_ok=True)
+                json_path = JSON_STORE / f"{record_id}.json"
+                json_path.write_text(json.dumps(record, ensure_ascii=False, indent=2), encoding="utf-8")
+            progress.log(f"{label}: JSON tervalidasi" + (" dan disalin ke server." if (KEEP_SERVER_JSON or KEEP_SERVER_PDFS) else "."))
             results.append(record)
         except Exception as exc:
             errors.append({"filename": filename, "error": str(exc)[:1500]})
-            progress_update(current=file_index, filename=filename, stage="Gagal memproses", log=f"GAGAL {filename}: {str(exc)[:240]}")
+            progress.log(f"GAGAL {label}: {str(exc)[:300]}")
         finally:
-            progress_update(percent=min(99, int((file_index / max(1, len(files))) * 100)), current=file_index, filename=filename)
-    progress_update(percent=100, current=len(files), total=len(files), stage="Selesai", log=f"Batch selesai: {len(results)} berhasil, {len(errors)} gagal.", active=False)
+            progress.complete_step()
+    progress.log(f"Batch selesai: {len(results)} berhasil, {len(errors)} gagal.")
+    progress.finish(ok=True)
     return jsonify({"articles": results, "errors": errors, "model": MODEL, "usage": usage})
+
+
+def count_reduce_calls(batch_count, group_size):
+    """Jumlah panggilan penggabungan ringkasan yang akan terjadi (grup berisi 1 ringkasan dilewatkan tanpa AI)."""
+    calls, n = 0, batch_count
+    while n > group_size:
+        calls += sum(1 for i in range(0, n, group_size) if min(group_size, n - i) > 1)
+        n = -(-n // group_size)
+    return calls
 
 
 @app.post("/api/synthesize")
@@ -785,16 +1079,31 @@ def synthesize():
 
     usage = new_usage()
     compact = [compact_article(a) for a in selected]
-    # Small batches help the local 8B model stay within its context window.
-    batches = [compact[i:i + 4] for i in range(0, len(compact), 4)]
+    # Ukuran batch mengikuti provider (model lokal 8B: kecil; API: besar) dan bisa diatur lewat .env.
+    batches = [compact[i:i + SYNTH_BATCH_SIZE] for i in range(0, len(compact), SYNTH_BATCH_SIZE)]
+    reduce_calls = count_reduce_calls(len(batches), REDUCE_GROUP_SIZE)
+    progress = new_progress(body.get("job_id", ""), "synthesis", total_steps=len(batches) + reduce_calls + 2)
+    progress.usage = usage
+    progress.set(stage="Menyiapkan sintesis", current=0, total=len(batches) + reduce_calls + 2)
+    progress.log(
+        f"Sintesis dimulai: {len(selected)} artikel · {len(batches)} batch (maks {SYNTH_BATCH_SIZE} artikel/batch)"
+        f" · {reduce_calls} penggabungan · sintesis akhir · taksonomi · model {MODEL}"
+    )
+    step = 0
     try:
         summaries = []
         for idx, group in enumerate(batches, start=1):
+            step += 1
+            label = f"Batch {idx}/{len(batches)} ({len(group)} artikel)"
+            progress.set(current=step)
             summary = llm_json(
                 batch_synthesis_prompt(group, research_question, inclusion, exclusion),
-                max_output_tokens=1000,
+                max_output_tokens=1000 if SYNTH_BATCH_SIZE <= 6 else 1500,
                 usage=usage,
+                progress=progress,
+                label=label,
             )
+            progress.complete_step()
             summaries.append({
                 "batch": idx,
                 "article_ids": [a.get("id") for a in group],
@@ -804,25 +1113,31 @@ def synthesize():
         # Recursively reduce the batch summaries so the final prompt stays inside the
         # local model's 8K context window, even for larger article collections.
         reduction_level = 1
-        while len(summaries) > 4:
+        while len(summaries) > REDUCE_GROUP_SIZE:
             reduced = []
-            for idx in range(0, len(summaries), 4):
-                group = summaries[idx:idx + 4]
+            for idx in range(0, len(summaries), REDUCE_GROUP_SIZE):
+                group = summaries[idx:idx + REDUCE_GROUP_SIZE]
                 if len(group) == 1:
                     reduced.append(group[0])
                     continue
+                step += 1
+                label = f"Gabung ringkasan level {reduction_level} ({len(group)} bagian)"
+                progress.set(current=step)
                 merged = llm_json(
                     reduce_summaries_prompt(group, research_question, inclusion, exclusion),
                     max_output_tokens=900,
                     usage=usage,
+                    progress=progress,
+                    label=label,
                 )
+                progress.complete_step()
                 ids = []
                 for part in group:
                     for article_id in part.get("article_ids", []):
                         if article_id not in ids:
                             ids.append(article_id)
                 reduced.append({
-                    "batch": f"level-{reduction_level}-group-{idx // 4 + 1}",
+                    "batch": f"level-{reduction_level}-group-{idx // REDUCE_GROUP_SIZE + 1}",
                     "article_ids": ids,
                     "summary": merged,
                 })
@@ -839,11 +1154,16 @@ def synthesize():
             }
             for a in compact
         ]
+        step += 1
+        progress.set(current=step)
         result = llm_json(
             final_synthesis_prompt(summaries, catalog, research_question, inclusion, exclusion),
             max_output_tokens=1700,
             usage=usage,
+            progress=progress,
+            label="Sintesis akhir",
         )
+        progress.complete_step()
         if not isinstance(result, dict):
             raise RuntimeError("AI tidak mengembalikan sintesis dalam format yang benar.")
         valid_article_ids = {a.get("id") for a in compact}
@@ -852,11 +1172,15 @@ def synthesize():
         # Taxonomy is generated in a separate, focused call. In the previous workflow,
         # taxonomy competed with the entire synthesis JSON for the same output budget,
         # so the model often returned a valid synthesis but omitted the taxonomy field.
+        step += 1
+        progress.set(current=step)
         try:
             taxonomy_response = llm_json(
                 taxonomy_only_prompt(catalog, summaries, result.get("main_themes", []), research_question),
                 max_output_tokens=2300,
                 usage=usage,
+                progress=progress,
+                label="Taksonomi",
             )
             taxonomy = taxonomy_response.get("taxonomy") if isinstance(taxonomy_response, dict) else None
             if not taxonomy_has_content(taxonomy):
@@ -865,6 +1189,7 @@ def synthesize():
             result.pop("taxonomy_error", None)
             result["taxonomy_status"] = "ok"
         except Exception as taxonomy_exc:
+            progress.log(f"Taksonomi: ⚠ {str(taxonomy_exc)[:200]} (sintesis tetap disimpan).")
             # Do not discard a valid synthesis or taxonomy just because the focused call failed.
             if taxonomy_has_content(result.get("taxonomy")):
                 result["taxonomy_status"] = "fallback"
@@ -883,8 +1208,13 @@ def synthesize():
         result["generated_at"] = datetime.now(timezone.utc).isoformat()
         result["model"] = MODEL
         result["evidence_catalog"] = catalog
+        progress.complete_step()  # taksonomi (berhasil, fallback, atau kosong) selesai
+        progress.log(f"Sintesis selesai: {len(selected)} artikel disintesis.")
+        progress.finish(ok=True)
         return jsonify({"synthesis": result, "usage": usage})
     except Exception as exc:
+        progress.log(f"GAGAL: {str(exc)[:300]}")
+        progress.finish(ok=False)
         return jsonify({"error": str(exc)[:2200], "usage": usage}), 502
 
 
