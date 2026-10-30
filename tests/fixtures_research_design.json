@@ -1,0 +1,53 @@
+{
+  "_catatan": "Label buatan tangan (BUKAN keluaran AI) untuk 5 artikel contoh, dipakai sebagai gold standard mini dan fixture tes. Bentuknya sengaja seperti keluaran AI mentah supaya melewati validasi yang sama. Dua entri sengaja berisi kesalahan untuk menguji pertahanan: kutipan 'stated' palsu (c25ce2d9...) dan kode di luar codebook (c25ce2d9...).",
+  "a7b7e1329d79c2ba": {
+    "philosophy": {"value": "not_stated", "basis": "not_stated", "evidence": ""},
+    "approach": {"value": "deductive", "basis": "inferred", "evidence": ""},
+    "methodological_choice": {"value": "mono_quantitative", "basis": "inferred", "evidence": ""},
+    "strategy": {"value": ["experiment_modeling_simulation"], "basis": "stated", "evidence": "a numerical example based on a six-story nonlinear inelastic shear building model with Bouc-Wen hysteresis"},
+    "time_horizon": {"value": "not_applicable", "basis": "inferred", "evidence": ""},
+    "data_source": {"value": ["synthetic_simulated"], "basis": "inferred", "evidence": ""},
+    "analysis": {"value": ["quantitative_analysis"], "basis": "inferred", "evidence": ""},
+    "techniques": ["aLSTM-SNGP surrogate", "Monte Carlo simulation", "importance sampling", "particle filtering", "Gaussian mixture model"]
+  },
+  "be0ceffb4f15329a": {
+    "philosophy": {"value": "not_stated", "basis": "not_stated", "evidence": ""},
+    "approach": {"value": "deductive", "basis": "inferred", "evidence": ""},
+    "methodological_choice": {"value": "mono_quantitative", "basis": "inferred", "evidence": ""},
+    "strategy": {"value": ["experiment_modeling_simulation"], "basis": "stated", "evidence": "A comprehensive simulation based on a specialized synthetic dataset"},
+    "time_horizon": {"value": "not_applicable", "basis": "inferred", "evidence": ""},
+    "data_source": {"value": ["synthetic_simulated"], "basis": "stated", "evidence": "a specialized synthetic dataset with Rician fading"},
+    "analysis": {"value": ["quantitative_analysis"], "basis": "inferred", "evidence": ""},
+    "techniques": ["GNN+TCN predictor", "NSGA-II", "Gaussian predictive head"]
+  },
+  "c25ce2d9937e00bc": {
+    "philosophy": {"value": "positivism", "basis": "stated", "evidence": "we adopt a positivist stance throughout this study"},
+    "approach": {"value": "deductive", "basis": "inferred", "evidence": ""},
+    "methodological_choice": {"value": "mono_quantitative", "basis": "inferred", "evidence": ""},
+    "strategy": {"value": ["experiment_modeling_simulation", "archival_research", "numerical_experiment"], "basis": "inferred", "evidence": ""},
+    "time_horizon": {"value": "not_stated", "basis": "not_stated", "evidence": ""},
+    "data_source": {"value": ["secondary", "synthetic_simulated"], "basis": "inferred", "evidence": ""},
+    "analysis": {"value": ["quantitative_analysis"], "basis": "inferred", "evidence": ""},
+    "techniques": ["integer programming", "LP relaxation", "randomized rounding", "Random Forest"]
+  },
+  "cf05cda816f84a7b": {
+    "philosophy": {"value": "not_stated", "basis": "not_stated", "evidence": ""},
+    "approach": {"value": "deductive", "basis": "inferred", "evidence": ""},
+    "methodological_choice": {"value": "mono_quantitative", "basis": "inferred", "evidence": ""},
+    "strategy": {"value": ["experiment_modeling_simulation", "case_study"], "basis": "stated", "evidence": "we present a Singapore-based case study to evaluate the operational implications"},
+    "time_horizon": {"value": "not_applicable", "basis": "inferred", "evidence": ""},
+    "data_source": {"value": ["secondary"], "basis": "inferred", "evidence": ""},
+    "analysis": {"value": ["quantitative_analysis"], "basis": "inferred", "evidence": ""},
+    "techniques": ["set-covering model", "GBDT", "column generation", "rolling-horizon framework"]
+  },
+  "f0b90378a8c2d81b": {
+    "philosophy": {"value": "not_stated", "basis": "not_stated", "evidence": ""},
+    "approach": {"value": "deductive", "basis": "inferred", "evidence": ""},
+    "methodological_choice": {"value": "mono_quantitative", "basis": "inferred", "evidence": ""},
+    "strategy": {"value": ["experiment_modeling_simulation", "archival_research"], "basis": "inferred", "evidence": ""},
+    "time_horizon": {"value": "longitudinal", "basis": "inferred", "evidence": ""},
+    "data_source": {"value": ["secondary"], "basis": "inferred", "evidence": ""},
+    "analysis": {"value": ["quantitative_analysis"], "basis": "inferred", "evidence": ""},
+    "techniques": ["XGBoost", "Random Forest", "LSTM", "TCN", "two-stage stochastic programming"]
+  }
+}

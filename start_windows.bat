@@ -4,7 +4,7 @@ cd /d "%~dp0"
 if not exist ".env" (
   copy ".env.example" ".env" >nul
   echo File .env dibuat dari .env.example.
-  echo Periksa konfigurasi Ollama pada .env, simpan, lalu jalankan start_windows.bat lagi.
+  echo Pilih LLM_PROVIDER ^(ollama atau deepseek^) dan isi pengaturannya, simpan, lalu jalankan start_windows.bat lagi.
   start notepad ".env"
   pause
   exit /b

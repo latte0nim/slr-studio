@@ -1,5 +1,10 @@
 __pycache__/
+*.pyc
 .venv/
+venv/
 .env
-data/pdfs/*.pdf
-!data/pdfs/.gitkeep
+# Salinan opsional di server (KEEP_SERVER_PDFS / KEEP_SERVER_JSON) dan ekspor proyek lokal
+data/
+*.project.json
+slr-protocol-project-*.json
+litreview-project-*.json

@@ -1,16 +1,35 @@
+# Blueprint Render untuk SLR Protocol (https://render.com/docs/blueprint-spec).
+# Catatan penting:
+# - workers=1 WAJIB: progres analisis/sintesis disimpan di memori proses. Dengan banyak worker,
+#   polling progres bisa jatuh ke proses lain dan terlihat kosong. Konkurensi diatur lewat --threads.
+# - Jangan pasang healthCheckPath: /api/health dilindungi Basic Auth, sehingga health check akan 401.
+# - Filesystem free tier bersifat sementara, jadi salinan PDF/JSON di server dimatikan.
 services:
   - type: web
-    name: slr-ai-review
+    name: slr-protocol
     runtime: python
     plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --workers 1 --threads 4 --timeout 180
+    startCommand: gunicorn app:app --workers 1 --threads 8 --timeout 600
     envVars:
-      - key: GEMINI_MODEL
-        value: gemini-3.5-flash-lite
-      - key: GEMINI_API_KEY
-        sync: false
+      - key: LLM_PROVIDER
+        value: deepseek
+      - key: DEEPSEEK_API_KEY
+        sync: false          # isi manual di dashboard Render
+      - key: DEEPSEEK_MODEL
+        value: deepseek-flash
       - key: APP_USERNAME
         value: slr-user
       - key: APP_PASSWORD
-        sync: false
+        sync: false          # WAJIB diisi: tanpa ini siapa pun bisa memakai saldo API
+      - key: USD_TO_IDR
+        value: "18400"
+      # Free tier hanya punya 512 MB RAM: batasi ukuran unggahan.
+      - key: MAX_FILES_PER_BATCH
+        value: "8"
+      - key: MAX_FILE_MB
+        value: "15"
+      - key: KEEP_SERVER_PDFS
+        value: "false"
+      - key: KEEP_SERVER_JSON
+        value: "false"
