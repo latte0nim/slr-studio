@@ -1,0 +1,66 @@
+{
+ "cf05cda816f84a7b": {
+  "title": "Customized first-and-last-mile ridesharing services with electric modu",
+  "techniques": [
+   "GBDT",
+   "data-driven column generation",
+   "rolling horizon framework",
+   "labeling algorithm",
+   "branch-and-price",
+   "set-covering model",
+   "piecewise linear charging function",
+   "resource extension functions"
+  ]
+ },
+ "a7b7e1329d79c2ba": {
+  "title": "Adaptive and uncertainty-aware surrogate modeling for reliability anal",
+  "techniques": [
+   "aLSTM encoder",
+   "multi-head self-attention",
+   "SNGP",
+   "random Fourier features",
+   "spectral normalization",
+   "importance sampling",
+   "particle filtering",
+   "Gaussian mixture model"
+  ]
+ },
+ "f0b90378a8c2d81b": {
+  "title": "Air quality monitoring and mitigation through time series forecasting ",
+  "techniques": [
+   "XGBoost",
+   "Random Forest",
+   "LSTM",
+   "BiLSTM",
+   "Stacked LSTM",
+   "GRU",
+   "TCN",
+   "two-stage stochastic programming"
+  ]
+ },
+ "c25ce2d9937e00bc": {
+  "title": "Balancing the scales: Fair and efficient resource allocation for stude",
+  "techniques": [
+   "Integer Programming",
+   "LP relaxation",
+   "randomized rounding",
+   "permutation selection",
+   "Birkhoff algorithm",
+   "Random Forest",
+   "Gaussian Copula",
+   "GridSearchCV"
+  ]
+ },
+ "be0ceffb4f15329a": {
+  "title": "Uncertainty-aware CSI prediction and AI-seeded multi-objective optimiz",
+  "techniques": [
+   "GATv2",
+   "TCN",
+   "Gaussian uncertainty head",
+   "NSGA-II",
+   "CMA-ES",
+   "SBOA",
+   "INT8 quantization"
+  ]
+ }
+}

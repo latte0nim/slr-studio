@@ -644,7 +644,7 @@ CODEBOOK_VERSION = "onion-saunders2019-v3"  # v3: basis per nilai, label eksplis
 NOT_STATED = "not_stated"
 # Versi format hasil analisis per artikel. Naikkan bila skema/aturan ekstraksi berubah: artikel dengan versi lebih rendah
 # boleh diunggah ulang (browser tidak lagi menganggapnya duplikat) dan hasilnya menggantikan yang lama.
-ANALYSIS_VERSION = 3
+ANALYSIS_VERSION = 6  # v6: aturan penulisan techniques (tanpa topik/dataset/metrik, tanpa kata penjelas)
 
 
 def _cv(label, definition):
@@ -751,6 +751,87 @@ EXPLICIT_TERMS = {
         "action_research": r"action research|penelitian tindakan",
     },
 }
+
+
+# Label yang kutipan buktinya harus memuat istilahnya. Berbeda dari EXPLICIT_TERMS: boleh 'inferred', tetapi bila AI
+# melampirkan kutipan, kutipan itu harus relevan. Kutipan yang ADA di PDF tetapi tidak memuat istilah label bukan dukungan.
+# Tanpa kutipan, label tetap diterima sebagai 'inferred' (tetap tampil sebagai tebakan). Dasar: dari 5 artikel contoh,
+# 'synthetic_simulated' keliru diberikan ke artikel PM2.5 (data publik nyata) dengan kutipan tentang sample average
+# approximation, sedangkan 4 label sintetis yang benar semuanya memuat istilahnya.
+EVIDENCE_TERMS = {
+    "data_source": {
+        "synthetic_simulated": re.compile(
+            r"synthetic|simulat|generat|artificial|sintetis|simulasi|dibangkitkan|randomly\s+(?:sampl|draw)|numerical\s+(?:example|experiment)",
+            re.IGNORECASE),
+    },
+}
+
+
+def apply_evidence_gates(design):
+    """Buang label yang kutipannya tidak memuat istilah yang relevan (lihat EVIDENCE_TERMS)."""
+    for field, codes in EVIDENCE_TERMS.items():
+        item = design.get(field)
+        if not isinstance(item, dict) or not isinstance(item.get("items"), list):
+            continue
+        kept = []
+        for e in item["items"]:
+            pattern = codes.get(e.get("code"))
+            if pattern and e.get("evidence") and not pattern.search(e["evidence"]):
+                design.setdefault("warnings", []).append(
+                    f"{field}: '{e['code']}' dibuang karena kutipan buktinya tidak memuat istilah yang relevan (kutipan ada di teks, tetapi tidak mendukung label ini).")
+                continue
+            kept.append(e)
+        if len(kept) != len(item["items"]):
+            item["items"] = kept
+            item["value"] = [e["code"] for e in kept]
+            item["basis"] = NOT_STATED if not kept else ("stated" if all(e["basis"] == "stated" for e in kept) else "inferred")
+    return design
+
+
+# Pemulihan (recall) deterministik untuk label eksplisit yang terlewat AI. Hanya kalimat orang pertama yang menyebut
+# metode itu untuk studinya sendiri ("we present a ... case study"). Sengaja SEMPIT: kalimat pustaka ("case studies
+# from Canada ...") dan judul bagian ("4. Case studies") tidak cocok. Kode lain (survey dst.) sengaja belum ditambahkan:
+# "we survey the literature" bukan survei kuesioner, dan belum ada kasus terlewat yang teramati untuk kode itu.
+_SELF_SUBJECT = r"(?:\bwe|\bthis\s+(?:paper|study|article|work|research)|\bour\s+(?:paper|study|article|work|research))"
+_SELF_VERB = r"(?:present|conduct|perform|carry\s+out|carried\s+out|undertake|undertook|report|design)\w*"
+SELF_REFERENCE_RULES = {
+    "strategy": {
+        "case_study": re.compile(
+            rf"{_SELF_SUBJECT}\s+(?:[\w,-]+\s+){{0,2}}?{_SELF_VERB}\s+(?:[\w,-]+\s+){{0,6}}?case[- ]stud(?:y|ies)",
+            re.IGNORECASE),
+    },
+}
+
+
+def apply_self_reference_rules(design, page_texts, page_norms, full_norm):
+    """Tambahkan label eksplisit yang tidak diusulkan AI tetapi disebut penulis sendiri (lihat SELF_REFERENCE_RULES).
+    Hasilnya selalu 'stated' dengan kutipan terverifikasi (dibangun dari teks itu sendiri) dan ditandai source='rule'
+    serta dicatat di warnings agar pengguna tahu label ini bukan usulan AI."""
+    for field, codes in SELF_REFERENCE_RULES.items():
+        item = design.get(field)
+        if not isinstance(item, dict) or not RESEARCH_ONION[field]["multi"]:
+            continue
+        for code, pattern in codes.items():
+            if code in (item.get("value") or []):
+                continue
+            for page_num, page_text in page_texts:
+                match = pattern.search(re.sub(r"\s+", " ", page_text))
+                if not match:
+                    continue
+                evidence = match.group(0)[:400]
+                verified, _ = verify_quote(evidence, page_norms, full_norm)
+                if not verified:
+                    continue
+                items = list(item.get("items") or [])
+                items.append({"code": code, "basis": "stated", "evidence": evidence, "evidence_verified": True,
+                              "source": "rule", "page": page_num})
+                item["items"] = items
+                item["value"] = [e["code"] for e in items]
+                item["basis"] = "stated" if all(e["basis"] == "stated" for e in items) else "inferred"
+                design.setdefault("warnings", []).append(
+                    f"{field}: '{code}' ditambahkan oleh aturan karena penulis menulis \u201c{evidence}\u201d (hal. {page_num}); AI tidak mengusulkannya. Periksa kebenarannya.")
+                break
+    return design
 
 
 def codebook_prompt_block():
@@ -929,6 +1010,9 @@ def normalise_research_design(raw, page_norms, full_norm):
             if pattern and not (basis == "stated" and re.search(pattern, evidence, re.IGNORECASE)):
                 warnings.append(f"{field}: '{code}' dibuang karena label ini hanya boleh dipakai bila penulis menyebutnya sendiri (kutipan terverifikasi yang memuat istilahnya).")
                 continue
+            if field == "time_horizon" and code == "not_applicable":
+                # Ketiadaan dimensi waktu tidak bisa dikutip; kutipan yang diberikan AI biasanya soal horizon perencanaan model.
+                basis, evidence, verified = "inferred", "", False
             entries.append({"code": code, "basis": basis, "evidence": evidence, "evidence_verified": verified})
         if not spec["multi"]:
             entries = entries[:1]
@@ -969,9 +1053,9 @@ ATURAN research_design (kerangka research onion, Saunders dkk.):
 - philosophy: isi HANYA bila penulis menyebut istilahnya (mis. positivist, interpretivist, pragmatism) untuk studinya sendiri, dengan kutipan. Jangan menyimpulkan; selain itu not_stated. Tebakan akan dibuang sistem.
 - approach: deductive bila artikel menguji metode/model/hipotesis yang telah dirumuskan terhadap data atau benchmark; inductive bila membangun pola atau teori dari data tanpa hipotesis awal; not_stated bila ragu. Terapkan konsisten pada artikel yang serupa.
 - strategy: experiment_modeling_simulation untuk model matematis/ML/optimasi yang diuji lewat eksperimen numerik atau simulasi; archival_research bila menganalisis dataset historis atau publik yang sudah ada (boleh disimpulkan). Kode survey, case_study, ethnography, grounded_theory, narrative_inquiry, dan action_research HANYA boleh dipakai bila penulis sendiri menyebut metode itu untuk studinya sendiri (bukan saat membahas pustaka lain) dan Anda menyalin kutipannya. Contoh numerik, benchmark, atau data publik suatu wilayah BUKAN case_study; case_study butuh kasus nyata (organisasi, lokasi, sistem) yang disebut penulis sebagai studi kasus.
-- data_source: bedakan secondary (dikumpulkan pihak lain) dari synthetic_simulated (dibangkitkan peneliti).
-- time_horizon: jawab berurutan. (1) Artikel menganalisis data deret waktu historis dengan rentang periode yang disebut (mis. data harian 2004-2021) = longitudinal. (2) Pengamatan atau survei dilakukan sekali pada satu waktu = cross_sectional. (3) Selain itu (pemodelan, optimasi, simulasi, eksperimen numerik tanpa pengamatan lintas waktu) = not_applicable. Jangan keliru: "rolling horizon", "planning horizon", "total horizon" adalah horizon perencanaan model optimasi, BUKAN time horizon penelitian.
-- techniques: maksimal 8 nama metode/algoritma/model yang benar-benar dipakai penulis, istilah singkat sesuai artikel (mis. "column generation", "LSTM"), bukan kata generik.
+- data_source: bedakan secondary (dikumpulkan pihak lain) dari synthetic_simulated (data dibangkitkan peneliti lewat simulasi atau generator). Diskretisasi skenario, sampling untuk optimasi stokastik (mis. sample average approximation), dan data historis BUKAN data sintetis.
+- time_horizon: jawab berurutan. (1) Artikel menganalisis data deret waktu historis dengan rentang periode yang disebut (mis. data harian 2004-2021) = longitudinal. (2) Pengamatan atau survei dilakukan sekali pada satu waktu = cross_sectional. (3) Selain itu (pemodelan, optimasi, simulasi, eksperimen numerik tanpa pengamatan lintas waktu) = not_applicable (kosongkan evidence). Jangan keliru: "rolling horizon", "planning horizon", "total horizon" adalah horizon perencanaan model optimasi, BUKAN time horizon penelitian.
+- techniques: maksimal 8 nama metode/algoritma/model yang benar-benar dipakai penulis, istilah singkat sesuai artikel (mis. "column generation", "LSTM"). Tulis nama metodenya saja, tanpa kata penjelas seperti "classifier", "framework", "approach", "algorithm" kecuali bagian dari nama resminya. JANGAN memasukkan nama topik atau kerangka keseluruhan (mis. "predict-then-optimize"), nama dataset, metrik evaluasi, atau komponen/parameter model.
 
 KODE research_design:
 {codebook_block}
@@ -1197,7 +1281,237 @@ def _technique_nodes(prefix, group_articles):
     return [_node(f"{prefix}-t{i}", b["name"], "technique", "", b["ids"]) for i, b in enumerate(ordered)]
 
 
-def build_design_taxonomy(articles, topic=""):
+# ---------------------------------------------------------------------------
+# Tahap 3: normalisasi teknik = satu kosakata baku + keluarga metode.
+# AI hanya MENGUSULKAN (gabungan sinonim, buang istilah yang bukan teknik, pengelompokan ke keluarga).
+# Pengguna menyetujui di UI; pohon desain riset memakai pemetaan yang disetujui secara deterministik.
+# ---------------------------------------------------------------------------
+NORM_DROP = "__drop__"
+NORM_UNASSIGNED = "Belum dikelompokkan"
+NORM_CHUNK = _env_int("NORM_CHUNK", 150)  # nama teknik per panggilan AI
+NORM_MAX_TECHNIQUES = 600
+
+
+def collect_techniques(articles):
+    """Kumpulkan teknik unik dari artikel ber-research_design. Nama yang hanya berbeda huruf besar/kecil atau tanda
+    baca digabung secara deterministik (tanpa AI). Return [{key, name, raw[], count, article_ids[]}] urut jumlah artikel."""
+    buckets = {}
+    for a in articles:
+        d = a.get("research_design") if isinstance(a, dict) else None
+        if not isinstance(d, dict) or not a.get("id"):
+            continue
+        for t in d.get("techniques") or []:
+            key = _tech_key(t)
+            if not key:
+                continue
+            slot = buckets.setdefault(key, {"names": {}, "article_ids": []})
+            slot["names"][str(t)] = slot["names"].get(str(t), 0) + 1
+            if a["id"] not in slot["article_ids"]:
+                slot["article_ids"].append(a["id"])
+    out = []
+    for key, slot in buckets.items():
+        name = sorted(slot["names"].items(), key=lambda kv: (-kv[1], len(kv[0]), kv[0]))[0][0]
+        out.append({"key": key, "name": name, "raw": list(slot["names"]),
+                    "count": len(slot["article_ids"]), "article_ids": slot["article_ids"]})
+    out.sort(key=lambda t: (-t["count"], t["name"].lower()))
+    return out
+
+
+def _norm_lookup(normalization):
+    """Kunci teknik mentah -> (nama baku, id keluarga | NORM_DROP | None). None bila tidak ada pemetaan."""
+    if not isinstance(normalization, dict) or not isinstance(normalization.get("items"), list) or not normalization["items"]:
+        return None
+    families = {f["id"]: f for f in normalization.get("families", []) if isinstance(f, dict) and f.get("id")}
+    lookup = {}
+    for item in normalization["items"]:
+        if not isinstance(item, dict):
+            continue
+        canonical = str(item.get("canonical") or "").strip()
+        family = item.get("family")
+        for raw in [canonical] + [str(v) for v in (item.get("variants") or [])]:
+            key = _tech_key(raw)
+            if key and key not in lookup:
+                lookup[key] = (canonical or raw, family)
+    return {"lookup": lookup, "families": families}
+
+
+def _technique_tree(prefix, group_articles, norm):
+    """Teknik per cabang metodologi. Tanpa normalisasi: daftar datar. Dengan normalisasi: keluarga -> teknik baku."""
+    if not norm:
+        return _technique_nodes(prefix, group_articles)
+    lookup, families = norm["lookup"], norm["families"]
+    buckets = {}
+    for a in group_articles:
+        for t in a["research_design"].get("techniques") or []:
+            key = _tech_key(t)
+            if not key:
+                continue
+            canonical, family = lookup.get(key, (str(t), None))
+            if family == NORM_DROP:
+                continue
+            if family not in families:
+                family = None
+            ckey = _tech_key(canonical) or key
+            buckets.setdefault(family, {}).setdefault(ckey, {"name": canonical, "ids": []})["ids"].append(a["id"])
+    nodes = []
+    for family_id, techs in buckets.items():
+        ordered = sorted(techs.values(), key=lambda b: (-len(set(b["ids"])), b["name"].lower()))
+        children = [_node(f"{prefix}-{family_id or 'u'}-t{i}", b["name"], "technique", "", b["ids"]) for i, b in enumerate(ordered)]
+        ids = [i for b in ordered for i in b["ids"]]
+        if family_id is None:
+            nodes.append(_node(f"{prefix}-fu", NORM_UNASSIGNED, "family",
+                               "Teknik yang belum ada di pemetaan yang disetujui. Perbarui normalisasi.", ids, children=children))
+        else:
+            fam = families[family_id]
+            nodes.append(_node(f"{prefix}-f{family_id}", str(fam.get("name") or family_id), "family",
+                               str(fam.get("definition") or ""), ids, children=children))
+    nodes.sort(key=lambda n: (n["name"] == NORM_UNASSIGNED, -n["count"], n["name"].lower()))
+    return nodes
+
+
+def _norm_status(usable, norm):
+    if not norm:
+        return {"applied": False, "families": 0, "unmapped": [], "unmapped_count": 0}
+    unmapped = []
+    for t in collect_techniques(usable):
+        hit = norm["lookup"].get(t["key"])
+        if hit is None or (hit[1] != NORM_DROP and hit[1] not in norm["families"]):
+            unmapped.append(t["name"])
+    return {"applied": True, "families": len(norm["families"]), "unmapped": unmapped[:100], "unmapped_count": len(unmapped)}
+
+
+def normalization_prompt(techniques, running, topic, rq):
+    existing = [f for f in (running or {}).get("families", [])]
+    existing_block = ""
+    if existing:
+        lines = "\n".join(f'- {f["id"]} {f["name"]}: {f.get("definition", "")}' for f in existing)
+        existing_block = (
+            "\nKELUARGA YANG SUDAH ADA (jangan diubah; gunakan id-nya). Tetapkan teknik ke keluarga ini bila cocok; "
+            "buat keluarga baru (id baru, mis. berikutnya setelah id terbesar) hanya bila tidak ada yang cocok:\n" + lines + "\n"
+        )
+    listing = "\n".join(f'- "{t["name"]}" | {t["count"]} artikel' for t in techniques)
+    return f"""Anda menormalisasi daftar nama teknik/metode yang diekstrak dari artikel ilmiah untuk taksonomi desain penelitian.
+Gunakan hanya daftar di bawah; jangan menambah teknik yang tidak ada. Topik review: {topic or '(belum ditentukan)'}. Research question: {rq or '(belum dirumuskan)'}.
+{existing_block}
+DAFTAR TEKNIK (nama | jumlah artikel):
+{listing}
+
+TUGAS
+1. merges: gabungkan nama yang artinya SAMA PERSIS (singkatan vs nama lengkap, variasi penulisan, kata tambahan seperti "classifier", "framework", "approach"). JANGAN menggabungkan metode yang berbeda walau satu keluarga (mis. LSTM dan BiLSTM tetap terpisah). Varian yang menambah komponen metodologis bermakna (mis. quantile, conformal, robust, stochastic, weighted, distributionally robust) tetap terpisah dari metode dasarnya. Tiap nama hanya boleh muncul di satu merge. Semua varian harus persis salah satu nama pada daftar; canonical adalah nama yang paling umum dan jelas.
+2. drops: nama yang BUKAN teknik/metode: nama topik atau kerangka keseluruhan (mis. predict-then-optimize), nama dataset, metrik evaluasi, komponen atau parameter model (fungsi, loss, konstanta), perangkat lunak/solver/library (mis. Gurobi, CPLEX, PuLP, scikit-learn), objek domain. Nama arsitektur atau model prediksi/optimasi (mis. TCN, DCRNN, Transformer, XGBoost, LSTM) ADALAH teknik: jangan di-drop hanya karena namanya spesifik. Beri alasan singkat. Jika ragu, jangan di-drop.
+3. families: kelompokkan teknik yang tersisa ke 4-8 keluarga menurut SATU prinsip (tulis pada principle): jenis/peran teknik dalam metode penelitian. Nama keluarga ringkas (bahasa Indonesia, nama teknik tetap istilah aslinya); definisi satu kalimat yang membedakannya dari keluarga lain. Setiap teknik masuk tepat satu keluarga yang definisinya benar-benar cocok; jangan memaksa teknik ke keluarga yang salah (mis. K-means bukan teknik evaluasi), lebih baik tidak ditugaskan di assign. Hindari keluarga "Lainnya".
+4. assign: peta dari nama teknik ke id keluarga. Kuncinya adalah canonical (untuk yang digabung) atau nama itu sendiri (untuk yang tidak digabung). Setiap teknik yang tidak di-drop dan bukan sekadar varian harus ada di assign.
+
+Keluarkan JSON valid saja dengan struktur:
+{{"principle":"satu kalimat prinsip pengelompokan","families":[{{"id":"F1","name":"nama keluarga","definition":"definisi satu kalimat"}}],"merges":[{{"canonical":"nama baku","variants":["nama persis dari daftar","nama persis lain"]}}],"drops":[{{"name":"nama persis dari daftar","reason":"alasan singkat"}}],"assign":{{"nama teknik":"F1"}}}}
+"""
+
+
+def _next_family_id(families):
+    nums = [int(re.sub(r"\D", "", f["id"]) or 0) for f in families]
+    return f"F{(max(nums) if nums else 0) + 1}"
+
+
+def finalize_normalization(proposal, techniques, running=None):
+    """Rapikan usulan AI secara deterministik. Menjamin setiap nama masukan berakhir TEPAT SEKALI sebagai: dibuang,
+    varian dari nama baku, atau nama baku tersendiri; nama di luar daftar diabaikan; id keluarga yang tidak valid menjadi
+    'belum dikelompokkan'. Pemetaan yang sudah ada (running) dipertahankan apa adanya."""
+    proposal = proposal if isinstance(proposal, dict) else {}
+    running = running or {"families": [], "items": [], "principle": ""}
+    families = [dict(f) for f in running.get("families", [])]
+    items = [dict(i) for i in running.get("items", [])]
+    by_name = {t["name"]: t for t in techniques}
+
+    name_to_id = {str(f.get("name", "")).strip().lower(): f["id"] for f in families}
+    id_map = {f["id"]: f["id"] for f in families}
+    for fam in (proposal.get("families") if isinstance(proposal.get("families"), list) else []):
+        if not isinstance(fam, dict):
+            continue
+        name = str(fam.get("name") or "").strip()[:60]
+        if not name:
+            continue
+        fam_id = name_to_id.get(name.lower())
+        if fam_id is None:
+            fam_id = _next_family_id(families)
+            families.append({"id": fam_id, "name": name, "definition": str(fam.get("definition") or "").strip()[:240]})
+            name_to_id[name.lower()] = fam_id
+        proposed_id = str(fam.get("id") or "").strip()
+        if proposed_id and proposed_id not in id_map:
+            id_map[proposed_id] = fam_id
+
+    assign = proposal.get("assign") if isinstance(proposal.get("assign"), dict) else {}
+
+    def family_for(*names):
+        for n in names:
+            value = assign.get(n)
+            if value is not None and id_map.get(str(value).strip()):
+                return id_map[str(value).strip()]
+        return None
+
+    def make_item(canonical, names, family, reason=""):
+        raw, ids = [], []
+        for n in names:
+            raw += [r for r in by_name[n]["raw"] if r not in raw]
+            ids += [i for i in by_name[n]["article_ids"] if i not in ids]
+        return {"canonical": canonical, "variants": raw, "family": family, "reason": reason, "count": len(ids), "article_ids": ids, "new": True}
+
+    used, new_items = set(), []
+    for drop in (proposal.get("drops") if isinstance(proposal.get("drops"), list) else []):
+        name = str((drop.get("name") if isinstance(drop, dict) else drop) or "").strip()
+        if name in by_name and name not in used:
+            used.add(name)
+            reason = str(drop.get("reason") or "")[:160] if isinstance(drop, dict) else ""
+            new_items.append(make_item(name, [name], NORM_DROP, reason))
+    for merge in (proposal.get("merges") if isinstance(proposal.get("merges"), list) else []):
+        if not isinstance(merge, dict):
+            continue
+        group = []
+        for v in (merge.get("variants") if isinstance(merge.get("variants"), list) else []):
+            if isinstance(v, str) and v in by_name and v not in used and v not in group:
+                group.append(v)
+        canonical = str(merge.get("canonical") or "").strip()[:80]
+        if canonical in by_name and canonical not in used and canonical not in group:
+            group.append(canonical)
+        if len(group) < 2:
+            continue
+        used.update(group)
+        canonical = canonical or sorted(group, key=lambda n: (-by_name[n]["count"], len(n)))[0]
+        new_items.append(make_item(canonical, group, family_for(canonical, *group)))
+    for name in by_name:
+        if name not in used:
+            new_items.append(make_item(name, [name], family_for(name)))
+
+    return {"families": families, "items": items + new_items,
+            "principle": str(proposal.get("principle") or running.get("principle") or "")[:300]}
+
+
+def normalize_techniques(articles, existing, topic, rq, usage):
+    """Usulkan normalisasi untuk teknik yang belum ada di `existing`. Teknik diproses per NORM_CHUNK nama; keluarga dari
+    chunk sebelumnya dipakai sebagai konteks chunk berikutnya agar kosakata keluarga tetap konsisten."""
+    techniques = collect_techniques(articles)
+    if len(techniques) > NORM_MAX_TECHNIQUES:
+        raise ValueError(f"Terlalu banyak teknik unik ({len(techniques)}). Batas {NORM_MAX_TECHNIQUES}.")
+    if not techniques:
+        raise ValueError("Belum ada teknik pada artikel di cakupan ini.")
+    running = {"families": [dict(f) for f in (existing or {}).get("families", [])],
+               "items": [dict(i, new=False) for i in (existing or {}).get("items", [])],
+               "principle": str((existing or {}).get("principle") or "")}
+    # Item yang tersimpan 'belum dikelompokkan' (tanpa keluarga valid) ikut diproses ulang, konsisten dengan hitungan
+    # 'belum terpetakan' di UI. Item yang dibuang (NORM_DROP) dan yang sudah punya keluarga tidak disentuh.
+    family_ids = {f["id"] for f in running["families"]}
+    running["items"] = [i for i in running["items"] if i.get("family") == NORM_DROP or i.get("family") in family_ids]
+    known = _norm_lookup(running)
+    todo = [t for t in techniques if not known or t["key"] not in known["lookup"]]
+    for start in range(0, len(todo), NORM_CHUNK):
+        chunk = todo[start:start + NORM_CHUNK]
+        proposal = llm_json(normalization_prompt(chunk, running, topic, rq), max_output_tokens=4500,
+                            usage=usage, label=f"Normalisasi teknik {start // NORM_CHUNK + 1}")
+        running = finalize_normalization(proposal, chunk, running)
+    running.update({"model": MODEL, "proposed_at": datetime.now(timezone.utc).isoformat(), "added": len(todo)})
+    return running
+
+
+def build_design_taxonomy(articles, topic="", normalization=None):
     """Susun pohon Metodologi / Strategi / Teknik / Fondasi dari artikel ber-research_design."""
     usable, missing = [], []
     for a in articles:
@@ -1207,6 +1521,7 @@ def build_design_taxonomy(articles, topic=""):
         elif isinstance(a, dict):
             missing.append(a.get("id"))
     all_ids = [a["id"] for a in usable]
+    norm = _norm_lookup(normalization)
 
     # --- Cabang 1: Metodologi (methodological choice -> Kuantitatif / Kualitatif / Campuran -> teknik) ---
     choice, choice_none = _group_by_value(usable, "methodological_choice")
@@ -1220,7 +1535,7 @@ def build_design_taxonomy(articles, topic=""):
         )
         method_children.append(_node(
             f"m-{gid}", gname, "group", gdef, group_members[gid],
-            children=_technique_nodes(f"m-{gid}", members), note=note,
+            children=_technique_tree(f"m-{gid}", members, norm), note=note,
         ))
     if choice_none:
         members = [a for a in usable if a["id"] in set(choice_none)]
@@ -1228,7 +1543,7 @@ def build_design_taxonomy(articles, topic=""):
         method_children.append(_node(
             "m-not_stated", "Tidak dinyatakan", "group",
             "Pilihan metodologis tidak dapat ditentukan dari teks yang tersedia.", choice_none,
-            children=_technique_nodes("m-not_stated", members),
+            children=_technique_tree("m-not_stated", members, norm),
         ))
     metodologi = _node(
         "metodologi", "Metodologi", "branch",
@@ -1310,6 +1625,7 @@ def build_design_taxonomy(articles, topic=""):
         "tree": root,
         "matrix": matrix,
         "basis_summary": basis_summary,
+        "normalization_status": _norm_status(usable, norm),
         "generated_at": datetime.now(timezone.utc).isoformat(),
     }
 
@@ -1549,6 +1865,7 @@ def test_ai():
 def codebook():
     """Codebook research onion untuk label dan tooltip di frontend."""
     return jsonify({"version": CODEBOOK_VERSION, "analysis_version": ANALYSIS_VERSION, "fields": RESEARCH_ONION,
+                    "explicit_terms": {f: list(c) for f, c in EXPLICIT_TERMS.items()},
                     "method_groups": [{"id": g[0], "label": g[1], "keys": g[2]} for g in METHOD_GROUPS]})
 
 
@@ -1561,7 +1878,31 @@ def design_taxonomy():
     if not isinstance(articles, list):
         return jsonify({"error": "Data artikel tidak valid."}), 400
     topic = str(body.get("topic", "")).strip()[:200]
-    return jsonify(build_design_taxonomy([a for a in articles if isinstance(a, dict)][:500], topic))
+    normalization = body.get("normalization") if isinstance(body.get("normalization"), dict) else None
+    return jsonify(build_design_taxonomy([a for a in articles if isinstance(a, dict)][:500], topic, normalization))
+
+
+@app.post("/api/normalize-techniques")
+@auth_guard
+def normalize_techniques_route():
+    """Usulan normalisasi teknik (AI). Hasilnya DRAF: pengguna menyetujui di UI sebelum dipakai pohon."""
+    if not AI_CONFIGURED:
+        return jsonify({"error": CONFIG_ERROR}), 503
+    body = request.get_json(silent=True) or {}
+    articles = body.get("articles", [])
+    if not isinstance(articles, list):
+        return jsonify({"error": "Data artikel tidak valid."}), 400
+    existing = body.get("existing") if isinstance(body.get("existing"), dict) else None
+    topic = str(body.get("topic", "")).strip()[:200]
+    rq = str(body.get("research_question", "")).strip()[:1000]
+    usage = new_usage()
+    try:
+        result = normalize_techniques([a for a in articles if isinstance(a, dict)][:500], existing, topic, rq, usage)
+    except ValueError as exc:
+        return jsonify({"error": str(exc), "usage": usage}), 400
+    except Exception as exc:
+        return jsonify({"error": f"Normalisasi gagal: {str(exc)[:600]}", "usage": usage}), 502
+    return jsonify({"normalization": result, "usage": usage})
 
 
 @app.post("/api/analyze")
@@ -1644,6 +1985,8 @@ def analyze_pdfs():
                     "verified": ok,
                 })
             design = normalise_research_design(data.get("research_design"), page_norms, full_norm)
+            design = apply_evidence_gates(design)
+            design = apply_self_reference_rules(design, pdf_info["page_texts"], page_norms, full_norm)
             record = {
                 "id": record_id,
                 "hash": digest,

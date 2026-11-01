@@ -279,3 +279,23 @@ td{padding:12px;border-bottom:1px dashed var(--line-soft);vertical-align:top;fon
 @media (max-width:760px){.design-controls{grid-template-columns:1fr}.basis-row{grid-template-columns:1fr}}
 
 .design-copy-box{width:100%;margin:0 0 14px;background:var(--bg);border:1px solid var(--line);color:var(--text);font:12px/1.5 var(--mono);padding:10px}
+
+/* --- Normalisasi teknik (tahap 3) --- */
+#norm-panel h2{margin:0 0 6px;font-size:15px}
+.norm-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.norm-family{border:1px solid var(--line-soft);padding:10px 12px;margin:10px 0}
+.norm-fam-head{display:grid;grid-template-columns:minmax(260px,380px) 1fr auto;gap:8px;margin-bottom:8px;align-items:center}
+.norm-fam-head input,.norm-item input,.norm-item select,.norm-newfam input{background:var(--bg);border:1px solid var(--line);padding:5px 8px;color:var(--text);font:inherit;font-size:12px}
+.norm-fam-head input:first-child{font-weight:700;color:var(--bright)}
+.norm-item{display:grid;grid-template-columns:minmax(260px,1fr) auto minmax(300px,380px);gap:8px;align-items:center;padding:4px 0;border-top:1px dashed var(--line-soft)}
+.norm-item .norm-variants,.norm-item .norm-reason{grid-column:1/-1;font-size:11px;color:var(--dim)}
+.norm-chip{display:inline-block;border:1px solid var(--line-soft);padding:0 6px;margin:2px 4px 2px 0}
+.norm-split{background:none;border:0;color:var(--warn);cursor:pointer;padding:0 2px;font:inherit}
+.norm-new{font-size:10px;color:var(--info);margin-left:4px}
+.norm-newfam{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}.norm-newfam input{min-width:260px}
+.norm-stat{font-size:12px;color:var(--dim);margin:4px 0}
+.norm-family summary{cursor:pointer;color:var(--dim);font-size:12px}
+.dt-family>.dt-name{color:var(--info)}
+@media (max-width:760px){.norm-fam-head,.norm-item{grid-template-columns:1fr}}
+
+.norm-item input.norm-name{width:100%;box-sizing:border-box}.norm-item select,.norm-fam-head input{width:100%;box-sizing:border-box;text-overflow:ellipsis}.norm-dropped{border-color:var(--warn)}.norm-dropped summary{color:var(--warn)}

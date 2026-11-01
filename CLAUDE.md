@@ -179,7 +179,28 @@ cukup untuk prototype di atas HTTPS).
 
 `RESEARCH_ONION` di `app.py` adalah codebook (Saunders dkk., 2019): philosophy, approach, methodological_choice,
 strategy, time_horizon, data_source, analysis. Satu sumber kebenaran untuk prompt ekstraksi, validasi, dan taksonomi.
-Kode bertanda `[ekstensi]` (mis. `experiment_modeling_simulation`, `synthetic_simulated`) bukan dari Saunders; ditambahkan
+Analisis v5: `EVIDENCE_TERMS` + `apply_evidence_gates()` membuang `data_source.synthetic_simulated` bila AI melampirkan kutipan yang
+tidak memuat istilah relevan (synthetic/simulat/generat/dst.). Kutipan yang ADA di PDF belum tentu mendukung label; tanpa
+kutipan, label tetap diterima sebagai `inferred`. Dasar: artikel PM2.5 (data publik nyata) keliru berlabel sintetis lewat kutipan
+\"sample average approximation\"; keempat label sintetis yang benar lolos. Prompt juga menegaskan bahwa diskretisasi skenario/SAA
+bukan data sintetis.
+
+Analisis v4: (a) `SELF_REFERENCE_RULES` memulihkan `case_study` yang terlewat AI bila penulis menulis kalimat orang pertama
+(\"we present a ... case study\", sengaja sempit; kalimat pustaka dan judul bagian tidak cocok). Item hasilnya `source: \"rule\"`,
+`stated` dengan kutipan terverifikasi, dan dicatat di `warnings`. Kode strategi lain belum diberi aturan (\"we survey the
+literature\" bukan survei kuesioner; tambahkan hanya bila ada kasus terlewat yang teramati). (b) Lencana UI: \"dinyatakan ✓\"
+hanya untuk label eksplisit (`/api/codebook` -> `explicit_terms`); label lain yang `stated` tampil \"didukung kutipan ✓\"
+karena kode hanya memastikan kutipan ada di PDF. (c) `time_horizon: not_applicable` tidak membawa evidence (ketiadaan tidak
+bisa dikutip; kutipan AI biasanya soal horizon perencanaan model).
+
+Codebook v3 (dari audit 5 artikel contoh): (a) field multi-nilai (`strategy`, `data_source`, `analysis`) memakai basis dan bukti
+PER NILAI (`items[]`), karena satu kutipan tidak boleh "menyatakan" dua label; (b) label di `EXPLICIT_TERMS` (semua `philosophy`,
+serta strategi survey/case_study/ethnography/grounded_theory/narrative_inquiry/action_research) hanya diterima bila `stated`
+dengan kutipan terverifikasi yang MEMUAT istilahnya, selain itu dibuang dengan peringatan (bukan sekadar `inferred`);
+(c) `time_horizon` dijawab berurutan: deret waktu historis eksplisit = longitudinal, satu waktu = cross_sectional, selain itu
+not_applicable. Pada v2: `time_horizon` baku untuk studi pemodelan/optimasi/simulasi adalah `not_applicable` (longitudinal hanya bila
+artikel eksplisit menganalisis deret waktu historis); prompt menegaskan bahwa "rolling/planning/total horizon" adalah
+horizon perencanaan model, bukan time horizon penelitian. Kode bertanda `[ekstensi]` (mis. `experiment_modeling_simulation`, `synthetic_simulated`) bukan dari Saunders; ditambahkan
 agar cocok dengan riset pemodelan. Ubah `CODEBOOK_VERSION` bila arti kode berubah.
 
 Prinsip: AI hanya **mengklasifikasikan satu artikel ke kode codebook** (dengan `basis` stated/inferred/not_stated dan
@@ -188,8 +209,62 @@ tab Desain Riset. Cabang: Metodologi (Kuantitatif/Kualitatif/Campuran lalu tekni
 Fondasi & horizon waktu; plus matriks Metodologi x Strategi (sel kosong = kandidat gap) dan ringkasan
 stated/inferred/not_stated. `GET /api/codebook` memberi label untuk UI.
 
-Artikel lama (`analysis_version` 1) tidak punya `research_design`; UI memberi tahu dan mengizinkan unggah ulang
-(analisis ulang mengganti ekstraksi, keputusan screening dipertahankan).
+`ANALYSIS_VERSION` (app.py, juga dikirim lewat `/api/codebook`) adalah versi format analisis per artikel; naikkan bila skema atau aturan
+ekstraksi berubah. Artikel dengan versi lebih rendah tidak dianggap duplikat: boleh diunggah ulang, hasil baru menggantikan yang
+lama dan keputusan screening/eligibility dipertahankan. Hanya artikel dengan versi terbaru yang dilewati sebagai duplikat.
+
+### 4.6 Normalisasi teknik (tahap 3)
+
+Daftar teknik hasil ekstraksi (`research_design.techniques`) masih mentah: sinonim terpisah, kadang berisi istilah yang bukan
+teknik. Tahap ini memberi satu kosakata baku dan keluarga metode, yang menjadi kotak di bawah cabang Kuantitatif/Kualitatif
+pada pohon desain riset.
+
+Prinsip: **AI hanya mengusulkan, pengguna menyetujui, kode menerapkan secara deterministik.**
+- `collect_techniques()` menggabungkan nama yang hanya beda huruf besar/kecil dan tanda baca (tanpa AI).
+- `POST /api/normalize-techniques` (satu panggilan AI pendek per `NORM_CHUNK` nama, default 150; chunk berikutnya menerima
+  keluarga dari chunk sebelumnya sebagai konteks) mengusulkan `merges` (sinonim persis), `drops` (bukan teknik: topik,
+  dataset, metrik, komponen model), `families` (4-8, satu prinsip), `assign`. Mengembalikan `usage`, juga saat gagal.
+- `finalize_normalization()` merapikan usulan dan MENJAMIN setiap nama masukan berakhir tepat sekali (dibuang, varian dari
+  nama baku, atau nama baku sendiri). Nama karangan diabaikan, id keluarga tidak valid menjadi \"belum dikelompokkan\",
+  keluarga duplikat nama menyatu, drop menang atas merge, dan pemetaan yang sudah ada tidak diubah. Ia TIDAK bisa menilai
+  kebenaran semantik sebuah penggabungan; itu tugas pengguna lewat tombol × (pisahkan varian) di editor.
+- State browser: `state.norm = {draft, approved}`. Pohon hanya memakai `approved` (dikirim ke `/api/design-taxonomy` sebagai
+  `normalization`); `draft` adalah usulan/hasil edit yang belum disetujui. Ikut ekspor proyek; unduhan JSON taksonomi memuat
+  `normalization`.
+- Inkremental: \"Perbarui untuk teknik baru\" hanya memproses teknik yang tidak ada di pemetaan, termasuk item yang tersimpan
+  \"belum dikelompokkan\" (konsisten dengan hitungan `normalization_status.unmapped_count`).
+- Tanpa pemetaan, pohon tetap daftar datar seperti sebelumnya.
+
+Audit pertama pada korpus nyata (17 artikel INCLUDE, 109 nama teknik): usulan AI umumnya baik (sebagian besar penggabungan benar,
+keluarga koheren), tetapi ada kesalahan material yang kini ditangani lewat prompt dan editor: (a) AI membuang 9 nama arsitektur
+model prediksi (TCN, DCRNN, TGCN, ASTGCN, Transformer decoder-only, KAN, dst.) sebagai \"bukan teknik\" sementara arsitektur sejenis
+(LSTM, Transformer) dipertahankan; (b) perangkat lunak/solver (Gurobi, CPLEX) dikelompokkan sebagai teknik; (c) beberapa
+penggabungan menyatukan varian metodologis (quantile/XGB-CQR ke XGBoost, robust/stochastic MPC ke MPC, weighted SAA ke SAA);
+(d) satu keluarga \"Evaluasi dan validasi\" menampung teknik yang tidak cocok (K-means, reduced error pruning). Editor sekarang
+membuka bagian \"Dibuang\" secara otomatis dengan peringatan; keputusan akhir tetap di pengguna. Dua item yang tidak diberi
+keluarga tetap tampil di \"Belum dikelompokkan\". Dua item beranama baku identik di keluarga yang SAMA digabung oleh pohon
+(cara kerja untuk penggabungan manual); di keluarga berbeda tampil terpisah.
+
+`ANALYSIS_VERSION` 6: prompt ekstraksi meminta nama metode saja (tanpa \"classifier\"/\"framework\") dan melarang topik, dataset,
+metrik, atau komponen model dimasukkan sebagai teknik.
+
+### 4.7 Laporan HTML (untuk dibaca manusia)
+
+Tombol **Ekspor laporan (HTML)** di tab Desain Riset (`buildDesignReport()` di `app.js`, dibuat sepenuhnya di browser dari hasil
+`/api/design-taxonomy` dan pemetaan normalisasi yang DISETUJUI). JSON tetap untuk mesin (cadangan, impor, analisis); HTML untuk
+dibaca, dibagikan, dan dicetak ke PDF.
+
+- Satu berkas mandiri: CSS dan skrip kecil inline, tanpa sumber daya luar. Meta CSP (`default-src 'none'`) menutup permintaan jaringan.
+- Isi: konfigurasi review, cara membaca (legenda, batas 8 teknik), pohon yang bisa dilipat dengan definisi dan nomor referensi,
+  matriks metodologi x strategi, normalisasi teknik (keluarga, penggabungan, yang dibuang), kepercayaan label, label per artikel,
+  daftar referensi. Tema terang/gelap mengikuti sistem; `@media print` memaksa terang, membuka semua lipatan, dan membedakan
+  batang proporsi dengan tingkat abu-abu.
+- Keamanan: semua teks dari PDF/AI di-escape; DOI hanya jadi tautan bila cocok pola DOI ketat; data JSON ditanam di
+  `<script type=\"application/json\" id=\"slr-data\">` dengan `< > & U+2028 U+2029` di-escape agar tidak bisa menutup elemen.
+- Laporan adalah potret data saat dibuat; buat ulang bila data berubah. Draf pemetaan yang belum disetujui TIDAK dipakai
+  (dicatat di laporan).
+- Belum ada tes browser otomatis di repo; pengujian dilakukan dengan jsdom (termasuk muatan berbahaya di judul/penulis/DOI/teknik/topik)
+  dan render PDF (WeasyPrint) untuk memeriksa tata letak cetak. Tampilan di browser sungguhan belum diverifikasi visual.
 
 ## 5. Model data
 
@@ -203,8 +278,9 @@ Artikel lama (`analysis_version` 1) tidak punya `research_design`; UI memberi ta
 (`pending|include|exclude`), `source_name`, `search_query`, `search_date`, `analysis_version`,
 `extraction_status`, `pdf_stored`, `json_stored`.
 Tambahan v2 (`analysis_version` 2): `research_design{codebook_version, <field>{value, basis, evidence,
-evidence_verified}, techniques[], warnings[]}`, `evidence_quotes[].verified`, `evidence_quality{quotes_total,
-quotes_verified}`, `text_chars_original`, `text_truncated`, `references_removed`.
+evidence_verified[, items[{code, basis, evidence, evidence_verified}] untuk field multi-nilai]}, techniques[], warnings[]}`, `evidence_quotes[].verified`, `evidence_quality{quotes_total,
+quotes_verified}`, `text_chars_original` (termasuk daftar pustaka), `text_chars_body` (isi artikel tanpa daftar pustaka; dasar menghitung bagian
+yang dilewati), `text_truncated`, `references_removed`.
 
 Aturan keputusan (frontend, `handleDecisionChange`): mengubah screening menjadi selain `include` mereset
 `eligibility_decision` ke `pending`; **setiap** perubahan keputusan mengosongkan `state.synthesis`.
@@ -323,7 +399,7 @@ Python version tidak dipin; bila build gagal pada PyMuPDF di versi Python terbar
 
 ## 10. Verifikasi dan pengujian
 
-Tes otomatis tanpa jaringan dan tanpa API key: `python tests/test_research_design.py` (51 pengecekan: normalisasi
+Tes otomatis tanpa jaringan dan tanpa API key: `python tests/test_research_design.py` (131 pengecekan: normalisasi
 kutipan, pembuangan referensi, pemotongan teks, validasi codebook, taksonomi desain, hierarki). Bagian yang butuh PDF
 memakai `data/pdfs` atau `SLR_PDF_DIR`. `tests/fixtures_research_design.json` berisi label buatan tangan (gold standard
 mini, bukan keluaran AI), dua entri sengaja salah untuk menguji pertahanan. Belum ada tes browser otomatis di repo.
@@ -364,13 +440,15 @@ Urut kira-kira berdasarkan dampak:
    tes browser di repo. Kualitas label AI sendiri (akurasi klasifikasi) belum diukur: perlu audit sampel manual.
 9. Tarif/jadwal peak DeepSeek di-hardcode sebagai bawaan dan bisa kedaluwarsa; libur China tidak dimodelkan.
 10. Warna SVG visualisasi di-hardcode di JavaScript.
-11. **Label research onion banyak yang `inferred`.** Philosophy dan approach jarang dinyatakan penulis; tampilkan apa
+11. **Label research onion banyak yang `inferred`** (philosophy kini hanya muncul bila dinyatakan penulis). Philosophy dan approach jarang dinyatakan penulis; tampilkan apa
     adanya, jangan disajikan sebagai fakta. Kebenaran label `stated` hanya dijamin bahwa kutipannya ada di teks,
     bukan bahwa kutipan itu benar-benar mendukung label.
 12. **Teknik digabung berdasarkan string yang sama** (huruf besar/kecil dan tanda baca diabaikan). Sinonim ("LSTM" vs
     "Long Short-Term Memory") belum digabung: butuh langkah normalisasi konsep dengan persetujuan manusia.
 13. **Taksonomi topik tetap usulan AI**, bukan hasil hitung. Cakupan diukur, tetapi kebenaran pengelompokan tidak.
-14. Pemotongan teks tetap bisa menghilangkan bagian tengah (hasil/diskusi) pada artikel yang sangat panjang.
+14. Aturan recall self-reference hanya untuk `case_study`; label eksplisit lain yang terlewat AI tetap terlewat.
+15. **Kualitas usulan normalisasi AI belum terukur pada korpus nyata** (uji memakai LLM tiruan dan pemetaan buatan tangan). Setelah persetujuan, kebenaran pengelompokan sepenuhnya tanggung jawab pengguna. Jumlah artikel pada item hasil pisah (×) tidak diketahui di editor, tetapi pohon menghitungnya ulang dari data artikel.
+16. Pemotongan teks tetap bisa menghilangkan bagian tengah (hasil/diskusi) pada artikel yang sangat panjang.
 
 ## 12. Panduan perubahan cepat
 

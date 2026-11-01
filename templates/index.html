@@ -137,9 +137,10 @@
           <div class="panel design-controls">
             <label class="design-field"><span>Nama topik (akar taksonomi)</span><input id="design-topic" type="text" maxlength="200" placeholder="mis. Predict-then-Optimize"></label>
             <label class="design-field"><span>Artikel yang dihitung</span><select id="design-scope"><option value="notexcluded">Semua kecuali yang di-EXCLUDE manual</option><option value="all">Semua artikel hasil ekstraksi</option><option value="included">Hanya yang INCLUDE (screening + full-text)</option></select></label>
-            <div class="design-actions"><button class="button button-secondary" id="design-copy" type="button">Salin outline teks</button><button class="button button-secondary" id="design-download" type="button">Unduh JSON</button></div>
+            <div class="design-actions"><button class="button button-secondary" id="design-copy" type="button">Salin outline teks</button><button class="button button-secondary" id="design-download" type="button">Unduh JSON</button><button class="button" id="design-report" type="button" title="Satu berkas HTML mandiri: bisa dibuka tanpa internet dan dicetak ke PDF">Ekspor laporan (HTML)</button></div>
           </div>
           <div id="design-notices"></div>
+          <div id="norm-panel" class="panel design-panel hidden"></div>
           <div id="design-tree" class="panel design-panel"><div class="empty-state">Unggah artikel terlebih dahulu.</div></div>
           <div id="design-matrix" class="panel design-panel hidden"></div>
           <div id="design-basis" class="panel design-panel hidden"></div>
