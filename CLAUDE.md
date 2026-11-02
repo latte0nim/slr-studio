@@ -1,6 +1,6 @@
 # CLAUDE.md — SLR Protocol: panduan teknis end-to-end
 
-Dokumen ini untuk developer dan agen AI (Claude Code) yang akan membaca, mengubah, atau men-deploy repo ini.
+Dokumen ini untuk developer dan agen AI (Claude Code) yang akan membaca atau mengubah repo ini.
 Baca bagian 1–3 dulu, lalu loncat ke bagian yang relevan. README.md berisi panduan untuk pengguna akhir.
 
 ## 1. Ringkasan
@@ -20,7 +20,7 @@ Status: **prototype** untuk riset pribadi/kelompok kecil. Tidak ada akun, tidak 
 ### Prinsip desain (jangan dilanggar tanpa alasan kuat)
 
 - **Satu berkas backend (`app.py`) dan satu berkas frontend (`static/app.js`)**, tanpa framework dan tanpa build
-  step. Mudah dibaca, mudah di-deploy. Jangan memecah atau menambah toolchain kecuali diminta.
+  step. Mudah dibaca dan diubah. Jangan memecah atau menambah toolchain kecuali diminta.
 - **State milik browser.** Server hampir stateless: hanya menyimpan progres pekerjaan di memori (sementara).
   Sumber kebenaran proyek adalah `localStorage` + file Ekspor JSON.
 - **AI hanya membantu, manusia memutuskan.** Rekomendasi screening AI tidak pernah otomatis menjadi keputusan
@@ -35,8 +35,7 @@ app.py                  Backend Flask. Config, provider AI, progres, biaya, prom
 templates/index.html    Satu halaman Jinja (hanya url_for untuk gambar). Semua tab ada di sini.
 static/app.js           Frontend: IIFE tunggal, state, render, upload, progres, popup token, ekspor/impor.
 static/style.css        Tema terminal (monokrom, font mono, variabel CSS).
-requirements.txt        Flask, PyMuPDF, gunicorn, python-dotenv.
-render.yaml             Blueprint Render.
+requirements.txt        Flask, PyMuPDF, python-dotenv.
 start_windows.bat       Peluncur Windows (venv + pip install + python app.py).
 .env.example            Seluruh variabel konfigurasi beserta penjelasan.
 .gitignore              Mengabaikan .env, .venv, data/, dan berkas ekspor proyek.
@@ -53,10 +52,11 @@ dan **tidak pernah dibaca kembali** oleh aplikasi. Keduanya mati secara bawaan.
 ```bash
 pip install -r requirements.txt
 cp .env.example .env     # isi LLM_PROVIDER dan kredensial
-python app.py            # http://127.0.0.1:5000 (app.run host 0.0.0.0, lihat bagian 11)
+python app.py            # http://127.0.0.1:5000 (alamat dan port dari HOST/PORT, lihat bagian 3 dan 11)
 ```
 
-Produksi: `gunicorn app:app --workers 1 --threads 8 --timeout 600` (lihat bagian 9 mengapa `workers=1`).
+Server bawaan Flask dipakai untuk penggunaan lokal. Cara deployment belum ditentukan; batasan arsitektur yang relevan
+bila aplikasi dipindah ke server lain dicatat di bagian 9.
 
 `.env` dimuat dari folder `app.py` dengan `override=False` (variabel environment sistem menang atas `.env`).
 **Nilai yang ada di `.env`/environment selalu mengalahkan nilai bawaan kode.** Contoh jebakan: `.env` lama yang berisi
@@ -81,7 +81,7 @@ Produksi: `gunicorn app:app --workers 1 --threads 8 --timeout 600` (lihat bagian
 | `LLM_OUTPUT_SCALE` | `1` ollama / `1.75` deepseek | Pengali plafon token output (hanya plafon, bukan target). |
 | `KEEP_SERVER_PDFS` / `KEEP_SERVER_JSON` | `false` / `false` | Salinan opsional di `data/`. |
 | `APP_USERNAME` / `APP_PASSWORD` | `slr-user` / kosong | HTTP Basic Auth. Kosong = tanpa auth (peringatan dicetak bila provider deepseek). |
-| `PORT` | `5000` | Port saat `python app.py`. |
+| `HOST` / `PORT` | `0.0.0.0` / `5000` | Alamat dan port saat `python app.py`. `HOST=127.0.0.1` = hanya komputer ini. |
 
 Bawaan batas bergantung provider karena model lokal 8B berkonteks sempit, sedangkan API berkonteks besar.
 `MAX_CONTENT_LENGTH` Flask dihitung dari `MAX_FILES_PER_BATCH × ukuran file + 5 MB`; error 413 ditangani.
@@ -293,7 +293,7 @@ completion_tokens,cost_usd,cost_idr,usd_to_idr}}`.
 
 > **Jangan mengganti nama kunci `litreview_studio_project_v1`.** Itu kunci warisan; menggantinya membuat proyek
 > yang sudah tersimpan di browser pengguna tampak hilang. `localStorage` terikat ke origin, jadi
-> `localhost:5000` ≠ `127.0.0.1:5000` ≠ domain hosting.
+> `localhost:5000` ≠ `127.0.0.1:5000` ≠ alamat lain tempat aplikasi dibuka.
 
 `identifiedTotal` dan `duplicateCount` menggerakkan angka PRISMA. Duplikat yang dilewati di pre-check browser
 tetap menambah keduanya, supaya hitungan PRISMA konsisten.
@@ -385,17 +385,28 @@ sudut persegi, font IBM Plex Mono, warna terbalik untuk state aktif. Warna di SV
 (taxonomy, co-occurrence, system map) di-hardcode di `app.js` dan harus diselaraskan manual bila tema diubah.
 Ada stylesheet cetak (`@media print`) untuk PRISMA.
 
-## 9. Deploy
+## 9. Batasan arsitektur untuk deployment (belum ditentukan)
 
-`render.yaml` mendefinisikan satu web service gratis. Keputusan yang disengaja:
-- **`--workers 1 --threads 8`**: progres pekerjaan disimpan di memori proses; dengan banyak worker, polling bisa
-  mendarat di proses lain dan melihat job kosong. Konkurensi (request analisis panjang + polling) dari thread.
-- **`--timeout 600`**.
-- **Tanpa `healthCheckPath`**: `/api/health` memakai Basic Auth sehingga health check akan 401.
-- `KEEP_SERVER_*` = false (filesystem sementara dan privasi), `MAX_FILES_PER_BATCH=8`, `MAX_FILE_MB=15` (RAM 512 MB).
-- `DEEPSEEK_API_KEY` dan `APP_PASSWORD` bertanda `sync: false`: diisi manual di dashboard. **`APP_PASSWORD` wajib.**
+Repo ini tidak membawa konfigurasi platform apa pun. Bila aplikasi nanti dipindah dari komputer lokal ke server lain,
+hal-hal berikut adalah sifat kode saat ini dan harus dipenuhi oleh lingkungan tujuan:
 
-Python version tidak dipin; bila build gagal pada PyMuPDF di versi Python terbaru, pin lewat env `PYTHON_VERSION`.
+- **Satu proses/worker.** Progres analisis dan sintesis disimpan di memori proses (`Progress`). Dengan banyak worker,
+  polling progres bisa mendarat di proses lain dan melihat job kosong. Konkurensi (request analisis panjang + polling)
+  harus datang dari thread, bukan dari proses tambahan.
+- **Request panjang.** Analisis dan sintesis berjalan dalam satu request HTTP yang bisa berlangsung beberapa menit.
+  Server dan proxy harus mengizinkan batas waktu sekitar 10 menit, atau pekerjaan diubah menjadi job di background
+  (bagian 11 poin 1).
+- **Runtime Python dengan dependensi native.** PyMuPDF adalah wheel native dan proses berjalan lama; lingkungan yang
+  hanya menyediakan runtime JavaScript/edge atau fungsi serverless berumur pendek tidak cocok tanpa mengubah arsitektur.
+  Versi Python tidak dipin; bila PyMuPDF belum punya wheel untuk versi Python terbaru, pin versi di lingkungan build.
+- **Memori dan disk.** PDF diproses di memori: batasi `MAX_FILES_PER_BATCH` dan `MAX_FILE_MB` sesuai RAM. Bila disk
+  bersifat sementara, biarkan `KEEP_SERVER_PDFS=false` dan `KEEP_SERVER_JSON=false` (bawaan); aplikasi tidak membaca
+  kembali salinan itu.
+- **Health check.** `/api/health` dilindungi Basic Auth bila `APP_PASSWORD` diisi, jadi pemeriksa kesehatan yang tidak
+  mengirim kredensial akan menerima 401.
+- **Rahasia dan akses.** `DEEPSEEK_API_KEY` dan `APP_PASSWORD` hanya lewat environment atau secret manager, jangan
+  pernah di-commit. `APP_PASSWORD` wajib bila aplikasi dapat dijangkau orang lain (tanpa itu siapa pun memakai saldo API),
+  dan HTTPS wajib karena Basic Auth, `crypto.subtle`, dan Clipboard API bergantung padanya.
 
 ## 10. Verifikasi dan pengujian
 
@@ -422,8 +433,8 @@ periksa persen monoton, baris `live`, dan log retry (sisipkan satu respons terpo
 
 Urut kira-kira berdasarkan dampak:
 
-1. **Request panjang sinkron.** `/api/analyze` dan `/api/synthesize` berjalan dalam satu request HTTP. Di hosting
-   dengan batas waktu request pada proxy, batch besar bisa terputus. Perbaikan yang direncanakan: jalankan
+1. **Request panjang sinkron.** `/api/analyze` dan `/api/synthesize` berjalan dalam satu request HTTP. Pada
+   server atau proxy dengan batas waktu request, batch besar bisa terputus. Perbaikan yang direncanakan: jalankan
    pekerjaan di background thread/antrian, kembalikan `job_id` segera, dan biarkan frontend polling sampai selesai
    (kerangka `Progress`/`job_id` sudah ada). Sampai itu dibuat, hasil yang sudah dibayar bisa hilang bila koneksi putus.
 2. **Progres di memori, satu proses.** Hilang saat restart; tidak bekerja dengan banyak worker. Perlu penyimpanan
@@ -433,9 +444,9 @@ Urut kira-kira berdasarkan dampak:
    dipanggil ulang bila lolos pre-check (mis. browser lain). Ide: cache ekstraksi berkunci hash + konteks review +
    model + `MAX_TEXT_CHARS`.
 5. **Tidak ada OCR.** PDF scan ditolak dengan pesan jelas.
-6. **`app.run(host="0.0.0.0")`** saat `python app.py`: dapat diakses dari jaringan lokal. Gunakan `APP_PASSWORD`,
-   atau ubah host ke `127.0.0.1` bila hanya dipakai lokal.
-7. **Auth sederhana** (Basic Auth, tanpa rate limit/lockout). Wajib HTTPS di produksi.
+6. **Bawaan `HOST=0.0.0.0`** saat `python app.py`: dapat diakses dari perangkat lain di jaringan yang sama. Isi
+   `HOST=127.0.0.1` bila hanya dipakai di komputer ini, dan/atau `APP_PASSWORD`.
+7. **Auth sederhana** (Basic Auth, tanpa rate limit/lockout). Wajib HTTPS bila diakses lewat jaringan publik.
 8. **Tes otomatis hanya mencakup logika murni dan alur backend dengan LLM tiruan**; belum ada CI dan belum ada
    tes browser di repo. Kualitas label AI sendiri (akurasi klasifikasi) belum diukur: perlu audit sampel manual.
 9. Tarif/jadwal peak DeepSeek di-hardcode sebagai bawaan dan bisa kedaluwarsa; libur China tidak dimodelkan.
@@ -461,7 +472,7 @@ Urut kira-kira berdasarkan dampak:
 | Mengubah tarif/jadwal peak | `.env` (`DEEPSEEK_PRICE_*`, `DEEPSEEK_PEAK_MULTIPLIER`); jadwal di `deepseek_is_peak` dan `deepseek_pricing_info` |
 | Menambah tab/halaman | `index.html` (tombol `data-target` + `section.page-section`), `navigate`/`renderAll` di `app.js` |
 | Mengubah tema | variabel `:root` di `style.css` + warna SVG di `app.js` |
-| Menambah kredensial/rahasia | `.env` dan `render.yaml` (`sync: false`); jangan pernah commit nilainya |
+| Menambah kredensial/rahasia | `.env` (dan secret manager platform bila nanti ada deployment); jangan pernah commit nilainya |
 
 ## 13. Konvensi untuk kontributor
 

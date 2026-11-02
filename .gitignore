@@ -8,3 +8,7 @@ data/
 *.project.json
 slr-protocol-project-*.json
 litreview-project-*.json
+# Keluaran riset (JSON taksonomi dan laporan HTML) tidak ikut repo
+taksonomi-desain-riset*.json
+laporan-desain-riset-*.html
+contoh-laporan-*.html

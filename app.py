@@ -101,7 +101,7 @@ app.config["MAX_CONTENT_LENGTH"] = MAX_FILES_PER_BATCH * MAX_FILE_BYTES + 5 * 10
 if IS_API and not APP_PASSWORD:
     print(
         "PERINGATAN: LLM_PROVIDER=deepseek tetapi APP_PASSWORD kosong. Siapa pun yang bisa membuka aplikasi ini "
-        "dapat memakai API key dan saldo kamu. Isi APP_PASSWORD di .env (atau environment hosting).",
+        "dapat memakai API key dan saldo kamu. Isi APP_PASSWORD di .env.",
         file=sys.stderr,
     )
 PDF_STORE = BASE_DIR / "data" / "pdfs"  # Original files retained; preview UI/route removed.
@@ -2231,5 +2231,6 @@ def too_large(_error):
 
 
 if __name__ == "__main__":
+    host = os.getenv("HOST", "0.0.0.0")  # isi HOST=127.0.0.1 agar hanya bisa dibuka dari komputer ini
     port = int(os.getenv("PORT", "5000"))
-    app.run(host="0.0.0.0", port=port, debug=False)
+    app.run(host=host, port=port, debug=False)

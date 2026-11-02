@@ -22,6 +22,10 @@ artikel yang lolos menjadi tema, kontradiksi, research gap, taxonomy, jaringan i
   yang **INCLUDE di kedua tahap**.
 - PRISMA flow, review synthesis (tema, kesepakatan, kontradiksi, research gap), lima bentuk taxonomy
   (hierarchical, poly-hierarchical, faceted, flat, matrix), jaringan co-occurrence, dan system map (unduh SVG).
+- **Desain riset (research onion):** tiap artikel diberi label metodologi, strategi, sumber data, dan time horizon
+  (berikut basis dinyatakan/disimpulkan dan kutipan yang diverifikasi ke PDF), disusun menjadi taksonomi desain riset
+  dan matriks metodologi × strategi. Nama dan keluarga teknik dinormalisasi lewat usulan AI yang kamu setujui.
+  Hasilnya bisa diekspor sebagai **laporan HTML** mandiri (bisa dicetak ke PDF).
 - **Progres live** untuk analisis dan sintesis: persen berdasarkan langkah yang benar-benar selesai, log per
   panggilan AI (token, durasi, biaya), serta catatan retry bila jawaban terpotong.
 - **Popup pemakaian token** (klik chip token di pojok kanan atas): token, jumlah panggilan, estimasi biaya
@@ -52,6 +56,10 @@ python app.py
 
 Buka http://127.0.0.1:5000. Untuk menguji koneksi AI tanpa upload PDF, buka `/api/test-ai`.
 Pill status di pojok kanan atas harus menampilkan "Model siap".
+
+Secara bawaan server dapat dibuka dari perangkat lain di jaringan yang sama (`HOST=0.0.0.0`). Isi `HOST=127.0.0.1`
+di `.env` agar hanya komputer ini yang bisa membukanya, dan isi `APP_PASSWORD` bila orang lain dapat menjangkaunya,
+karena tanpa itu siapa pun bisa memakai saldo API-mu.
 
 ### Memilih provider AI
 
@@ -113,19 +121,6 @@ limitasi, saran riset) ikut terbaca. Semua batas dapat diubah lewat `.env`.
 - Salinan PDF/JSON di server bersifat opsional dan **mati secara bawaan**
   (`KEEP_SERVER_PDFS`, `KEEP_SERVER_JSON`); aplikasi tidak membacanya kembali.
 
-## Deploy ke Render
-
-1. Buat repository GitHub dari folder ini (jangan commit `.env`).
-2. Di Render pilih **New → Blueprint** (memakai `render.yaml`) atau **New → Web Service** dengan
-   start command `gunicorn app:app --workers 1 --threads 8 --timeout 600`.
-3. Isi environment variable rahasia di dashboard: `DEEPSEEK_API_KEY` dan **`APP_PASSWORD`**.
-   Tanpa `APP_PASSWORD`, siapa pun yang membuka alamatnya bisa memakai saldo API-mu.
-4. Browser akan meminta username/password (HTTP Basic Auth) sebelum membuka aplikasi.
-
-Catatan free tier: layanan tidur saat tidak aktif, RAM 512 MB (karena itu batas upload di `render.yaml`
-lebih kecil), dan filesystem bersifat sementara. Analisis dan sintesis berjalan sebagai satu request panjang;
-lihat bagian keterbatasan di `CLAUDE.md` bila platform memutus request yang terlalu lama.
-
 ## Aset gambar
 
 Antarmuka memakai tiga gambar di folder `static/` yang tidak ikut dalam kerangka repo ini; letakkan sendiri:
@@ -167,9 +162,9 @@ templates/index.html    satu halaman (semua tab)
 static/app.js           logika frontend (state, render, upload, progres, popup)
 static/style.css        tema terminal
 requirements.txt        dependensi Python
-render.yaml             blueprint deploy Render
 start_windows.bat       peluncur Windows
 .env.example            contoh konfigurasi
+tests/                  tes otomatis logika murni dan alur backend (tanpa jaringan)
 CLAUDE.md               dokumentasi teknis end-to-end
 ```
 
@@ -178,4 +173,3 @@ CLAUDE.md               dokumentasi teknis end-to-end
 - PRISMA 2020: https://www.prisma-statement.org/prisma-2020
 - DeepSeek API: https://api-docs.deepseek.com
 - Ollama: https://ollama.com
-- Render: https://render.com/docs
