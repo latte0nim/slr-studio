@@ -16,14 +16,17 @@
         <img class="brand-logo" src="{{ url_for('static', filename='slr.png') }}" alt="SLR Protocol">
         <span><strong>SLR Protocol</strong><small>literature review</small></span>
       </a>
-      <div class="workspace-label">WORKSPACE</div>
-      <nav class="side-nav" aria-label="Navigasi utama">
+      <div class="workspace-label">TAKSONOMI</div>
+      <nav class="side-nav" aria-label="Taksonomi desain riset">
         <button class="nav-item active" data-target="overview"><span class="nav-icon">01</span> Ikhtisar</button>
         <button class="nav-item" data-target="articles"><span class="nav-icon">02</span> Artikel <span class="nav-count" id="nav-article-count">0</span></button>
-        <button class="nav-item" data-target="prisma"><span class="nav-icon">03</span> PRISMA Flow</button>
-        <button class="nav-item" data-target="synthesis"><span class="nav-icon">04</span> Review Synthesis</button>
-        <button class="nav-item" data-target="taxonomy"><span class="nav-icon">05</span> Taxonomy</button>
-        <button class="nav-item" data-target="design"><span class="nav-icon">06</span> Desain Riset</button>
+        <button class="nav-item" data-target="design"><span class="nav-icon">03</span> Taksonomi Desain Riset</button>
+      </nav>
+      <div class="workspace-label workspace-label-sub">SLR LANJUTAN</div>
+      <nav class="side-nav" aria-label="Tahap SLR lanjutan">
+        <button class="nav-item" data-target="prisma"><span class="nav-icon">04</span> PRISMA Flow</button>
+        <button class="nav-item" data-target="synthesis"><span class="nav-icon">05</span> Review Synthesis</button>
+        <button class="nav-item" data-target="taxonomy"><span class="nav-icon">06</span> Peta Topik</button>
         <button class="nav-item" data-target="cooccurrence"><span class="nav-icon">07</span> Co-occurrence</button>
         <button class="nav-item" data-target="system-map"><span class="nav-icon">08</span> System Map</button>
       </nav>
@@ -100,7 +103,7 @@
         </section>
 
         <section id="articles" class="page-section">
-          <div class="section-heading page-title-row"><div><p class="eyebrow">ARTICLE MANAGEMENT</p><h1>Daftar artikel</h1><p class="page-subtitle">Periksa hasil ekstraksi, lalu tetapkan keputusan screening dan full-text eligibility.</p></div><button class="button button-secondary" data-go="overview">+ Tambah PDF</button></div>
+          <div class="section-heading page-title-row"><div><p class="eyebrow">ARTICLE MANAGEMENT</p><h1>Daftar artikel</h1><p class="page-subtitle">Periksa hasil ekstraksi, lalu tetapkan keputusan screening dan full-text eligibility.</p></div><div class="title-actions"><button class="button button-secondary" data-go="overview">+ Tambah PDF</button><button class="button" data-go="design">Lanjut: Taksonomi Desain Riset →</button></div></div>
           <div class="filter-row"><div class="search-field"><span>⌕</span><input id="article-search" type="search" placeholder="Cari judul, penulis, kata kunci…"></div><select id="article-filter" aria-label="Filter artikel"><option value="all">Semua artikel</option><option value="pending">Belum diputuskan</option><option value="included">Termasuk sintesis</option><option value="excluded">Dikeluarkan</option></select></div>
           <div class="panel table-panel"><div class="table-top"><div><strong>Evidence library</strong><small id="article-table-note">Belum ada artikel</small></div><button class="text-button" id="clear-articles">Hapus semua artikel</button></div><div class="table-scroll"><table><thead><tr><th>ARTIKEL / METADATA</th><th>REKOMENDASI MODEL</th><th>SCREENING</th><th>FULL TEXT</th><th></th></tr></thead><tbody id="articles-body"><tr><td colspan="5" class="empty-cell">Belum ada artikel. Unggah PDF pada halaman Ikhtisar.</td></tr></tbody></table></div></div>
           <div id="article-detail" class="panel article-detail hidden"></div>
@@ -122,18 +125,19 @@
             <p id="synthesis-progress-usage" class="progress-usage"></p>
             <div class="process-log-wrap"><strong>Log proses</strong><div id="synthesis-progress-log" class="process-log" aria-live="polite"><div class="process-log-item">Menunggu proses dimulai…</div></div></div>
           </div>
-          <div id="synthesis-empty" class="panel empty-large"><div class="empty-illustration">*</div><h2>Temukan pola di antara studi</h2><p>Jalankan sintesis untuk membandingkan tema, konsistensi hasil, kontradiksi, research gap, taxonomy, dan relasi sistem.</p><button class="button button-primary" data-go="articles">Verifikasi artikel terlebih dahulu →</button></div>
+          <div id="synthesis-empty" class="panel empty-large"><div class="empty-illustration">*</div><h2>Temukan pola di antara studi</h2><p>Jalankan sintesis untuk membandingkan tema, konsistensi hasil, kontradiksi, research gap, peta topik, dan relasi sistem.</p><button class="button button-primary" data-go="articles">Verifikasi artikel terlebih dahulu →</button></div>
           <div id="synthesis-output" class="hidden"></div>
         </section>
 
         <section id="taxonomy" class="page-section">
-          <div class="section-heading page-title-row"><div><p class="eyebrow">KNOWLEDGE ORGANIZATION</p><h1>Taxonomy explorer</h1><p class="page-subtitle">Klasifikasi konseptual yang dihasilkan dari artikel terpilih.</p></div><button class="button button-secondary" data-go="synthesis">Lihat sintesis ↗</button></div>
+          <div class="section-heading page-title-row"><div><p class="eyebrow">PETA TOPIK</p><h1>Peta topik</h1><p class="page-subtitle">Pengelompokan studi menurut apa yang diteliti (domain, masalah, peran prediksi). Dihasilkan AI dari Review Synthesis; bukan taksonomi desain riset.</p></div><button class="button button-secondary" data-go="synthesis">Lihat sintesis ↗</button></div>
           <div class="taxonomy-tabs" role="tablist"><button class="taxonomy-tab active" data-taxonomy="hierarchical">01 / Hierarchical</button><button class="taxonomy-tab" data-taxonomy="poly">02 / Poly-hierarchical</button><button class="taxonomy-tab" data-taxonomy="faceted">03 / Faceted</button><button class="taxonomy-tab" data-taxonomy="flat">04 / List · Flat</button><button class="taxonomy-tab" data-taxonomy="matrix">05 / Matrices</button></div>
-          <div id="taxonomy-content" class="panel taxonomy-panel"><div class="empty-state">Jalankan Review Synthesis untuk menghasilkan taxonomy dari artikel yang termasuk.</div></div>
+          <div id="taxonomy-content" class="panel taxonomy-panel"><div class="empty-state">Jalankan Review Synthesis untuk menghasilkan peta topik dari artikel yang termasuk.</div></div>
         </section>
 
         <section id="design" class="page-section">
           <div class="section-heading page-title-row"><div><p class="eyebrow">RESEARCH ONION</p><h1>Taksonomi desain riset</h1><p class="page-subtitle">Metodologi, strategi, dan teknik dari artikel, disusun menurut lapisan research onion (Saunders dkk.). Dihitung oleh kode dari label hasil ekstraksi, tanpa AI dan tanpa biaya token.</p></div></div>
+          <div id="design-steps" class="panel design-steps"></div>
           <div class="panel design-controls">
             <label class="design-field"><span>Nama topik (akar taksonomi)</span><input id="design-topic" type="text" maxlength="200" placeholder="mis. Predict-then-Optimize"></label>
             <label class="design-field"><span>Artikel yang dihitung</span><select id="design-scope"><option value="notexcluded">Semua kecuali yang di-EXCLUDE manual</option><option value="all">Semua artikel hasil ekstraksi</option><option value="included">Hanya yang INCLUDE (screening + full-text)</option></select></label>

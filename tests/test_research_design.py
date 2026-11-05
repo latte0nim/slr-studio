@@ -387,4 +387,114 @@ try:
 finally:
     app.llm_json = real_llm
 
+
+print("   normalisasi inkremental (A-D): singkatan, kunci longgar, penjaga varian, attach, gabung otomatis")
+K, M = app._tech_key, app._merge_key
+check("A: singkatan kurung diabaikan (random forest (RF), SAA, KNN, CSR, BBC)",
+      K("random forest (RF)") == K("Random Forest") and K("sample average approximation (SAA)") == K("Sample Average Approximation")
+      and K("K-nearest neighbour (KNN)") == K("K-nearest neighbour") and K("cluster-based scenario reduction (CSR)") == K("cluster-based scenario reduction")
+      and K("Benders-based branch-and-cut (BBC)") == K("Benders-based branch-and-cut"))
+check("A: kurung yang BUKAN singkatan nama tetap dibedakan (kernel RBF, kata kecil, satu kata)",
+      K("support vector machine (RBF)") != K("support vector machine") and K("XGBoost (quantile)") != K("XGBoost") and K("Lasso (L1)") != K("Lasso"))
+dd = app.collect_techniques([mk_article("y1", ["random forest (RF)"]), mk_article("y2", ["Random Forest"])])
+check("A: 'random forest (RF)' dan 'Random Forest' satu ember (2 artikel, dua ejaan tercatat)", len(dd) == 1 and dd[0]["count"] == 2 and len(dd[0]["raw"]) == 2)
+check("kunci longgar: rolling horizon ~ rolling horizon optimization ~ framework; Random Forest classifier ~ RF",
+      M("rolling horizon") == M("rolling horizon optimization") == M("rolling horizon framework") and M("Random Forest classifier") == M("random forest (RF)"))
+check("kunci longgar TIDAK menyatukan metode berbeda (LSTM/BiLSTM, Transformer/decoder-only, Bayesian optimization/Bayesian)",
+      M("LSTM") != M("BiLSTM") and M("Transformer") != M("Transformer decoder-only") and M("Bayesian optimization") != M("Bayesian"))
+check("C: konflik kata pengubah (weighted SAA vs SAA, robust MPC vs MPC, quantile XGBoost vs XGBoost); stochastic program sepadan",
+      app._modifier_conflict("weighted sample average approximation", "Sample Average Approximation") and app._modifier_conflict("robust MPC", "MPC")
+      and app._modifier_conflict("quantile XGBoost", "XGBoost") and not app._modifier_conflict("stochastic program", "two-stage stochastic programming")
+      and not app._modifier_conflict("XGB-CQR", "XGBoost"))
+
+def mk_item(name, fam, ids=("a",), variants=None):
+    return {"canonical": name, "variants": list(variants or [name]), "family": fam, "reason": "", "count": len(ids), "article_ids": list(ids), "new": False}
+dup_norm = {"families": [{"id": "F1", "name": "Stokastik", "definition": "d"}, {"id": "F2", "name": "Jaringan", "definition": "d"}],
+            "items": [mk_item("Sample Average Approximation", "F1", ("a", "b")), mk_item("sample average approximation (SAA)", "F1", ("c",)),
+                      mk_item("weighted sample average approximation", "F1", ("d",)), mk_item("rolling horizon optimization", "F1", ("a",)),
+                      mk_item("rolling horizon", "F1", ("e",)), mk_item("LSTM", "F2"), mk_item("BiLSTM", "F2"),
+                      mk_item("Gurobi", app.NORM_DROP), mk_item("XGBoost", "F1"), mk_item("XGBoost", "F2")]}
+before_dup = json.dumps(dup_norm, sort_keys=True)
+cons, merged_ex, review_ex = app.consolidate_normalization(dup_norm)
+c_by = {i["canonical"]: i for i in cons["items"]}
+check("gabung otomatis duplikat lama: SAA(SAA) dan 'rolling horizon' masuk ke item lama (10 -> 8 item)", len(cons["items"]) == 8 and "rolling horizon" not in c_by and "sample average approximation (SAA)" not in c_by)
+check("gabungan mewarisi artikel (union) dan mencatat ejaan", set(c_by["Sample Average Approximation"]["article_ids"]) == {"a", "b", "c"} and c_by["Sample Average Approximation"]["count"] == 3 and "sample average approximation (SAA)" in c_by["Sample Average Approximation"]["variants"])
+check("varian bermakna (weighted SAA), LSTM/BiLSTM, dan buangan tidak ikut digabung", "weighted sample average approximation" in c_by and "LSTM" in c_by and "BiLSTM" in c_by and c_by["Gurobi"]["family"] == app.NORM_DROP)
+check("duplikat LINTAS keluarga dilaporkan, tidak digabung diam-diam", review_ex == [["XGBoost", "XGBoost"]] and sum(1 for i in cons["items"] if i["canonical"] == "XGBoost") == 2)
+check("konsolidasi tidak mengubah masukan", json.dumps(dup_norm, sort_keys=True) == before_dup and len(merged_ex) == 2)
+
+run_norm = {"families": cons["families"], "items": [dict(i) for i in cons["items"]]}
+todo_fx = [{"key": "rolling horizon framework", "name": "rolling horizon framework", "raw": ["rolling horizon framework"], "count": 1, "article_ids": ["z"]},
+           {"key": "benders decomposition", "name": "Benders decomposition", "raw": ["Benders decomposition"], "count": 1, "article_ids": ["z"]},
+           {"key": "weighted saa", "name": "weighted SAA", "raw": ["weighted SAA"], "count": 1, "article_ids": ["z"]}]
+rest, att = app.auto_attach(todo_fx, run_norm)
+check("auto-attach tanpa AI: 'rolling horizon framework' menempel ke item lama; sisanya tetap untuk AI",
+      [t["name"] for t in rest] == ["Benders decomposition", "weighted SAA"] and att == [{"name": "rolling horizon framework", "to": "rolling horizon optimization", "how": "otomatis"}])
+
+base_map = {"families": [{"id": "F1", "name": "Stokastik", "definition": "d"}], "items": [mk_item("Sample Average Approximation", "F1", ("a",))]}
+before_base = json.dumps(base_map, sort_keys=True)
+ts = app.collect_techniques([mk_article("b1", ["SAA"]), mk_article("c1", ["weighted SAA"]), mk_article("d1", ["Unknown thing"])])
+fin_a = app.finalize_normalization({"attach": {"SAA": "Sample Average Approximation", "weighted SAA": "Sample Average Approximation",
+                                               "Unknown thing": "Tidak Ada"}, "assign": {}}, ts, base_map)
+fa = {i["canonical"]: i for i in fin_a["items"]}
+check("B: attach AI menempelkan SAA ke item lama, keluarga lama tetap, jumlah artikel bertambah", set(fa["Sample Average Approximation"]["variants"]) == {"Sample Average Approximation", "SAA"} and fa["Sample Average Approximation"]["family"] == "F1" and fa["Sample Average Approximation"]["count"] == 2 and fin_a["attached"] == [{"name": "SAA", "to": "Sample Average Approximation", "how": "AI"}])
+check("C: attach ke varian bermakna ditolak (weighted SAA jadi item sendiri); target tak ada diabaikan", "weighted SAA" in fa and fa["weighted SAA"]["family"] is None and "Unknown thing" in fa and len(fin_a["items"]) == 3)
+check("attach tidak mengubah pemetaan masukan", json.dumps(base_map, sort_keys=True) == before_base)
+ts2 = app.collect_techniques([mk_article("e1", ["Sample Average Approximation", "SAA", "weighted SAA"])])
+fin_m = app.finalize_normalization({"merges": [{"canonical": "Sample Average Approximation", "variants": ["SAA", "weighted SAA"]}], "assign": {}}, ts2)
+fm = {i["canonical"]: i for i in fin_m["items"]}
+check("C: merge AI yang mencampur weighted SAA dipecah: SAA bergabung, weighted tetap sendiri",
+      set(fm["Sample Average Approximation"]["variants"]) == {"Sample Average Approximation", "SAA"} and fm["weighted SAA"]["variants"] == ["weighted SAA"])
+
+ts_abbr = app.collect_techniques([mk_article("q1", ["Benders-based branch-and-cut (BBC)", "support vector machine (RBF)"])])
+fin_abbr = app.finalize_normalization({"assign": {}}, ts_abbr)
+fb = {i["canonical"]: i for i in fin_abbr["items"]}
+check("nama baku item baru tanpa singkatan kurung (BBC), ejaan asli tetap di variants; '(RBF)' bukan singkatan jadi dibiarkan",
+      "Benders-based branch-and-cut" in fb and fb["Benders-based branch-and-cut"]["variants"] == ["Benders-based branch-and-cut (BBC)"]
+      and "support vector machine (RBF)" in fb)
+long_name = "Model prediktif berbasis pembelajaran mesin (Jaringan Syaraf Tiruan dan Deep Learning)"
+ts_long = app.collect_techniques([mk_article("lg1", ["LSTM"])])
+fin_long = app.finalize_normalization({"families": [{"id": "F1", "name": long_name, "definition": "d"}], "assign": {"LSTM": "F1"}}, ts_long)
+check("nama keluarga panjang (>60 karakter) tidak terpotong diam-diam", fin_long["families"][0]["name"] == long_name and len(long_name) > 60, fin_long["families"][0]["name"])
+print("   rute Perbarui: nama baru menempel ke item lama, AI hanya untuk sisa")
+inc_map = {"families": [{"id": "F1", "name": "Stokastik dan robust", "definition": "d"}, {"id": "F2", "name": "Sekuensial", "definition": "d"}],
+           "items": [mk_item("Sample Average Approximation", "F1", ("a",)), mk_item("rolling horizon optimization", "F2", ("a",)), mk_item("Random Forest", "F2", ("a",))]}
+inc_arts = [mk_article("n1", ["random forest (RF)", "rolling horizon", "SAA", "weighted sample average approximation", "Benders decomposition", "Sample Average Approximation"])]
+calls2, real2 = [], app.llm_json
+def fake_llm_inc(prompt, **kw):
+    calls2.append(prompt)
+    if kw.get("usage") is not None:
+        kw["usage"]["calls"] += 1
+    return {"principle": "uji", "families": [], "merges": [], "drops": [],
+            "attach": {"SAA": "Sample Average Approximation", "weighted sample average approximation": "Sample Average Approximation"},
+            "assign": {"weighted sample average approximation": "F1", "Benders decomposition": "F2"}}
+try:
+    app.llm_json = fake_llm_inc
+    cl2 = app.app.test_client()
+    inc_before = json.dumps(inc_map, sort_keys=True)
+    ji = cl2.post("/api/normalize-techniques", json={"articles": inc_arts, "topic": "PtO", "existing": inc_map}).get_json()
+    nn = ji["normalization"]
+    ni = {i["canonical"]: i for i in nn["items"]}
+    check("Perbarui memanggil AI sekali, hanya untuk nama yang tidak jelas (3 dari 4 nama baru; 1 ditempel otomatis)", len(calls2) == 1 and nn["added"] == 4 and '- "rolling horizon"' not in calls2[0] and '- "SAA"' in calls2[0])
+    check("prompt Perbarui memuat NAMA BAKU YANG SUDAH ADA + aturan attach + skema attach", "NAMA BAKU YANG SUDAH ADA" in calls2[0] and "Sample Average Approximation" in calls2[0] and "attach" in calls2[0])
+    check("hasil: SAA & rolling horizon menempel ke item lama (bukan item baru); weighted tetap item sendiri; Benders item baru",
+          set(ni["Sample Average Approximation"]["variants"]) >= {"SAA"} and "rolling horizon" in ni["rolling horizon optimization"]["variants"]
+          and "SAA" not in ni and "rolling horizon" not in ni and "weighted sample average approximation" in ni and "Benders decomposition" in ni and len(nn["items"]) == 5)
+    check("laporan: semua yang menempel tercatat (otomatis, AI, dan ejaan lewat kunci sama) dan item yang tersentuh ditandai",
+          {(a["name"], a["how"]) for a in nn["attached"]} == {("rolling horizon", "otomatis"), ("SAA", "AI"), ("random forest (RF)", "ejaan")}
+          and ni["rolling horizon optimization"].get("touched") and ni["Random Forest"].get("touched"))
+    check("hitungan artikel dihitung ulang dari cakupan saat ini dan ejaan baru ('random forest (RF)') tampak sebagai varian item lama", ni["Random Forest"]["article_ids"] == ["n1"] and ni["Random Forest"]["count"] == 1 and "random forest (RF)" in ni["Random Forest"]["variants"], str(ni["Random Forest"]))
+    check("keluarga lama tidak berubah dan masukan tidak dimutasi", nn["families"] == inc_map["families"] and json.dumps(inc_map, sort_keys=True) == inc_before)
+    calls2.clear()
+    ji2 = cl2.post("/api/normalize-techniques", json={"articles": inc_arts, "topic": "PtO", "existing": nn}).get_json()
+    check("Perbarui kedua kali tanpa teknik baru: tanpa panggilan AI dan hasil stabil (idempoten)", len(calls2) == 0 and len(ji2["normalization"]["items"]) == len(nn["items"]) and ji2["normalization"]["added"] == 0)
+    ji3 = cl2.post("/api/normalize-techniques", json={"articles": inc_arts, "topic": "PtO", "existing": dup_norm}).get_json()
+    check("Perbarui menggabung duplikat lama otomatis dan melaporkan duplikat lintas keluarga", len(ji3["normalization"]["merged_existing"]) == 2 and ji3["normalization"]["review"] == [["XGBoost", "XGBoost"]])
+    calls2.clear()
+    cl2.post("/api/normalize-techniques", json={"articles": corpus, "topic": "PtO"})
+    check("usul dari nol: tanpa blok nama baku; prompt memuat aturan buang baru (uji statistik & alat diferensiasi = teknik)",
+          "NAMA BAKU YANG SUDAH ADA" not in calls2[0] and "Friedman" in calls2[0] and "KKT conditions" in calls2[0] and "ADALAH teknik, bukan metrik" in calls2[0])
+finally:
+    app.llm_json = real2
+
 print(f"\nSEMUA LULUS: {len(PASSED)} pengecekan")

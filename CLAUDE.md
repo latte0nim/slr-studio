@@ -205,7 +205,7 @@ agar cocok dengan riset pemodelan. Ubah `CODEBOOK_VERSION` bila arti kode beruba
 
 Prinsip: AI hanya **mengklasifikasikan satu artikel ke kode codebook** (dengan `basis` stated/inferred/not_stated dan
 bukti). Pohon **dihitung kode** oleh `build_design_taxonomy` (group-by), tanpa LLM: `POST /api/design-taxonomy`,
-tab Desain Riset. Cabang: Metodologi (Kuantitatif/Kualitatif/Campuran lalu teknik), Strategi, Teknik & prosedur,
+tab Taksonomi Desain Riset (label sidebar; id `design`). Cabang: Metodologi (Kuantitatif/Kualitatif/Campuran lalu teknik), Strategi, Teknik & prosedur,
 Fondasi & horizon waktu; plus matriks Metodologi x Strategi (sel kosong = kandidat gap) dan ringkasan
 stated/inferred/not_stated. `GET /api/codebook` memberi label untuk UI.
 
@@ -231,8 +231,18 @@ Prinsip: **AI hanya mengusulkan, pengguna menyetujui, kode menerapkan secara det
 - State browser: `state.norm = {draft, approved}`. Pohon hanya memakai `approved` (dikirim ke `/api/design-taxonomy` sebagai
   `normalization`); `draft` adalah usulan/hasil edit yang belum disetujui. Ikut ekspor proyek; unduhan JSON taksonomi memuat
   `normalization`.
-- Inkremental: \"Perbarui untuk teknik baru\" hanya memproses teknik yang tidak ada di pemetaan, termasuk item yang tersimpan
-  \"belum dikelompokkan\" (konsisten dengan hitungan `normalization_status.unmapped_count`).
+- Inkremental (diperbarui 3 Nov 2026): "Perbarui untuk teknik baru" mempertahankan keluarga dan item lama, memproses hanya teknik
+  yang tidak ada di pemetaan (termasuk item "belum dikelompokkan"), dan MENEMPELKAN nama baru ke item lama alih-alih membuat item
+  duplikat. Urutannya: (1) `consolidate_normalization()` menggabung duplikat yang sudah ada di pemetaan (kunci nama sama; hanya bila
+  keluarga sama; duplikat lintas keluarga hanya dilaporkan di `review`); (2) `auto_attach()` menempelkan nama baru yang jelas sama
+  tanpa AI (`_merge_key`: singkatan kurung dan kata generik di ujung diabaikan); (3) AI hanya untuk sisanya, dengan daftar NAMA BAKU
+  YANG SUDAH ADA di prompt dan field `attach` (nama baru -> nama baku lama); (4) `refresh_item_counts()` menghitung ulang artikel dan
+  ejaan pada item lama. Hasil melaporkan `attached`, `merged_existing`, `review`; item yang tersentuh membawa `touched` (UI: "+N varian baru").
+- `_tech_key()` mengabaikan singkatan di kurung pada ujung nama HANYA bila huruf-hurufnya inisial kata sebelumnya ("random forest (RF)");
+  "(RBF)" pada "support vector machine" tidak dibuang. Penjaga varian bermakna (`_MODIFIERS`: weighted, quantile, conformal, robust,
+  stochastic, distributionally) berlaku di `finalize_normalization` untuk `merges` dan `attach`: anggota dengan kata pengubah yang
+  tidak sama dengan nama baku dikeluarkan menjadi item sendiri. Daftar kata pengubah ini dipilih dari korpus Predict-then-Optimize;
+  korpus bidang lain mungkin butuh tambahan.
 - Tanpa pemetaan, pohon tetap daftar datar seperti sebelumnya.
 
 Audit pertama pada korpus nyata (17 artikel INCLUDE, 109 nama teknik): usulan AI umumnya baik (sebagian besar penggabungan benar,
@@ -255,9 +265,18 @@ Tombol **Ekspor laporan (HTML)** di tab Desain Riset (`buildDesignReport()` di `
 dibaca, dibagikan, dan dicetak ke PDF.
 
 - Satu berkas mandiri: CSS dan skrip kecil inline, tanpa sumber daya luar. Meta CSP (`default-src 'none'`) menutup permintaan jaringan.
-- Isi: konfigurasi review, cara membaca (legenda, batas 8 teknik), pohon yang bisa dilipat dengan definisi dan nomor referensi,
-  matriks metodologi x strategi, normalisasi teknik (keluarga, penggabungan, yang dibuang), kepercayaan label, label per artikel,
-  daftar referensi. Tema terang/gelap mengikuti sistem; `@media print` memaksa terang, membuka semua lipatan, dan membedakan
+- Dua mode dalam SATU berkas (atribut `data-view` pada `<html>`, tombol di bilah atas): NASKAH (acuan menulis, PDF bersih tanpa hal teknis
+  tool) dan LENGKAP (audit untuk dicek manusia). Bagian naskah bernomor 1-9: topik dan fokus, metode penyusunan (dibaca dari config
+  Ikhtisar dan dihitung dari data: hasil seleksi, sebaran tahun), pohon research onion, definisi konsep (kode hierarkis), matriks
+  metodologi x strategi, keluarga teknik + artikel, posisi dalam onion (kalimat otomatis, cabang kosong disebut), temuan dan celah
+  (dari Review Synthesis; ID artikel mentah diganti nomor referensi, kode codebook diganti label), daftar pustaka. Lampiran A-F
+  (konfigurasi, cara membaca, penggabungan/pembuangan nama, kepercayaan label, label per artikel, status verifikasi) ditandai
+  `.audit` dan disembunyikan di mode naskah. Tombol: Pratinjau naskah, Tampilan lengkap, Panduan kerangka, Cetak naskah, Cetak lengkap. Tampilan ketiga (`data-view="panduan"`, bagian `.guide`, menyembunyikan yang lain) berisi panduan kerangka dokumen: peta bab dengan status (salin/tulis ulang/tulis sendiri), pertanyaan pemandu per bab dengan contoh yang dihitung dari data proyek, alur kerja, catatan format ITB (dengan peringatan untuk diverifikasi ke template TMI), dan daftar periksa. `.refnote` di mode naskah/lengkap menegaskan bahwa laporan adalah acuan, bukan naskah final.
+- Jangan "mencuci" tebakan AI: banner DRAFT (tampil di KEDUA mode) menyebut artikel yang belum diverifikasi, pemetaan teknik yang belum
+  disetujui atau masih draf, dan keluarga teknik tanpa definisi. Verifikasi = kotak "Sudah saya cek" di detail artikel
+  (`owner_verified`, `owner_verified_at` pada artikel; ikut ekspor/impor proyek). Daftar pustaka membawa catatan bahwa nama jurnal,
+  volume, dan halaman belum diekstrak (hanya judul, penulis, tahun, DOI); pelengkapan dari DOI (Crossref) belum dibuat.
+- Tema terang/gelap mengikuti sistem;  `@media print` memaksa terang, membuka semua lipatan, dan membedakan
   batang proporsi dengan tingkat abu-abu.
 - Keamanan: semua teks dari PDF/AI di-escape; DOI hanya jadi tautan bila cocok pola DOI ketat; data JSON ditanam di
   `<script type=\"application/json\" id=\"slr-data\">` dengan `< > & U+2028 U+2029` di-escape agar tidak bisa menutup elemen.
@@ -360,7 +379,7 @@ Helper `$`/`$$`, `esc()` (escape HTML, **wajib** untuk semua data AI yang masuk 
 | Area | Fungsi kunci |
 |---|---|
 | State & penyimpanan | `loadState`, `saveState`, `DEFAULT_STATE`, `STORE_KEY` |
-| Navigasi | `navigate(target)`, tombol `data-target`, 8 tab: overview, articles, prisma, synthesis, taxonomy, design, cooccurrence, system-map |
+| Navigasi | `navigate(target)`, tombol `data-target`, 8 tab dalam DUA grup sidebar. TAKSONOMI (tugas desain riset): overview "Ikhtisar", articles "Artikel", design "Taksonomi Desain Riset". SLR LANJUTAN: prisma, synthesis, taxonomy "Peta Topik", cooccurrence, system-map. Id section dan `data-target` TIDAK diganti (hanya label tampil); urutan tombol tidak memengaruhi logika `navigate`. `renderDesignSteps()` menggambar panel LANGKAH di atas Desain Riset (status dibaca dari state, tidak disimpan) |
 | Upload | `handleUpload`: validasi → pre-check duplikat (`sha256Hex` via `crypto.subtle`) → FormData + `job_id` → polling → merge artikel |
 | Progres | `PANELS`, `renderProcessProgress`, `startProgressPolling(kind, jobId)` (interval 500 ms) |
 | Sintesis | `handleSynthesis` (menolak bila belum ada artikel INCLUDE/INCLUDE) |
@@ -410,7 +429,9 @@ hal-hal berikut adalah sifat kode saat ini dan harus dipenuhi oleh lingkungan tu
 
 ## 10. Verifikasi dan pengujian
 
-Tes otomatis tanpa jaringan dan tanpa API key: `python tests/test_research_design.py` (131 pengecekan: normalisasi
+Uji UI (opsional, butuh `npm i jsdom` dan server berjalan): `node tests/ui_smoke.js http://127.0.0.1:5055 <ekspor-proyek.json|-> static/app.js` memuat halaman asli di jsdom, mengklik semua tab, dan melaporkan galat JS serta isi panel langkah. `node tests/ui_report_check.js http://127.0.0.1:5055 <ekspor-proyek.json> static/app.js` menguji end-to-end: verifikasi artikel lewat UI, pembuatan laporan, mode naskah/audit, tombol cetak, banner draf (35-38 pengecekan pada data nyata, ekspektasinya dihitung dari state proyek, bukan diasumsikan).
+
+Tes otomatis tanpa jaringan dan tanpa API key: `python tests/test_research_design.py` (158 pengecekan: normalisasi
 kutipan, pembuangan referensi, pemotongan teks, validasi codebook, taksonomi desain, hierarki). Bagian yang butuh PDF
 memakai `data/pdfs` atau `SLR_PDF_DIR`. `tests/fixtures_research_design.json` berisi label buatan tangan (gold standard
 mini, bukan keluaran AI), dua entri sengaja salah untuk menguji pertahanan. Belum ada tes browser otomatis di repo.

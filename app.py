@@ -1230,8 +1230,47 @@ def _node(node_id, name, kind, definition="", article_ids=None, children=None, i
     }
 
 
+_ABBR_TAIL = re.compile(r"^(.*\S)\s*\(\s*([A-Za-z][A-Za-z0-9]{1,7})\s*\)\s*$")
+_GENERIC_TAIL = {"optimization", "optimisation", "framework", "approach", "method", "methods", "algorithm", "model", "models",
+                 "technique", "classifier", "regressor"}
+# Kata pengubah yang membuat sebuah teknik menjadi varian BERMAKNA (bukan sekadar ejaan lain) dari metode dasarnya.
+_MODIFIERS = {"weighted", "quantile", "conformal", "robust", "stochastic", "distributionally"}
+
+
+def _strip_abbreviation(name):
+    """'random forest (RF)' -> 'random forest'. Hanya membuang singkatan di ujung nama bila huruf-hurufnya memang
+    inisial kata-kata sebelumnya (berurutan, boleh melompati kata). '(RBF)' pada 'support vector machine (RBF)' tidak dibuang."""
+    text = unicodedata.normalize("NFKC", str(name)).strip()
+    m = _ABBR_TAIL.match(text)
+    if not m:
+        return text
+    base, abbr = m.group(1), m.group(2)
+    words = re.findall(r"[A-Za-z0-9]+", base)
+    if len(words) < 2 or abbr.upper() != abbr:
+        return text
+    initials = iter(w[0].lower() for w in words)
+    return base if all(ch in initials for ch in abbr.lower()) else text
+
+
 def _tech_key(name):
-    return re.sub(r"[\W_]+", " ", unicodedata.normalize("NFKC", str(name)).lower()).strip()
+    return re.sub(r"[\W_]+", " ", _strip_abbreviation(name).lower()).strip()
+
+
+def _merge_key(name):
+    """Kunci longgar untuk 'nama yang sama': _tech_key tanpa kata generik di ujung (rolling horizon optimization ~ rolling horizon)."""
+    toks = _tech_key(name).split()
+    while len(toks) > 2 and toks[-1] in _GENERIC_TAIL:
+        toks.pop()
+    return " ".join(toks)
+
+
+def _modifier_set(name):
+    return set(_tech_key(name).split()) & _MODIFIERS
+
+
+def _modifier_conflict(a, b):
+    """True bila salah satu nama punya kata pengubah bermakna yang tidak dimiliki yang lain (weighted SAA vs SAA)."""
+    return _modifier_set(a) != _modifier_set(b)
 
 
 def _group_by_value(articles, field):
@@ -1380,6 +1419,120 @@ def _norm_status(usable, norm):
     return {"applied": True, "families": len(norm["families"]), "unmapped": unmapped[:100], "unmapped_count": len(unmapped)}
 
 
+def _copy_item(item):
+    copy = dict(item)
+    for k in ("variants", "article_ids", "touched"):
+        if isinstance(copy.get(k), list):
+            copy[k] = list(copy[k])
+    return copy
+
+
+def _absorb(target, names, article_ids, touched_name=None):
+    """Tambahkan nama mentah + artikel ke item baku `target` (in-place pada salinan)."""
+    variants = target.setdefault("variants", [target.get("canonical")] if target.get("canonical") else [])
+    for n in names:
+        if n not in variants:
+            variants.append(n)
+    ids = target.setdefault("article_ids", [])
+    for i in article_ids or []:
+        if i not in ids:
+            ids.append(i)
+    if ids:
+        target["count"] = len(ids)
+    if touched_name:
+        touched = target.setdefault("touched", [])
+        if touched_name not in touched:
+            touched.append(touched_name)
+
+
+def consolidate_normalization(norm):
+    """Gabungkan item baku DUPLIKAT yang sudah ada di pemetaan (kunci nama sama setelah singkatan dan kata generik diabaikan),
+    mis. 'Random Forest' + 'random forest (RF)', 'rolling horizon optimization' + 'rolling horizon'. Hanya bila keluarganya
+    sama (atau salah satunya belum dikelompokkan) dan tanpa konflik kata pengubah. Duplikat lintas keluarga dilaporkan, tidak
+    digabung diam-diam. Return (pemetaan baru, [gabungan], [perlu dicek])."""
+    out, merged, review = [], [], []
+    for raw_item in (norm or {}).get("items", []):
+        item = _copy_item(raw_item)
+        if item.get("family") == NORM_DROP or not item.get("canonical"):
+            out.append(item)
+            continue
+        item_keys = {_merge_key(n) for n in [item["canonical"]] + list(item.get("variants") or [])}
+        target = None
+        for prev in out:
+            if prev.get("family") == NORM_DROP or not prev.get("canonical"):
+                continue
+            prev_keys = {_merge_key(n) for n in [prev["canonical"]] + list(prev.get("variants") or [])}
+            if _merge_key(prev["canonical"]) not in item_keys and _merge_key(item["canonical"]) not in prev_keys:
+                continue
+            if _modifier_conflict(prev["canonical"], item["canonical"]):
+                continue
+            if prev.get("family") != item.get("family") and prev.get("family") is not None and item.get("family") is not None:
+                review.append([prev["canonical"], item["canonical"]])
+                continue
+            target = prev
+            break
+        if target is None:
+            out.append(item)
+            continue
+        if target.get("family") is None:
+            target["family"] = item.get("family")
+        _absorb(target, list(item.get("variants") or [item["canonical"]]), item.get("article_ids"), item["canonical"])
+        merged.append({"name": item["canonical"], "to": target["canonical"]})
+    result = dict(norm or {})
+    result["items"] = out
+    return result, merged, review
+
+
+def auto_attach(todo, running):
+    """Tempelkan nama baru yang JELAS sama dengan item lama (kunci longgar sama, tanpa konflik pengubah) tanpa AI.
+    Mengubah running['items'] (salinan milik pemanggil). Return (nama yang masih perlu AI, [yang ditempelkan])."""
+    index = {}
+    for i, item in enumerate(running["items"]):
+        if item.get("family") == NORM_DROP or not item.get("canonical"):
+            continue
+        for n in [item["canonical"]] + list(item.get("variants") or []):
+            index.setdefault(_merge_key(n), i)
+    remaining, attached = [], []
+    for t in todo:
+        i = index.get(_merge_key(t["name"]))
+        if i is None or _modifier_conflict(t["name"], running["items"][i]["canonical"]):
+            remaining.append(t)
+            continue
+        _absorb(running["items"][i], t["raw"], t["article_ids"], t["name"])
+        attached.append({"name": t["name"], "to": running["items"][i]["canonical"], "how": "otomatis"})
+    return remaining, attached
+
+
+def refresh_item_counts(running, techniques):
+    """Setelah artikel bertambah: perbarui daftar artikel/jumlah dan ejaan mentah pada item yang sudah ada, supaya
+    angka di UI tidak basi dan ejaan baru (mis. 'random forest (RF)') tampak sebagai varian."""
+    index = {}
+    for i, item in enumerate(running["items"]):
+        if not item.get("canonical"):
+            continue
+        for n in [item["canonical"]] + list(item.get("variants") or []):
+            index.setdefault(_tech_key(n), i)
+    fresh = {}
+    for t in techniques:
+        i = index.get(t["key"])
+        if i is None:
+            continue
+        slot = fresh.setdefault(i, {"ids": [], "raw": []})
+        slot["ids"] += [a for a in t["article_ids"] if a not in slot["ids"]]
+        slot["raw"] += [r for r in t["raw"] if r not in slot["raw"]]
+    absorbed = []
+    for i, slot in fresh.items():
+        item = running["items"][i]
+        known = set(item.get("variants") or [])
+        added = [r for r in slot["raw"] if r not in known]
+        item["article_ids"] = slot["ids"]
+        item["count"] = len(slot["ids"])
+        if added:
+            _absorb(item, added, None, added[0])
+            absorbed += [{"name": r, "to": item.get("canonical"), "how": "ejaan"} for r in added]
+    return absorbed
+
+
 def normalization_prompt(techniques, running, topic, rq):
     existing = [f for f in (running or {}).get("families", [])]
     existing_block = ""
@@ -1390,6 +1543,23 @@ def normalization_prompt(techniques, running, topic, rq):
             "buat keluarga baru (id baru, mis. berikutnya setelah id terbesar) hanya bila tidak ada yang cocok:\n" + lines + "\n"
         )
     listing = "\n".join(f'- "{t["name"]}" | {t["count"]} artikel' for t in techniques)
+    kept = [i for i in (running or {}).get("items", []) if i.get("family") != NORM_DROP and i.get("canonical")]
+    attach_task, attach_schema = "", ""
+    if kept:
+        fam_names = {f["id"]: f["name"] for f in existing}
+        grouped = {}
+        for i in kept[:500]:
+            grouped.setdefault(i.get("family"), []).append(str(i["canonical"])[:80])
+        lines = "\n".join(f"{fid or 'tanpa keluarga'} {fam_names.get(fid, '')}: " + "; ".join(names) for fid, names in grouped.items())
+        existing_block += "\nNAMA BAKU YANG SUDAH ADA (jangan diubah):\n" + lines + "\n"
+        attach_task = (
+            "2. attach: bila sebuah nama pada DAFTAR TEKNIK adalah teknik yang SAMA PERSIS dengan salah satu NAMA BAKU YANG SUDAH ADA "
+            "(singkatan, variasi penulisan, kata tambahan generik), tempelkan ke nama baku itu dengan pasangan "
+            '{"nama dari daftar":"nama baku yang sudah ada persis"}. Varian bermakna (weighted, quantile, conformal, robust, stochastic, '
+            "distributionally robust) tetap terpisah dari metode dasarnya, JANGAN di-attach. Nama yang di-attach tidak boleh muncul di "
+            "merges, drops, atau assign. Bila tidak ada yang cocok, jangan attach; perlakukan sebagai nama baru.\n"
+        )
+        attach_schema = ',"attach":{"nama dari daftar":"nama baku yang sudah ada"}'
     return f"""Anda menormalisasi daftar nama teknik/metode yang diekstrak dari artikel ilmiah untuk taksonomi desain penelitian.
 Gunakan hanya daftar di bawah; jangan menambah teknik yang tidak ada. Topik review: {topic or '(belum ditentukan)'}. Research question: {rq or '(belum dirumuskan)'}.
 {existing_block}
@@ -1398,12 +1568,12 @@ DAFTAR TEKNIK (nama | jumlah artikel):
 
 TUGAS
 1. merges: gabungkan nama yang artinya SAMA PERSIS (singkatan vs nama lengkap, variasi penulisan, kata tambahan seperti "classifier", "framework", "approach"). JANGAN menggabungkan metode yang berbeda walau satu keluarga (mis. LSTM dan BiLSTM tetap terpisah). Varian yang menambah komponen metodologis bermakna (mis. quantile, conformal, robust, stochastic, weighted, distributionally robust) tetap terpisah dari metode dasarnya. Tiap nama hanya boleh muncul di satu merge. Semua varian harus persis salah satu nama pada daftar; canonical adalah nama yang paling umum dan jelas.
-2. drops: nama yang BUKAN teknik/metode: nama topik atau kerangka keseluruhan (mis. predict-then-optimize), nama dataset, metrik evaluasi, komponen atau parameter model (fungsi, loss, konstanta), perangkat lunak/solver/library (mis. Gurobi, CPLEX, PuLP, scikit-learn), objek domain. Nama arsitektur atau model prediksi/optimasi (mis. TCN, DCRNN, Transformer, XGBoost, LSTM) ADALAH teknik: jangan di-drop hanya karena namanya spesifik. Beri alasan singkat. Jika ragu, jangan di-drop.
-3. families: kelompokkan teknik yang tersisa ke 4-8 keluarga menurut SATU prinsip (tulis pada principle): jenis/peran teknik dalam metode penelitian. Nama keluarga ringkas (bahasa Indonesia, nama teknik tetap istilah aslinya); definisi satu kalimat yang membedakannya dari keluarga lain. Setiap teknik masuk tepat satu keluarga yang definisinya benar-benar cocok; jangan memaksa teknik ke keluarga yang salah (mis. K-means bukan teknik evaluasi), lebih baik tidak ditugaskan di assign. Hindari keluarga "Lainnya".
-4. assign: peta dari nama teknik ke id keluarga. Kuncinya adalah canonical (untuk yang digabung) atau nama itu sendiri (untuk yang tidak digabung). Setiap teknik yang tidak di-drop dan bukan sekadar varian harus ada di assign.
+{attach_task}{"3" if attach_task else "2"}. drops: nama yang BUKAN teknik/metode: nama topik atau kerangka keseluruhan (mis. predict-then-optimize), nama dataset, metrik angka (mis. RMSE, MAE, MAPE), komponen atau parameter model (fungsi, loss, konstanta), perangkat lunak/solver/library (mis. Gurobi, CPLEX, PuLP, scikit-learn), objek domain. Nama arsitektur atau model prediksi/optimasi (mis. TCN, DCRNN, Transformer, XGBoost, LSTM) ADALAH teknik: jangan di-drop hanya karena namanya spesifik. Uji statistik dan prosedur validasi (mis. Friedman test, Wilcoxon signed-rank test, K-fold cross-validation) ADALAH teknik, bukan metrik. Alat matematis yang dipakai artikel sebagai bagian prosedur metodenya, seperti kondisi optimalitas dan diferensiasi untuk pelatihan end-to-end (mis. KKT conditions, implicit function theorem, finite differences), ADALAH teknik. Beri alasan singkat. Jika ragu, jangan di-drop.
+{"4" if attach_task else "3"}. families: kelompokkan teknik yang tersisa ke 4-8 keluarga menurut SATU prinsip (tulis pada principle): jenis/peran teknik dalam metode penelitian. Nama keluarga ringkas (bahasa Indonesia, nama teknik tetap istilah aslinya); definisi satu kalimat yang membedakannya dari keluarga lain. Setiap teknik masuk tepat satu keluarga yang definisinya benar-benar cocok; jangan memaksa teknik ke keluarga yang salah (mis. K-means bukan teknik evaluasi), lebih baik tidak ditugaskan di assign. Hindari keluarga "Lainnya".
+{"5" if attach_task else "4"}. assign: peta dari nama teknik ke id keluarga. Kuncinya adalah canonical (untuk yang digabung) atau nama itu sendiri (untuk yang tidak digabung). Setiap teknik yang tidak di-drop dan bukan sekadar varian harus ada di assign.
 
 Keluarkan JSON valid saja dengan struktur:
-{{"principle":"satu kalimat prinsip pengelompokan","families":[{{"id":"F1","name":"nama keluarga","definition":"definisi satu kalimat"}}],"merges":[{{"canonical":"nama baku","variants":["nama persis dari daftar","nama persis lain"]}}],"drops":[{{"name":"nama persis dari daftar","reason":"alasan singkat"}}],"assign":{{"nama teknik":"F1"}}}}
+{{"principle":"satu kalimat prinsip pengelompokan","families":[{{"id":"F1","name":"nama keluarga","definition":"definisi satu kalimat"}}],"merges":[{{"canonical":"nama baku","variants":["nama persis dari daftar","nama persis lain"]}}]{attach_schema},"drops":[{{"name":"nama persis dari daftar","reason":"alasan singkat"}}],"assign":{{"nama teknik":"F1"}}}}
 """
 
 
@@ -1419,7 +1589,7 @@ def finalize_normalization(proposal, techniques, running=None):
     proposal = proposal if isinstance(proposal, dict) else {}
     running = running or {"families": [], "items": [], "principle": ""}
     families = [dict(f) for f in running.get("families", [])]
-    items = [dict(i) for i in running.get("items", [])]
+    items = [_copy_item(i) for i in running.get("items", [])]
     by_name = {t["name"]: t for t in techniques}
 
     name_to_id = {str(f.get("name", "")).strip().lower(): f["id"] for f in families}
@@ -1427,7 +1597,7 @@ def finalize_normalization(proposal, techniques, running=None):
     for fam in (proposal.get("families") if isinstance(proposal.get("families"), list) else []):
         if not isinstance(fam, dict):
             continue
-        name = str(fam.get("name") or "").strip()[:60]
+        name = str(fam.get("name") or "").strip()[:120]
         if not name:
             continue
         fam_id = name_to_id.get(name.lower())
@@ -1453,7 +1623,7 @@ def finalize_normalization(proposal, techniques, running=None):
         for n in names:
             raw += [r for r in by_name[n]["raw"] if r not in raw]
             ids += [i for i in by_name[n]["article_ids"] if i not in ids]
-        return {"canonical": canonical, "variants": raw, "family": family, "reason": reason, "count": len(ids), "article_ids": ids, "new": True}
+        return {"canonical": _strip_abbreviation(canonical)[:80], "variants": raw, "family": family, "reason": reason, "count": len(ids), "article_ids": ids, "new": True}
 
     used, new_items = set(), []
     for drop in (proposal.get("drops") if isinstance(proposal.get("drops"), list) else []):
@@ -1462,6 +1632,19 @@ def finalize_normalization(proposal, techniques, running=None):
             used.add(name)
             reason = str(drop.get("reason") or "")[:160] if isinstance(drop, dict) else ""
             new_items.append(make_item(name, [name], NORM_DROP, reason))
+    # attach: nama baru -> item baku yang SUDAH ADA (mewarisi keluarganya). Target harus nama baku yang ada (bukan buangan) dan
+    # tidak boleh berkonflik kata pengubah bermakna (weighted SAA tidak boleh menempel ke SAA).
+    attached = []
+    canon_index = {_tech_key(i["canonical"]): n for n, i in enumerate(items) if i.get("family") != NORM_DROP and i.get("canonical")}
+    for name, target in (proposal.get("attach") if isinstance(proposal.get("attach"), dict) else {}).items():
+        n = canon_index.get(_tech_key(target)) if isinstance(target, str) else None
+        if not isinstance(name, str) or name not in by_name or name in used or n is None:
+            continue
+        if _modifier_conflict(name, items[n]["canonical"]):
+            continue
+        used.add(name)
+        _absorb(items[n], by_name[name]["raw"], by_name[name]["article_ids"], name)
+        attached.append({"name": name, "to": items[n]["canonical"], "how": "AI"})
     for merge in (proposal.get("merges") if isinstance(proposal.get("merges"), list) else []):
         if not isinstance(merge, dict):
             continue
@@ -1474,14 +1657,18 @@ def finalize_normalization(proposal, techniques, running=None):
             group.append(canonical)
         if len(group) < 2:
             continue
-        used.update(group)
         canonical = canonical or sorted(group, key=lambda n: (-by_name[n]["count"], len(n)))[0]
+        # penjaga varian bermakna: anggota yang berbeda kata pengubahnya dari nama baku dikeluarkan (jadi item sendiri)
+        group = [v for v in group if v == canonical or not _modifier_conflict(v, canonical)]
+        if len(group) < 2:
+            continue
+        used.update(group)
         new_items.append(make_item(canonical, group, family_for(canonical, *group)))
     for name in by_name:
         if name not in used:
             new_items.append(make_item(name, [name], family_for(name)))
 
-    return {"families": families, "items": items + new_items,
+    return {"families": families, "items": items + new_items, "attached": attached,
             "principle": str(proposal.get("principle") or running.get("principle") or "")[:300]}
 
 
@@ -1500,14 +1687,22 @@ def normalize_techniques(articles, existing, topic, rq, usage):
     # 'belum terpetakan' di UI. Item yang dibuang (NORM_DROP) dan yang sudah punya keluarga tidak disentuh.
     family_ids = {f["id"] for f in running["families"]}
     running["items"] = [i for i in running["items"] if i.get("family") == NORM_DROP or i.get("family") in family_ids]
+    # 1) Duplikat yang sudah ada di pemetaan digabung otomatis (tanpa AI).
+    running, merged_existing, review = consolidate_normalization(running)
     known = _norm_lookup(running)
     todo = [t for t in techniques if not known or t["key"] not in known["lookup"]]
+    added = len(todo)
+    # 2) Nama baru yang jelas sama dengan item lama ditempelkan otomatis; sisanya baru ke AI (yang boleh attach/merge).
+    todo, attached = auto_attach(todo, running)
     for start in range(0, len(todo), NORM_CHUNK):
         chunk = todo[start:start + NORM_CHUNK]
         proposal = llm_json(normalization_prompt(chunk, running, topic, rq), max_output_tokens=4500,
                             usage=usage, label=f"Normalisasi teknik {start // NORM_CHUNK + 1}")
         running = finalize_normalization(proposal, chunk, running)
-    running.update({"model": MODEL, "proposed_at": datetime.now(timezone.utc).isoformat(), "added": len(todo)})
+        attached += running.pop("attached", [])
+    attached += refresh_item_counts(running, techniques)
+    running.update({"model": MODEL, "proposed_at": datetime.now(timezone.utc).isoformat(), "added": added,
+                    "attached": attached, "merged_existing": merged_existing, "review": review})
     return running
 
 
@@ -1575,10 +1770,16 @@ def build_design_taxonomy(articles, topic="", normalization=None):
 
     # --- Cabang 4: Fondasi (philosophy, approach, time horizon) ---
     fond_children = []
+    # Definisi baku lapisan luar research onion (Saunders dkk.), supaya tabel definisi di laporan tidak berlubang.
+    foundation_def = {
+        "philosophy": "Asumsi filosofis peneliti tentang hakikat realitas dan pengetahuan (mis. positivisme, interpretivisme, pragmatisme).",
+        "approach": "Cara penelitian berhubungan dengan teori: deduktif (menguji teori atau model yang sudah ada), induktif (membangun teori dari data), atau abduktif (bolak-balik di antara keduanya).",
+        "time_horizon": "Rentang waktu penelitian: cross-sectional (satu titik waktu) atau longitudinal (pengamatan berulang atau deret waktu).",
+    }
     for gid, field, label in (("f-phil", "philosophy", "Philosophy"), ("f-appr", "approach", "Approach to theory development"),
                               ("f-time", "time_horizon", "Time horizon")):
         by_value, none_ids = _group_by_value(usable, field)
-        fond_children.append(_node(gid, label, "group", "", all_ids, children=_value_nodes(gid, field, by_value, none_ids)))
+        fond_children.append(_node(gid, label, "group", foundation_def[field], all_ids, children=_value_nodes(gid, field, by_value, none_ids)))
     fondasi = _node(
         "fondasi", "Fondasi & horizon waktu", "branch",
         "Lapisan luar research onion. Sering tidak dinyatakan pada artikel teknik, jadi banyak bernilai 'inferred' atau 'tidak dinyatakan'.",
