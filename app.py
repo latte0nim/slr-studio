@@ -18,6 +18,14 @@ import fitz  # PyMuPDF
 from flask import Flask, render_template, request, jsonify, Response
 from werkzeug.utils import secure_filename
 
+import arah_riset  # langkah 0 khusus TMI: murni komputasi dari data tesis, tanpa AI
+
+try:
+    ARAH_RISET = arah_riset.Engine()
+except (OSError, ValueError) as exc:  # data hilang/rusak: fitur mati, sisa app tetap jalan
+    ARAH_RISET = None
+    print(f"[Arah Riset] dinonaktifkan: {exc}", file=sys.stderr)
+
 # Resolve paths relative to app.py so .env is found regardless of the terminal's current folder.
 BASE_DIR = Path(__file__).resolve().parent
 ENV_FILE = BASE_DIR / ".env"
@@ -2429,6 +2437,64 @@ def synthesize():
 @app.errorhandler(413)
 def too_large(_error):
     return jsonify({"error": "Total ukuran upload terlalu besar. Kurangi jumlah PDF dalam satu batch."}), 413
+
+
+def _ar_selected(body):
+    valid = {k for k, _ in arah_riset.LAYERS}
+    return {k: v for k, v in ((body or {}).get("selected") or {}).items() if k in valid and isinstance(v, str) and v}
+
+
+def _ar_guard():
+    if ARAH_RISET is None:
+        return jsonify({"error": "Data Arah Riset tidak ditemukan. Periksa folder arah_riset_data/."}), 503
+    return None
+
+
+@app.get("/api/arah-riset/meta")
+@auth_guard
+def arah_riset_meta():
+    """Jumlah tesis dan daftar layer pertanyaan. Tanpa AI, tanpa biaya token."""
+    if (err := _ar_guard()):
+        return err
+    return jsonify({"total": len(ARAH_RISET.t),
+                    "layers": [{"id": k, "title": t} for k, t in arah_riset.LAYERS]})
+
+
+@app.post("/api/arah-riset/options")
+@auth_guard
+def arah_riset_options():
+    if (err := _ar_guard()):
+        return err
+    body = request.get_json(silent=True) or {}
+    layer = body.get("layer")
+    if layer not in {k for k, _ in arah_riset.LAYERS}:
+        return jsonify({"error": "Layer tidak dikenal."}), 400
+    opts, n = ARAH_RISET.options(layer, _ar_selected(body), top=arah_riset.TOP.get(layer, 10))
+    return jsonify({"n": n, "options": [{"value": v, "label": ARAH_RISET.label(layer, v), "count": c} for v, c in opts]})
+
+
+@app.post("/api/arah-riset/examples")
+@auth_guard
+def arah_riset_examples():
+    if (err := _ar_guard()):
+        return err
+    sel = _ar_selected(request.get_json(silent=True))
+    return jsonify({"n": len(ARAH_RISET.filtered(sel)),
+                    "examples": [{"judul": t["judul"], "angkatan": t["angkatan"], "url": t["url"]}
+                                 for t in ARAH_RISET.examples(sel, n=5)]})
+
+
+@app.post("/api/arah-riset/generate")
+@auth_guard
+def arah_riset_generate():
+    if (err := _ar_guard()):
+        return err
+    body = request.get_json(silent=True) or {}
+    extra = [x.strip()[:80] for x in str(body.get("extra") or "").split(",") if x.strip()][:6]
+    try:
+        return jsonify(ARAH_RISET.generate(_ar_selected(body), extra_en_terms=extra))
+    except ValueError as exc:
+        return jsonify({"error": str(exc)}), 400
 
 
 if __name__ == "__main__":

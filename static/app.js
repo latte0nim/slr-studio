@@ -309,6 +309,7 @@
       search_query: $('#search-query').value.trim(),
       inclusion: $('#inclusion').value.trim(),
       exclusion: $('#exclusion').value.trim(),
+      guide_context: $('#guide-context').value || 'itb-tmi',
     };
   }
   function applyMeta(meta = {}) {
@@ -318,6 +319,7 @@
     $('#search-query').value = meta.search_query || '';
     $('#inclusion').value = meta.inclusion || '';
     $('#exclusion').value = meta.exclusion || '';
+    $('#guide-context').value = meta.guide_context || 'itb-tmi';
   }
   function saveMetaFromForm(showToast = false) {
     state.meta = getMetaFromForm();
@@ -329,9 +331,10 @@
     if (!target || !$('#' + target)) return;
     $$('.page-section').forEach(section => section.classList.toggle('active-section', section.id === target));
     $$('.nav-item').forEach(button => button.classList.toggle('active', button.dataset.target === target));
-    const labels = {overview:'Ikhtisar', articles:'Artikel', prisma:'PRISMA Flow', synthesis:'Review Synthesis', taxonomy:'Peta Topik', design:'Taksonomi Desain Riset', cooccurrence:'Co-occurrence', 'system-map':'System Map'};
+    const labels = {'arah-riset':'Arah Riset', overview:'Ikhtisar', articles:'Artikel', prisma:'PRISMA Flow', synthesis:'Review Synthesis', taxonomy:'Peta Topik', design:'Taksonomi Desain Riset', cooccurrence:'Co-occurrence', 'system-map':'System Map'};
     $('#breadcrumb-current').textContent = labels[target] || target;
     window.scrollTo({top:0, behavior:'smooth'});
+    if (target === 'arah-riset') renderArahRiset();
     if (target === 'articles') renderArticles();
     if (target === 'prisma') renderPrisma();
     if (target === 'taxonomy') renderTaxonomy();
@@ -853,7 +856,9 @@ html[data-view="naskah"] .audit,html[data-view="naskah"] .tag,html[data-view="na
 .chip{display:inline-block;font-size:11px;border:1px solid var(--line);padding:0 7px;margin-right:4px;white-space:nowrap}.chip.s{color:var(--ok);border-color:var(--ok)}.chip.r{color:var(--warn);border-color:var(--warn)}.chip.t{color:var(--bright);border-color:var(--bright)}
 .eg{border-left:3px solid var(--line);padding:6px 12px;margin:8px 0;font-size:13px;color:var(--dim)}.eg b{color:var(--fg)}.eg ul{margin:4px 0;padding-left:20px;border-left:0}
 ul.chk{list-style:none;padding-left:0;border-left:0}ul.chk li{margin:5px 0}ul.chk li:before{content:"\\2610  "}
-.refnote{border:1px solid var(--line);padding:7px 14px;margin:10px 0;font-size:12.5px;color:var(--dim)}`;
+.refnote{border:1px solid var(--line);padding:7px 14px;margin:10px 0;font-size:12.5px;color:var(--dim)}
+details.ex{border:1px solid var(--line);margin:10px 0}details.ex>summary{cursor:pointer;padding:9px 14px;font-weight:700}.ex-body{padding:2px 16px 10px;border-top:1px solid var(--line)}.ex-body h5{margin:14px 0 4px;font-size:13px}.ex-body p{font-size:13.5px}
+.ex-cap{font-size:12px;color:var(--dim);text-align:center}pre.ex-fig{font-size:12px;line-height:1.5;border:1px solid var(--line);padding:10px 14px;overflow-x:auto;white-space:pre}`;
   function rptRefs(ids) {
     const nums = list(ids).map(id => designRefs[id]).filter(Boolean).sort((a, b) => a - b);
     return nums.length ? `<span class="refs">[${nums.join(', ')}]</span>` : '';
@@ -975,6 +980,8 @@ ul.chk{list-style:none;padding-left:0;border-left:0}ul.chk li{margin:5px 0}ul.ch
     const strV = valsIn(bStr), strFilled = strV.filter(v => v.count > 0);
     const dataFilled = valsIn(grpBy(bTek, 'Pengumpulan')).filter(v => v.count > 0), anaFilled = valsIn(grpBy(bTek, 'Analisis')).filter(v => v.count > 0);
     const phFilled = valsIn(grpBy(bFon, 'Philosophy')).filter(v => v.count > 0), tmFilled = valsIn(grpBy(bFon, 'Time')).filter(v => v.count > 0);
+    const itb = (meta.guide_context || 'itb-tmi') === 'itb-tmi';
+    const phAllNot = phFilled.length > 0 && phFilled.every(v => /tidak dinyatakan/i.test(v.name));
     const famSorted = treeFams.slice().sort((a, b) => b.count - a.count), famFmt = f => `${esc(f.name)} (${esc(f.count)} artikel)`;
     const infN = sum('inferred'), totN = sum('stated') + sum('inferred') + sum('not_stated');
     const gapItems = list(syn && syn.research_gaps).slice(0, 4).map(g => `<li>${rptProse(g.gap)}</li>`).join('');
@@ -998,9 +1005,70 @@ ul.chk{list-style:none;padding-left:0;border-left:0}ul.chk li{margin:5px 0}ul.ch
       ['Lampiran', 'Label per artikel (opsional).', 'Lampiran E (mode lengkap)', tgS],
     ].map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('');
     const refnote = '<p class="refnote">Dokumen ini adalah acuan data dan kerangka untuk menulis, bukan naskah final. Susun ulang sesuai format yang diminta dan tulis pembahasan sendiri; panduan lengkapnya ada di laporan HTML, tampilan Panduan kerangka.</p>';
+    const exampleHtml = `<div class="card"><p><b>Teks di bagian F ini tetap</b> (tidak mengikuti datamu). Ia memakai data proyek contoh per 5 November 2026 (17 artikel ScienceDirect, topik <i>Predict-then-Optimize untuk keputusan operasional</i>) hanya untuk memperlihatkan bentuk dan nada tulisan tiap bagian. <b>Jangan disalin.</b> Alasan memilih topik, pembahasan, dan kesimpulan harus berasal dari pemikiranmu sendiri; kalimat yang ditandai <i>contoh alasan</i> sengaja dibuat sebagai pengandaian. Temuan dan celah penelitian (Bagian 8) tidak dicontohkan karena dibahas pada tahap SLR. Angka di sini bisa berbeda dari ekspormu: selalu rujuk laporanmu sendiri.</p></div>
+<details class="ex"><summary>Halaman judul dan abstrak (contoh)</summary><div class="ex-body">
+<p><b>Judul.</b> Taksonomi Desain Penelitian pada Studi Predict-then-Optimize untuk Keputusan Operasional Industri</p>
+<p><b>Abstrak.</b> Studi predict-then-optimize (PTO) menggabungkan model prediksi dengan model optimasi untuk mengambil keputusan operasional di bawah ketidakpastian. Penelitian ini menyusun taksonomi desain penelitian dari 17 artikel jurnal ScienceDirect terbitan 2024 sampai 2026 dengan kerangka research onion. Taksonomi disusun top-down: metodologi dan strategi, teknik dan prosedur, serta fondasi dan horizon waktu, dengan sepuluh keluarga teknik di bawah metodologi kuantitatif. Seluruh artikel berstrategi eksperimen pemodelan dan simulasi dengan metodologi kuantitatif, sebagian besar (16 artikel) memakai data sekunder, dan tidak ada yang menyatakan filosofi penelitiannya. Keluarga teknik yang paling banyak muncul adalah jaringan syaraf prediktif dan optimasi matematis (masing-masing 11 artikel). Hasil ini menjadi dasar bagi tahap systematic literature review berikutnya.</p>
+<p><b>Kata kunci.</b> predict-then-optimize, decision-focused learning, research onion, taksonomi penelitian</p></div></details>
+<details class="ex"><summary>Bab I. Pendahuluan (contoh)</summary><div class="ex-body">
+<h5>I.1 Latar belakang dan alasan memilih topik</h5>
+<p>Pengambilan keputusan operasional di sektor logistik, transportasi, energi, dan industri proses hampir selalu bergantung pada parameter yang belum diketahui saat keputusan dibuat, seperti permintaan, harga, waktu tempuh, atau ketersediaan sumber daya. Pendekatan konvensional memisahkan dua pekerjaan: model prediksi memperkirakan parameter itu, lalu model optimasi memakai hasil prakiraan tersebut untuk menentukan keputusan. Pada literatur yang ditelaah (2024 sampai 2026), pola ini berkembang menjadi pendekatan yang menghubungkan keduanya lebih erat, antara lain melalui pelatihan model prediksi yang memperhitungkan dampak keputusan (<i>decision-focused learning</i>) dan penanganan ketidakpastian yang eksplisit pada tahap optimasi.</p>
+<p><i>Contoh alasan; ganti dengan alasanmu yang sebenarnya.</i> Saya memilih topik ini karena berada di pertemuan dua bidang yang saya pelajari, yaitu pembelajaran mesin dan optimasi untuk sistem industri, dan karena literaturnya tersebar di banyak domain aplikasi sehingga sulit melihat pola metodologinya secara keseluruhan. Taksonomi desain penelitian diperlukan untuk memetakan bagaimana studi-studi tersebut dirancang, bukan hanya apa yang mereka hasilkan.</p>
+<h5>I.2 Fokus dan pertanyaan penelitian</h5>
+<p>Penelitian ini berfokus pada desain penelitian pada studi predict-then-optimize untuk keputusan operasional industri, yaitu metodologi, strategi, dan teknik yang dipakai. Studi yang hanya melakukan prediksi tanpa optimasi, atau berada di luar domain operasional dan industri, tidak masuk fokus. Pertanyaan penelitian: <i>Bagaimana desain penelitian (metodologi, strategi, teknik) pada studi predict-then-optimize untuk keputusan operasional industri?</i></p>
+<h5>I.3 Tujuan</h5>
+<p>Taksonomi ini bertujuan (1) memetakan posisi studi PTO pada lapisan research onion (Saunders dkk., 2019), (2) mengelompokkan teknik yang dipakai ke dalam keluarga yang terdefinisi, dan (3) menyediakan dasar untuk tahap systematic literature review berikutnya.</p></div></details>
+<details class="ex"><summary>Bab II. Metode penyusunan taksonomi (contoh)</summary><div class="ex-body">
+<h5>II.1 Sumber dan pencarian</h5>
+<p>Literatur dicari pada ScienceDirect pada 3 November 2026 (<i>gunakan tanggal yang benar-benar kamu lakukan</i>) dengan string pencarian: ("prescriptive analytics" OR "predict-then-optimize" OR "decision-focused learning") AND ("uncertainty" OR "stochastic") AND ("optimization" OR "resource allocation" OR "logistics").</p>
+<h5>II.2 Kriteria dan seleksi</h5>
+<p>Kriteria inklusi: artikel jurnal peer-reviewed 2020 sampai 2026, berbahasa Inggris, yang menggabungkan prediksi (pembelajaran mesin atau forecasting) dengan model optimasi untuk keputusan operasional. Kriteria eksklusi: hanya prediksi tanpa optimasi; domain di luar operasional atau industri; artikel review atau opini; tanpa teks lengkap. Sebanyak 20 artikel diunggah dan diekstrak; 17 lolos screening dan penilaian teks lengkap, dan 3 dieksklusi pada tahap screening. Angka ini dihitung dari PDF yang dikumpulkan, bukan dari jumlah hasil pencarian database, sehingga tidak disajikan sebagai diagram alir PRISMA. Artikel yang lolos terbit pada 2024 (1 artikel), 2025 (3 artikel), dan 2026 (13 artikel).</p>
+<h5>II.3 Metode klasifikasi</h5>
+<p>Taksonomi disusun top-down mengikuti research onion (Saunders dkk., 2019): dari topik, dipecah menjadi metodologi dan strategi, teknik dan prosedur, serta fondasi dan horizon waktu. Pada lapisan teknik, nama teknik yang disebut tiap artikel dinormalisasi menjadi keluarga teknik; usulan awal dibuat dengan bantuan model bahasa dan seluruh pengelompokan diperiksa serta disetujui peneliti. Satu artikel dapat muncul pada lebih dari satu cabang karena tiap lapisan menjelaskan dimensi yang berbeda. <i>Contoh alasan:</i> research onion dipilih karena memberi kerangka berlapis yang eksplisit dan dipakai sebagai acuan dalam perkuliahan.</p>
+<h5>II.4 Ekstraksi dan verifikasi</h5>
+<p>Label desain penelitian tiap artikel diekstrak dari teks lengkap PDF dengan bantuan model bahasa, disertai kutipan bukti dan status label: dinyatakan penulis, disimpulkan, atau tidak dinyatakan. Peneliti memverifikasi seluruh 17 artikel terhadap PDF-nya. Sebagian besar label berstatus disimpulkan, sehingga hasilnya harus dibaca sebagai penafsiran peneliti atas desain studi, bukan pernyataan penulis artikel.</p></div></details>
+<details class="ex"><summary>Bab III. Taksonomi penelitian (contoh)</summary><div class="ex-body">
+<h5>III.1 Hierarki taksonomi</h5>
+<p>Gambar III.1 menunjukkan hierarki taksonomi. Topik membentuk akar yang bercabang menjadi empat lapisan research onion. Seluruh artikel berada pada metodologi kuantitatif, sehingga sepuluh keluarga teknik ditempatkan di bawah cabang tersebut.</p>
+<pre class="ex-fig">Predict-then-Optimize untuk keputusan operasional (17)
+├─ 1 Metodologi
+│   ├─ 1.1 Kuantitatif (17)  → 10 keluarga teknik (1.1.1 sampai 1.1.10)
+│   ├─ 1.2 Kualitatif (0)
+│   └─ 1.3 Campuran (0)
+├─ 2 Strategi: Eksperimen pemodelan dan simulasi (17); Riset arsip (12); Studi kasus (4)
+├─ 3 Teknik dan prosedur: 3.1 Pengumpulan data; 3.2 Analisis data
+└─ 4 Fondasi dan horizon waktu: 4.1 Philosophy; 4.2 Approach; 4.3 Time horizon</pre>
+<p class="ex-cap">Gambar III.1 Hierarki taksonomi desain penelitian pada studi predict-then-optimize (n = 17). <i>Gambar ini kamu buat sendiri di Word atau draw.io; blok di atas hanya isinya.</i></p>
+<h5>III.2 Definisi konsep dan subkonsep</h5>
+<p>Tabel III.1 merangkum definisi tiap konsep. Definisi lapisan research onion mengacu pada kerangka Saunders dkk. (2019), sedangkan definisi keluarga teknik disusun dari teknik yang muncul pada korpus dan disetujui peneliti. <i>(Contoh ini hanya memuat sebagian baris; naskahmu memuat semuanya.)</i></p>
+<p class="ex-cap">Tabel III.1 Definisi konsep dan subkonsep (cuplikan)</p>
+<div class="wrap"><table><thead><tr><th>Kode</th><th>Konsep</th><th>Definisi</th><th class="n">Artikel</th></tr></thead><tbody><tr><td>1</td><td>Metodologi</td><td>Pilihan metodologis penelitian (lapisan methodological choice pada research onion).</td><td class="n">17</td></tr><tr><td>1.1</td><td>Kuantitatif</td><td>Data dan analisis numerik, statistik, atau komputasional.</td><td class="n">17</td></tr><tr><td>1.1.1</td><td>Jaringan syaraf prediktif</td><td>Model prediktif berlapis yang mempelajari pola nonlinier dan dependensi temporal atau spasial dari data, seperti LSTM, CNN, graph convolutional network, dan Transformer.</td><td class="n">11</td></tr><tr><td>1.1.7</td><td>Pembelajaran berorientasi keputusan</td><td>Metode yang mengintegrasikan prediksi dengan tujuan optimasi secara langsung seperti SPO dan decision-focused learning.</td><td class="n">5</td></tr><tr><td>2</td><td>Strategi</td><td>Strategi penelitian (lapisan strategies). Satu artikel boleh memakai lebih dari satu strategi.</td><td class="n">17</td></tr><tr><td>3.1</td><td>Pengumpulan data</td><td>Sumber data yang dipakai.</td><td class="n">17</td></tr><tr><td>4.2</td><td>Approach to theory development</td><td>Cara penelitian berhubungan dengan teori: deduktif (menguji teori atau model yang sudah ada), induktif (membangun teori dari data), atau abduktif (bolak-balik di antara keduanya).</td><td class="n">17</td></tr></tbody></table></div>
+<h5>III.3 Matriks metodologi dan strategi</h5>
+<p>Tabel III.2 memperlihatkan bahwa seluruh 17 artikel berada pada metodologi kuantitatif dan menggunakan strategi eksperimen pemodelan dan simulasi; 12 artikel juga memakai strategi riset arsip dan 4 artikel berbentuk studi kasus. Satu artikel dapat berada pada lebih dari satu strategi, sehingga jumlah kolom tidak dijumlahkan.</p>
+<p class="ex-cap">Tabel III.2 Sebaran artikel menurut metodologi dan strategi</p>
+<div class="wrap"><table><thead><tr><th>Metodologi</th><th class="n">Eksperimen pemodelan dan simulasi</th><th class="n">Riset arsip</th><th class="n">Studi kasus</th></tr></thead><tbody><tr><td>Kuantitatif</td><td class="n">17</td><td class="n">12</td><td class="n">4</td></tr><tr><td>Kualitatif</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr><tr><td>Campuran</td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr></tbody></table></div>
+<h5>III.4 Keluarga teknik dan artikelnya</h5>
+<p>Tabel III.3 menyajikan sepuluh keluarga teknik. Keluarga yang paling banyak dipakai adalah jaringan syaraf prediktif dan optimasi matematis (masing-masing 11 artikel), disusul pemrograman stokastik dan robust (9 artikel) serta pohon keputusan dan boosting (7 artikel). Yang paling jarang adalah kalibrasi dan kuantifikasi ketidakpastian prediksi (1 artikel) dan evaluasi dan interpretasi model (3 artikel). Satu artikel dapat memakai teknik dari beberapa keluarga, sehingga jumlahnya tidak dijumlahkan.</p>
+<p class="ex-cap">Tabel III.3 Keluarga teknik pada korpus (jumlah artikel yang memakai sedikitnya satu teknik dari keluarga itu)</p>
+<div class="wrap"><table><thead><tr><th>Kode</th><th>Keluarga</th><th class="n">Artikel</th><th>Definisi</th></tr></thead><tbody><tr><td>1.1.1</td><td>Jaringan syaraf prediktif</td><td class="n">11</td><td>Model prediktif berlapis yang mempelajari pola nonlinier dan dependensi temporal atau spasial dari data, seperti LSTM, CNN, graph convolutional network, dan Transformer.</td></tr><tr><td>1.1.2</td><td>Optimasi matematis dan algoritma solusi</td><td class="n">11</td><td>Formulasi dan penyelesaian program optimasi deterministik seperti MILP, SOCP, dan pencarian solusi.</td></tr><tr><td>1.1.3</td><td>Pemrograman stokastik dan robust</td><td class="n">9</td><td>Pendekatan optimasi yang menangani ketidakpastian melalui skenario, himpunan ambiguitas, atau kendala peluang.</td></tr><tr><td>1.1.4</td><td>Pohon keputusan dan boosting</td><td class="n">7</td><td>Model prediktif berbasis struktur pohon, baik tunggal maupun ensambel (bagging dan boosting), seperti Random Forest, XGBoost, dan LightGBM.</td></tr><tr><td>1.1.5</td><td>Heuristik dan algoritma numerik</td><td class="n">6</td><td>Prosedur pencarian dan perhitungan praktis yang menghasilkan solusi baik secara efisien tanpa jaminan optimalitas, seperti beam search, grid search, dan insertion heuristic.</td></tr><tr><td>1.1.6</td><td>Model linear, kernel, dan klaster</td><td class="n">6</td><td>Model prediktif klasik berbasis regresi linier, metode kernel, jarak, dan pengelompokan, seperti Lasso, SVM, k-NN, dan K-means.</td></tr><tr><td>1.1.7</td><td>Pembelajaran berorientasi keputusan</td><td class="n">5</td><td>Metode yang mengintegrasikan prediksi dengan tujuan optimasi secara langsung seperti SPO dan decision-focused learning.</td></tr><tr><td>1.1.8</td><td>Optimasi sekuensial dan kendali</td><td class="n">4</td><td>Teknik pengambilan keputusan berulang atas horizon waktu seperti MPC dan pemrograman dinamis.</td></tr><tr><td>1.1.9</td><td>Evaluasi dan interpretasi model</td><td class="n">3</td><td>Teknik untuk menguji signifikansi perbedaan atau menjelaskan kontribusi fitur model.</td></tr><tr><td>1.1.10</td><td>Kalibrasi dan kuantifikasi ketidakpastian prediksi</td><td class="n">1</td><td>Teknik yang mengkalibrasi atau membangkitkan kuantil/interval ketidakpastian dari model prediksi.</td></tr></tbody></table></div>
+<h5>III.5 Posisi dalam research onion</h5>
+<p>Pada lapisan metodologi, seluruh 17 artikel (100%) berada pada metodologi kuantitatif tunggal; tidak ada artikel kualitatif maupun campuran. Strategi yang dipakai adalah eksperimen pemodelan dan simulasi (17 artikel), riset arsip (12), dan studi kasus (4). Sumber data: data sekunder (16 artikel), data sintetis atau hasil simulasi (11), dan data primer lainnya (1); satu artikel tidak menyatakan sumber datanya. Analisis data bersifat kuantitatif pada seluruh artikel dan juga kualitatif pada satu artikel. Pada lapisan fondasi, tidak satu pun artikel menyatakan filosofi penelitiannya; seluruhnya dikategorikan berpendekatan deduktif, dengan horizon waktu longitudinal (7 artikel) atau tidak relevan (10 artikel).</p></div></details>
+<details class="ex"><summary>Bab IV. Pembahasan (contoh, tanpa bagian celah)</summary><div class="ex-body">
+<p><i>Bagian celah dan arah penelitian lanjut sengaja tidak dicontohkan: itu dibahas pada tahap SLR.</i></p>
+<p><b>Metodologi.</b> Seluruh 17 artikel bermetodologi kuantitatif dan berstrategi eksperimen pemodelan dan simulasi (Tabel III.2). Pola ini wajar untuk bidang yang berpusat pada pengembangan dan pengujian model matematis. Namun, korpus dijaring dengan kata kunci teknis (<i>prescriptive analytics</i>, <i>predict-then-optimize</i>, <i>decision-focused learning</i>), sehingga studi kualitatif atau campuran, misalnya tentang penerapan analitik preskriptif di organisasi, kemungkinan besar tidak terjaring. Cabang kualitatif dan campuran yang kosong karena itu lebih tepat dibaca sebagai batas cakupan korpus, bukan bukti bahwa studi semacam itu tidak ada.</p>
+<p><b>Strategi dan data.</b> Riset arsip muncul pada 12 artikel dan studi kasus pada 4 artikel. Data sekunder dipakai oleh 16 artikel dan data sintetis atau hasil simulasi oleh 11 artikel. Tidak ada satu pun artikel yang berstrategi eksperimen laboratorium atau lapangan, sehingga bukti dari penerapan langsung di lapangan tidak tercermin pada label desain penelitian. Dengan kata lain, klaim kinerja keputusan pada korpus ini bertumpu pada data historis dan simulasi.</p>
+<p><b>Keluarga teknik.</b> Komponen prediksi dan komponen optimasi sama-sama banyak: jaringan syaraf prediktif (11 artikel) dan optimasi matematis (11 artikel) memimpin, diikuti pemrograman stokastik dan robust (9) dan model pohon (7). Pembelajaran berorientasi keputusan, yang menjadi ciri integrasi lebih erat antara prediksi dan keputusan, dipakai pada 5 artikel, misalnya untuk pengendalian iklim rumah kaca (X. Chen &amp; You, 2026), dan kalibrasi ketidakpastian prediksi pada 1 artikel. Angka ini mengisyaratkan bahwa komponen prediksi dan optimasi yang berdiri sendiri masih lebih banyak dipakai daripada pelatihan prediksi yang menimbang dampak keputusan, meskipun hubungan ini perlu dikonfirmasi dengan pembacaan yang lebih dalam.</p>
+<p><b>Fondasi.</b> Tidak satu pun artikel menyatakan filosofi penelitiannya, dan label pendekatan teori serta horizon waktu tidak selalu dinyatakan penulis. Hal ini umum pada artikel teknik, tetapi berarti lapisan luar research onion pada taksonomi ini adalah penafsiran peneliti, bukan fakta yang dilaporkan penulis.</p>
+<p><b>Keterbatasan.</b> Taksonomi ini dibangun dari 17 artikel pada satu database (ScienceDirect) untuk 2024 sampai 2026, sehingga tidak dapat digeneralisasi ke seluruh literatur PTO. Label diekstrak dengan bantuan model bahasa dan sebagian besar berstatus disimpulkan, walaupun seluruh artikel telah diverifikasi terhadap PDF. Satu artikel dapat berada di banyak cabang, sehingga jumlah per cabang tidak saling menjumlah. Penentuan keluarga teknik juga melibatkan penilaian peneliti, misalnya apakah suatu uji statistik dipandang sebagai teknik.</p></div></details>
+<details class="ex"><summary>Bab V. Kesimpulan dan saran (contoh)</summary><div class="ex-body">
+<p>Pertanyaan penelitian dijawab sebagai berikut. Studi predict-then-optimize untuk keputusan operasional pada korpus ini seragam secara metodologis (kuantitatif, eksperimen pemodelan dan simulasi, data sekunder), dan keragamannya terletak pada tekniknya. Tiga temuan utama: (1) seluruh 17 artikel kuantitatif dan tidak ada yang kualitatif atau campuran; (2) tidak ada artikel berstrategi eksperimen laboratorium atau lapangan; (3) teknik terbagi dalam sepuluh keluarga dengan prediksi dan optimasi sebagai inti, sedangkan pembelajaran berorientasi keputusan baru dipakai pada 5 artikel.</p>
+<p>Saran: tahap berikutnya adalah systematic literature review formal dengan protokol pencarian yang terdokumentasi, termasuk menambah database dan memperluas kata kunci agar studi kualitatif dan campuran, bila ada, ikut terjaring.</p></div></details>
+<details class="ex"><summary>Daftar pustaka (contoh, urut abjad)</summary><div class="ex-body">
+<p>Contoh ini memakai gaya penulis-tahun dengan penulis pertama dan <i>dkk.</i> untuk tiga penulis atau lebih. Tulis semua penulis dan lengkapi nama jurnal, volume, dan halaman sesuai gaya sitasi yang diminta template. Dalam teks, dua artikel dengan nama belakang sama dibedakan dengan inisial (C. Wang, 2024 dan X. Wang, 2026; S. Chen, 2025 dan X. Chen, 2026).</p>
+<ol class="refs-list"><li>Alkhulaifi, N., dkk. (2026). Decision-Focused Learning Enhanced by Automated Feature Engineering for Energy Storage Optimisation. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.eswa.2025.130554</li><li>Chen, S., dkk. (2025). A prescriptive tree-based model for energy-efficient room scheduling: Considering uncertainty in energy generation and consumption. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.ejor.2025.02.023</li><li>Chen, X., &amp; You, F. (2026). Decision-focused learning-augmented MPC for climate control in controlled-environment agriculture greenhouses. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.compag.2026.112496</li><li>Guo, Y., dkk. (2026). A smart predict-then-optimize framework for vehicle rebalancing problem. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.trb.2026.103411</li><li>Han, J., dkk. (2026). A predict-then-optimize framework for multi-stage agricultural production and distribution planning. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.asoc.2026.115224</li><li>Helyar, S., &amp; Alnaggar, A. (2025). Air quality monitoring and mitigation through time series forecasting and stochastic optimization. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.jenvman.2025.125540</li><li>Ji, Y., dkk. (2026). A predict-then-optimize framework for exposure allocation in online-to-offline platforms under uncertainty. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.omega.2026.103603</li><li>Li, X., dkk. (2026). Data-Driven Predict-then-Optimize framework for landing scheduling with hybrid descent modes. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.trb.2026.103535</li><li>Lin, Z., dkk. (2026). Predict-then-optimize: LM-MTSF provides data-driven support for distributionally robust operation optimization of active distribution networks. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.apenergy.2026.128393</li><li>Ribeiro, R., &amp; Fanzeres, B. (2026). Integrated estimate-and-optimize decision trees learning for two-stage linear decision-making problems. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.ejor.2025.08.048</li><li>Sheng, T., dkk. (2026). A predict-then-optimize framework for Just-In-Time arrival of vessels with probabilistic berth-availability forecasts. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.tre.2026.105033</li><li>Sun, B., &amp; Meng, Q. (2026). Customized first-and-last-mile ridesharing services with electric modular autonomous vehicles. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.tre.2026.105184</li><li>Tan, Z., dkk. (2026). Data-driven arrival time suggestion for drivers in trucking platform of export containers. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.ejor.2026.06.019</li><li>Wang, C., dkk. (2024). Refinery planning optimization based on smart predict-then-optimize method under exogenous price uncertainty. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.compchemeng.2024.108765</li><li>Wang, X., dkk. (2026). SPO-VCS: An end-to-end smart predict-then-optimize framework with alternating differentiation method for relocation problems in large-scale vehicle crowd sensing. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.tre.2025.104515</li><li>Zhang, C., dkk. (2025). Predictive and prescriptive analytics for robust airport gate assignment planning in airside operations under uncertainty. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.tre.2025.103963</li><li>Zhao, Y., dkk. (2026). Machine Learning-Enhanced Rolling Horizon Optimization algorithm for dynamic scheduling in AGV-Supported rice production. <span class="todo">[nama jurnal, volume(nomor), halaman: lengkapi dari DOI]</span> https://doi.org/10.1016/j.cor.2026.107688</li></ol></div></details>`;
     const guide = `<h2>Panduan kerangka: dari laporan ini ke naskah tugasmu</h2>
-<div class="card"><p><b>Laporan ini adalah acuan, bukan naskah tugas.</b> Mode naskah berisi data, tabel, dan kerangka yang dihitung dari proyekmu. Yang dikumpulkan harus naskahmu sendiri: disusun ulang mengikuti format thesis TMI, dengan alasan memilih topik, pembahasan, dan kesimpulan yang kamu tulis sendiri. Contoh di panduan ini diambil dari proyekmu: topik <b>${esc(topic)}</b>, ${esc(arts.length)} artikel.</p>
-<p>Slide tugas meminta tiga hal: (a) topik dan fokus, (b) konsep dan subkonsep yang didefinisikan, (c) pengelompokan hierarkis (top-down atau bottom-up) yang logis. Bab I dan II menjawab (a), Bab III menjawab (b) dan (c), Bab IV dan V sepenuhnya milikmu.</p>
+<div class="card"><p><b>Laporan ini adalah acuan, bukan naskah tugas.</b> Mode naskah berisi data, tabel, dan kerangka yang dihitung dari proyekmu. Yang dikumpulkan harus naskahmu sendiri: disusun ulang mengikuti ${itb ? 'format thesis TMI' : 'format penulisan yang diminta'}, dengan alasan memilih topik, pembahasan, dan kesimpulan yang kamu tulis sendiri. Contoh di panduan ini diambil dari proyekmu: topik <b>${esc(topic)}</b>, ${esc(arts.length)} artikel.</p>
+<p>${itb ? 'Slide tugas meminta tiga hal' : 'Taksonomi penelitian yang baik menjawab tiga hal'}: (a) topik dan fokus, (b) konsep dan subkonsep yang didefinisikan, (c) pengelompokan hierarkis (top-down atau bottom-up) yang logis. Bab I dan II menjawab (a), Bab III menjawab (b) dan (c), Bab IV dan V sepenuhnya milikmu.</p>
 <p>Penanda: ${tgS} bahan siap, tinggal dirapikan ke format; ${tgR} bahan ada tetapi kalimatnya harus kamu tulis ulang; ${tgW} tidak ada di laporan, harus kamu tulis.</p></div>
 <h3>A. Peta kerangka dokumen</h3><div class="wrap"><table><thead><tr><th>Bab</th><th>Yang ditulis</th><th>Bahan di laporan</th><th>Status</th></tr></thead><tbody>${mapRows}</tbody></table></div>
 <h3>B. Bab per bab</h3>
@@ -1028,15 +1096,15 @@ ${eg(`posisi dalam onion pada proyekmu:<ul class="plain">${posItems}</ul>`)}</di
 <li><b>Metodologi.</b> Mengapa distribusinya begini: sifat bidang atau cara kamu memilih artikel? Apa arti cabang yang kosong bagi klaim taksonomimu?${eg(`${metoLine}.${emptyMeto ? ` Cabang tanpa artikel: ${emptyMeto}.` : ''}`)}</li>
 <li><b>Strategi.</b> Satu artikel boleh punya beberapa strategi: mana yang tumpang tindih dan mengapa? Apa artinya bagi bukti dari lapangan?${eg(`${fmtV(strFilled)}.`)}</li>
 <li><b>Data dan analisis.</b> Seberapa bergantung bidang ini pada data sekunder atau sintetis, dan apa risikonya?${eg(`pengumpulan data: ${fmtV(dataFilled)}. Analisis: ${fmtV(anaFilled)}.`)}</li>
-<li><b>Keluarga teknik.</b> Teknik mana yang menjadi inti metodologi dan mana yang baru muncul? Bagaimana hubungan antar keluarga, misalnya prediksi yang menyuplai optimasi?${eg(`terpadat: ${famSorted.slice(0, 3).map(famFmt).join('; ') || 'belum ada'}. Tertipis: ${famSorted.slice(-3).reverse().map(famFmt).join('; ') || 'belum ada'}.`)}</li>
-<li><b>Fondasi.</b> Banyak artikel teknik tidak menyatakan filosofi atau pendekatan teorinya. Jangan mengarang: sebut sebagai keterbatasan, lalu jelaskan apa dampaknya pada lapisan luar onion.${eg(`Philosophy: ${fmtV(phFilled)}. Time horizon: ${fmtV(tmFilled)}.`)}</li>
+<li><b>Keluarga teknik.</b> Teknik mana yang menjadi inti metodologi dan mana yang baru muncul? Bagaimana hubungan antar keluarga, misalnya satu keluarga yang menyuplai masukan bagi keluarga lain?${eg(`terpadat: ${famSorted.slice(0, 3).map(famFmt).join('; ') || 'belum ada'}. Tertipis: ${famSorted.slice(-3).reverse().map(famFmt).join('; ') || 'belum ada'}.`)}</li>
+<li><b>Fondasi.</b> ${phAllNot ? 'Tidak ada artikel yang menyatakan filosofinya. Jangan mengarang: sebut sebagai keterbatasan, lalu jelaskan apa dampaknya pada lapisan luar onion.' : 'Bandingkan artikel yang menyatakan filosofi atau pendekatan teorinya dengan yang tidak: apa bedanya, dan apa dampaknya pada lapisan luar onion? Jangan mengarang label yang tidak dinyatakan penulis.'}${eg(`Philosophy: ${fmtV(phFilled)}. Time horizon: ${fmtV(tmFilled)}.`)}</li>
 <li><b>Keterbatasan.</b> Apa yang tidak bisa disimpulkan dari taksonomi ini? Pikirkan jumlah artikel, satu sumber, label yang disimpulkan AI, dan satu artikel yang masuk banyak cabang.${eg(`${esc(arts.length)} artikel; ${esc(infN)} dari ${esc(totN)} label adalah kesimpulan AI, bukan pernyataan penulis; ${esc(verifiedN)} artikel sudah kamu verifikasi.`)}</li>
 <li><b>Celah dan langkah lanjut.</b> Pilih dua atau tiga celah dan buktikan dari tabelmu sendiri, bukan dari kalimat AI. Hubungkan ke tahap SLR.${gapItems ? eg(`celah dari Review Synthesis (bahan berpikir, bukan untuk disalin):<ul class="plain">${gapItems}</ul>`) : eg('belum ada hasil Review Synthesis. Jalankan dulu bila ingin memakainya sebagai bahan.')}</li></ol>
 <p><b>Hindari:</b> menyalin Bagian 8 apa adanya; menulis hubungan sebab-akibat dari data yang hanya deskriptif; menggeneralisasi seluruh bidang dari ${esc(arts.length)} artikel; menyebut proses PRISMA penuh bila tidak dijalankan.</p></div>
 <div class="card"><h4>Bab V. Kesimpulan dan saran ${tgW}</h4><ul class="plain">
 <li>Jawab pertanyaan penelitian dalam beberapa kalimat, tanpa angka baru.</li>
 <li>Rangkum tiga temuan utama dari Bab IV.</li>
-<li>Saran: langkah berikutnya, yaitu SLR formal sesuai arahan dosen, dan apa yang ingin kamu periksa lebih lanjut.</li></ul></div>
+<li>${itb ? 'Saran: langkah berikutnya, yaitu SLR formal sesuai arahan dosen, dan apa yang ingin kamu periksa lebih lanjut.' : 'Saran: langkah berikutnya, misalnya SLR formal, dan apa yang ingin kamu periksa lebih lanjut.'}</li></ul></div>
 <div class="card"><h4>Daftar pustaka ${tgR}</h4><ul class="plain">
 <li>Nomor [n] di laporan hanya penomoran internal laporan. Di naskah, ganti dengan gaya sitasi yang diminta template.</li>
 <li>Lengkapi nama jurnal, volume, dan halaman dari DOI. Laporan hanya memuat penulis, tahun, judul, dan DOI.</li>
@@ -1052,13 +1120,13 @@ ${eg(`posisi dalam onion pada proyekmu:<ul class="plain">${posItems}</ul>`)}</di
 <li>Tulis Bab IV dan V memakai pertanyaan pemandu di atas.</li>
 <li>Lengkapi daftar pustaka dan ganti [n] dengan gaya sitasi.</li>
 <li>Baca ulang: setiap angka di naskahmu harus bisa ditemukan di laporan, dan setiap label yang kamu bahas sudah kamu cek di PDF artikelnya.</li>
-<li>Cek aturan dosen soal penggunaan AI, lalu kumpulkan hardcopy dan softcopy sesuai slide.</li></ol></div>
+<li>${itb ? 'Cek aturan dosen soal penggunaan AI, lalu kumpulkan hardcopy dan softcopy sesuai slide.' : 'Cek aturan penggunaan AI di mata kuliahmu, lalu kumpulkan sesuai ketentuan.'}</li></ol></div>
 <h3>D. Catatan format</h3>
-<div class="card"><ul class="plain">
+<div class="card">${itb ? `<ul class="plain">
 <li>Slide tugas meminta format penulisan thesis TMI. Template prodi menang bila berbeda dari catatan ini.</li>
 <li>Rujukan yang kutemukan, yaitu Petunjuk Teknis Penulisan Tesis Magister ITB Sekolah Pascasarjana (2017, revisi 2019): Times New Roman 12, rata kiri-kanan, spasi 1,5; judul bab di tengah, tebal ukuran 14; judul subbab tebal ukuran 12; setiap bab dimulai di halaman baru.</li>
 <li>Gambar, tabel, dan rumus bernomor dua angka: angka Romawi untuk bab dan angka Arab untuk urutan di bab itu (Gambar III.1, Tabel III.2). Header tabel diulang bila tabel pindah halaman, gambar tidak boleh melewati margin.</li>
-<li>Daftar pustaka memakai gaya CSL ITB Sekolah Pascasarjana dengan baris kedua menjorok. Margin dari diagram contoh tampaknya kiri 4 cm dan sisi lain 3 cm; periksa langsung ke dokumen aslinya karena hasil ekstraksinya tidak rapi dan mungkin sudah ada edisi baru.</li></ul></div>
+<li>Daftar pustaka memakai gaya CSL ITB Sekolah Pascasarjana dengan baris kedua menjorok. Margin dari diagram contoh tampaknya kiri 4 cm dan sisi lain 3 cm; periksa langsung ke dokumen aslinya karena hasil ekstraksinya tidak rapi dan mungkin sudah ada edisi baru.</li></ul>` : `<ul class="plain"><li>Ikuti pedoman penulisan yang diminta program studi atau dosenmu: ukuran huruf, spasi, margin, penomoran halaman, penomoran gambar dan tabel, serta gaya sitasi mengikuti pedoman itu.</li><li>Bila ada template resmi, pakai template itu dari awal; mengubah format di akhir hampir selalu merusak penomoran gambar, tabel, dan daftar isi.</li><li>Gambar, tabel, dan rumus sebaiknya diberi nomor yang konsisten dan dirujuk di teks. Header tabel diulang bila tabel pindah halaman, dan gambar tidak boleh melewati margin.</li></ul>`}</div>
 <h3>E. Daftar periksa sebelum menyerahkan</h3>
 <div class="card"><ul class="chk">
 <li>Bab I, IV, dan V ditulis dengan kata sendiri.</li>
@@ -1067,7 +1135,8 @@ ${eg(`posisi dalam onion pada proyekmu:<ul class="plain">${posItems}</ul>`)}</di
 <li>Semua gambar dan tabel bernomor, berjudul, dan dirujuk di teks.</li>
 <li>Rujukan [n] sudah diganti gaya sitasi template, dan daftar pustaka lengkap.</li>
 <li>Penggunaan bantuan AI disebut di metode dan sesuai aturan dosen.</li>
-<li>Format mengikuti template thesis TMI.</li></ul></div>`;
+<li>Format mengikuti ${itb ? 'template thesis TMI' : 'pedoman penulisan yang diminta'}.</li></ul></div>
+<h3>F. Contoh naskah (kasus: Predict-then-Optimize)</h3>${exampleHtml}`;
     const data = {generated_at: when.toISOString(), topic, scope: ui.scope, codebook_version: res.codebook_version, review: meta, design: res, normalization: approved || null,
       articles: arts.map((a, i) => ({n: i + 1, id: a.id, title: a.title, year: a.year, doi: a.doi, authors: a.authors, verified: !!a.owner_verified}))};
     const dataJson = JSON.stringify(data).replace(/</g, '\\u003c').replace(/>/g, '\\u003e').replace(/&/g, '\\u0026').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029');
@@ -1377,9 +1446,144 @@ ${refnote}
     toast('Keputusan tersimpan. Jalankan ulang sintesis bila daftar artikel yang termasuk berubah.', 'success');
   }
 
+  // ---- Arah Riset (langkah 0, khusus TMI ITB) ----
+  // Pilihan disimpan di kunci SENDIRI: tidak ikut Ekspor proyek dan tidak terhapus bersama artikel.
+  const AR_KEY = 'slr_arah_riset_v1';
+  const AR_LAYERS = [
+    ['kk', 'Kelompok keilmuan', 'Kamu tertarik masuk kelompok keilmuan apa?'],
+    ['masalah', 'Jenis masalah', 'Masalah seperti apa yang ingin kamu analisis?'],
+    ['sektor', 'Sektor / konteks', 'Di sektor atau konteks apa?'],
+    ['kelompok_metode', 'Kelompok metode', 'Pendekatan metodenya yang mana?'],
+    ['metode', 'Metode spesifik', 'Ada metode spesifik yang menarik?'],
+    ['pendekatan', 'Bentuk penelitian', 'Penelitianmu menghasilkan apa?']
+  ];
+  let ar = loadAr();
+  let arReady = false, arShowEx = false, arLast = null, arSeq = 0;
+  const arLabels = {}, arStore = {};
+
+  function loadAr() {
+    try {
+      const v = JSON.parse(localStorage.getItem(AR_KEY) || '{}');
+      const ids = AR_LAYERS.map(l => l[0]);
+      const sel = {};
+      Object.entries(v.sel || {}).forEach(([k, val]) => { if (ids.includes(k) && typeof val === 'string' && val) sel[k] = val; });
+      return { sel, active: Number.isInteger(v.active) && v.active >= 0 && v.active < ids.length ? v.active : 0, extra: typeof v.extra === 'string' ? v.extra : '' };
+    } catch (_) { return { sel: {}, active: 0, extra: '' }; }
+  }
+  function saveAr() { try { localStorage.setItem(AR_KEY, JSON.stringify(ar)); } catch (_) { /* penyimpanan penuh/diblokir: abaikan */ } }
+  async function arApi(path, body) {
+    const res = await fetch('/api/arah-riset/' + path, body === undefined ? {} : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || ('Gagal memuat Arah Riset (' + res.status + ').'));
+    return data;
+  }
+
+  async function renderArahRiset() {
+    if (!arReady) {
+      try {
+        const meta = await arApi('meta');
+        $('#ar-total').textContent = meta.total.toLocaleString('id-ID');
+        const kk = await arApi('options', { selected: {}, layer: 'kk' });
+        kk.options.forEach(o => { arLabels['kk:' + o.value] = o.label; });
+        arReady = true;
+      } catch (err) { $('#ar-step').innerHTML = `<div class="empty-state">${esc(err.message)}</div>`; return; }
+    }
+    renderArTabs();
+    await renderArStep();
+  }
+  function renderArTabs() {
+    $('#ar-tabs').innerHTML = AR_LAYERS.map(([id, title], i) =>
+      `<button class="taxonomy-tab ${i === ar.active ? 'active' : ''}" data-ar-tab="${i}" role="tab" aria-selected="${i === ar.active}">${String(i + 1).padStart(2, '0')} / ${esc(title)}${ar.sel[id] ? ' ✓' : ''}</button>`).join('');
+  }
+  async function renderArStep() {
+    const seq = ++arSeq;
+    const [layer, title, question] = AR_LAYERS[ar.active];
+    const box = $('#ar-step');
+    let data;
+    try { data = await arApi('options', { selected: ar.sel, layer }); }
+    catch (err) { if (seq === arSeq) box.innerHTML = `<div class="empty-state">${esc(err.message)}</div>`; return; }
+    if (seq !== arSeq) return; // klik cepat: hanya render terakhir yang dipakai
+    data.options.forEach(o => { arLabels[layer + ':' + o.value] = o.label; });
+    const max = Math.max(1, ...data.options.map(o => o.count));
+    const anySel = Object.keys(ar.sel).length > 0;
+    const canGen = !!(ar.sel.masalah || ar.sel.sektor || ar.sel.metode || ar.sel.kelompok_metode);
+    const chosen = AR_LAYERS.filter(([id]) => ar.sel[id]).map(([id]) => arLabels[id + ':' + ar.sel[id]] || ar.sel[id]);
+    box.innerHTML = `<h2>${esc(title)}</h2><p class="ar-q">${esc(question)}</p>
+      ${chosen.length ? `<p class="ar-hint">Pilihanmu: ${esc(chosen.join(' / '))}</p>` : ''}
+      <p class="ar-count ${data.n === 0 ? 'ar-warn' : ''}">${data.n} tesis cocok dengan pilihan lain${data.n === 0 ? '. Kombinasi ini belum pernah ada; longgarkan pilihan lain.' : ''}</p>
+      ${data.options.length ? data.options.map(o => `<button class="ar-opt ${ar.sel[layer] === o.value ? 'sel' : ''}" data-ar-v="${esc(o.value)}"><i style="width:${Math.round(o.count / max * 100)}%"></i><span>${esc(o.label)}</span><span class="ar-n">${o.count} tesis</span></button>`).join('') : '<p class="ar-hint">Tidak ada opsi umum untuk kombinasi ini. Lewati, atau longgarkan pilihan lain.</p>'}
+      <div class="ar-actions">
+        <button class="button button-quiet" data-ar-act="skip">Belum tahu</button>
+        <button class="button button-quiet" data-ar-act="examples" ${anySel ? '' : 'disabled title="Pilih minimal satu hal dulu"'}>${arShowEx ? 'Sembunyikan contoh' : 'Lihat contoh tesis'}</button>
+        <button class="button button-primary" data-ar-act="generate" ${canGen ? '' : 'disabled title="Pilih minimal masalah, sektor, atau metode"'}>Buat hasil</button>
+        <button class="button button-quiet" data-ar-act="reset">Mulai ulang</button>
+      </div>
+      <div id="ar-examples"></div>
+      <div class="field ar-extra"><label for="ar-extra">Kata kunci tambahan <span class="optional">(bahasa Inggris, pisahkan koma, opsional)</span></label><input id="ar-extra" type="text" maxlength="200" placeholder="contoh: cold chain, perishable" value="${esc(ar.extra)}"></div>`;
+    if (arShowEx) await loadArExamples();
+  }
+  async function loadArExamples() {
+    try {
+      const data = await arApi('examples', { selected: ar.sel });
+      const el = $('#ar-examples'); if (!el) return;
+      el.innerHTML = `<ul class="ar-ex">${data.examples.map(e => `<li>${e.url ? `<a href="${esc(e.url)}" target="_blank" rel="noopener noreferrer">${esc(e.judul)}</a>` : esc(e.judul)}${e.angkatan ? `<small>angkatan ${esc(e.angkatan)}</small>` : ''}</li>`).join('')}</ul><p class="ar-hint">Sampel acak dari ${data.n} tesis yang cocok. Tekan Lihat contoh lagi untuk sampel baru.</p>`;
+    } catch (err) { toast(err.message, 'error'); }
+  }
+  async function generateArahRiset() {
+    try {
+      const j = await arApi('generate', { selected: ar.sel, extra: ar.extra });
+      arLast = j;
+      const list = a => `<ul>${a.map(x => `<li>${esc(x)}</li>`).join('')}</ul>`;
+      const parts = [
+        ['topik', 'Topik umum', `<p>${esc(j.topik_umum)}</p>${j.topik_en ? `<p class="ar-hint">${esc(j.topik_en)}</p>` : ''}`, j.topik_umum],
+        ['rq', 'Research question', `<p>${esc(j.research_question)}</p>`, j.research_question],
+        ['rqslr', 'RQ untuk SLR', `<p>${esc(j.rq_untuk_slr)}</p>`, j.rq_untuk_slr],
+        ['qsd', `Query ScienceDirect (${j.operator_sciencedirect} operator)`, `<pre>${esc(j.query_sciencedirect)}</pre><p class="ar-hint">Tempel di kolom Title, abstract or author-specified keywords.</p>`, j.query_sciencedirect],
+        ['qsc', `Query Scopus (${j.operator_scopus} operator)`, `<pre>${esc(j.query_scopus)}</pre>`, j.query_scopus],
+        ['inc', 'Kriteria inklusi', list(j.inklusi), j.inklusi.map(x => '- ' + x).join('\n')],
+        ['exc', 'Kriteria eksklusi', list(j.eksklusi), j.eksklusi.map(x => '- ' + x).join('\n')]
+      ];
+      parts.forEach(p => { arStore[p[0]] = p[3]; });
+      arStore.all = parts.map(p => p[1] + '\n' + p[3]).join('\n\n');
+      const gaps = (j.celah_jurusan || []).length ? `<div class="ar-card"><h3>Celah di jurusanmu</h3>${list(j.celah_jurusan)}<p class="ar-hint">Belum ada di jurusanmu bukan berarti belum ada di literatur, dan belum tentu layak dikerjakan.</p></div>` : '';
+      $('#ar-result').innerHTML = `<h2>Hasil</h2><p class="ar-count">${j.jumlah_tesis_serupa} tesis serupa di jurusanmu</p>
+        ${parts.map(p => `<div class="ar-card"><h3>${esc(p[1])}<button class="button button-quiet button-small" data-ar-copy="${p[0]}">Salin</button></h3>${p[2]}</div>`).join('')}
+        <div class="ar-card"><h3>Kalau hasil pencarian tidak pas</h3><p>${esc(j.panduan_hasil)}</p></div>${gaps}
+        <div class="ar-actions"><button class="button button-quiet" data-ar-copy="all">Salin semua</button><button class="button button-quiet" data-ar-act="download">Unduh JSON</button></div>`;
+      if (window.innerWidth <= 1100) $('#ar-result').scrollIntoView({ behavior: 'smooth' });
+    } catch (err) { toast(err.message, 'error'); }
+  }
+  async function arClick(e) {
+    const t = e.target.closest('[data-ar-tab],[data-ar-v],[data-ar-act],[data-ar-copy]');
+    if (!t || t.disabled) return;
+    if (t.dataset.arTab !== undefined) { ar.active = +t.dataset.arTab; arShowEx = false; saveAr(); renderArTabs(); renderArStep(); return; }
+    if (t.dataset.arV !== undefined) {
+      const layer = AR_LAYERS[ar.active][0];
+      if (ar.sel[layer] === t.dataset.arV) delete ar.sel[layer]; else { ar.sel[layer] = t.dataset.arV; if (ar.active < AR_LAYERS.length - 1) ar.active++; }
+      arShowEx = false; saveAr(); renderArTabs(); renderArStep(); return;
+    }
+    if (t.dataset.arCopy !== undefined) {
+      const text = arStore[t.dataset.arCopy] || '';
+      if (await copyText(text)) toast('Disalin ke clipboard.', 'success'); else showCopyFallback(text);
+      return;
+    }
+    const act = t.dataset.arAct;
+    if (act === 'guide') { const g = $('#ar-guide'); g.classList.toggle('hidden'); t.setAttribute('aria-expanded', String(!g.classList.contains('hidden'))); }
+    else if (act === 'skip') { const layer = AR_LAYERS[ar.active][0]; delete ar.sel[layer]; if (ar.active < AR_LAYERS.length - 1) ar.active++; arShowEx = false; saveAr(); renderArTabs(); renderArStep(); }
+    else if (act === 'examples') { arShowEx = !arShowEx; if (arShowEx) { t.textContent = 'Sembunyikan contoh'; await loadArExamples(); } else { t.textContent = 'Lihat contoh tesis'; $('#ar-examples').innerHTML = ''; } }
+    else if (act === 'generate') await generateArahRiset();
+    else if (act === 'reset') { ar = { sel: {}, active: 0, extra: '' }; arShowEx = false; arLast = null; saveAr(); renderArTabs(); renderArStep(); $('#ar-result').innerHTML = '<div class="empty-state">Belum ada hasil. Pilih beberapa hal, lalu tekan Buat hasil.</div>'; }
+    else if (act === 'download' && arLast) {
+      const url = URL.createObjectURL(new Blob([JSON.stringify(arLast, null, 2)], { type: 'application/json' }));
+      const a = document.createElement('a'); a.href = url; a.download = 'arah-riset.json'; a.click(); URL.revokeObjectURL(url);
+    }
+  }
+
   function attachEvents() {
     $$('.nav-item').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.target)));
     $$('[data-go]').forEach(b=>b.addEventListener('click',()=>navigate(b.dataset.go)));
+    $('#arah-riset').addEventListener('click',arClick);
+    $('#arah-riset').addEventListener('input',e=>{if(e.target.id==='ar-extra'){ar.extra=e.target.value;saveAr();}});
     $('#project-form').addEventListener('submit',e=>{e.preventDefault();saveMetaFromForm(true);});
     $('#upload-form').addEventListener('submit',handleUpload);
     $('#run-synthesis').addEventListener('click',handleSynthesis);

@@ -16,6 +16,9 @@
         <img class="brand-logo" src="{{ url_for('static', filename='slr.png') }}" alt="SLR Protocol">
         <span><strong>SLR Protocol</strong><small>literature review</small></span>
       </a>
+      <nav class="side-nav side-nav-solo" aria-label="Arah riset">
+        <button class="nav-item" data-target="arah-riset"><span class="nav-icon">00</span> Arah Riset <span class="nav-count" title="Khusus TMI ITB">TMI</span></button>
+      </nav>
       <div class="workspace-label">TAKSONOMI</div>
       <nav class="side-nav" aria-label="Taksonomi desain riset">
         <button class="nav-item active" data-target="overview"><span class="nav-icon">01</span> Ikhtisar</button>
@@ -68,6 +71,7 @@
             <div class="field field-wide"><label for="search-query">Search query / kata kunci</label><textarea id="search-query" rows="2" placeholder="Masukkan query Boolean atau catatan pencarian"></textarea></div>
             <div class="field"><label for="inclusion">Kriteria inklusi</label><textarea id="inclusion" rows="3" placeholder="Contoh: artikel peer-reviewed, bahasa Inggris/Indonesia, rentang tahun…"></textarea></div>
             <div class="field"><label for="exclusion">Kriteria eksklusi</label><textarea id="exclusion" rows="3" placeholder="Contoh: editorial, artikel di luar domain, duplikat…"></textarea></div>
+            <div class="field"><label for="guide-context">Konteks panduan naskah</label><select id="guide-context"><option value="itb-tmi">ITB TMI (tugas taksonomi penelitian)</option><option value="umum">Umum (kampus atau mata kuliah lain)</option></select></div>
             <div class="form-footer"><span class="save-hint"><span class="save-check">✓</span> Perubahan disimpan lokal di browser</span><button type="submit" class="button button-primary">Simpan konfigurasi <span>→</span></button></div>
           </form>
 
@@ -100,6 +104,22 @@
 
           <div class="section-heading compact-heading"><div><p class="eyebrow">03 / REVIEW PROGRESS</p><h2>Progres analisis</h2></div><button class="text-button" data-go="articles">Kelola artikel <span>→</span></button></div>
           <div class="panel progress-panel"><div class="progress-panel-head"><div><strong>Screening dan eligibility</strong><p>PRISMA diperbarui dari keputusan yang tersimpan.</p></div><span id="progress-ratio" class="ratio-pill">0 / 0 selesai</span></div><div class="stacked-progress" id="stacked-progress"><span class="seg-included"></span><span class="seg-excluded"></span><span class="seg-pending"></span></div><div class="legend-row"><span><i class="legend-dot dot-included"></i>Termasuk</span><span><i class="legend-dot dot-excluded"></i>Dikeluarkan</span><span><i class="legend-dot dot-pending"></i>Belum diputuskan</span></div></div>
+        </section>
+
+        <section id="arah-riset" class="page-section">
+          <div class="section-heading page-title-row"><div><p class="eyebrow">ARAH RISET</p><h1>Arah riset</h1><p class="page-subtitle">Belum punya topik? Pilih arah dari <span id="ar-total">…</span> tesis Teknik dan Manajemen Industri ITB, lalu dapatkan topik, research question, search query, dan kriteria inklusi/eksklusi. Khusus TMI; hasilnya arah awal, bukan topik final.</p></div><button class="button button-secondary" data-ar-act="guide" aria-expanded="false">Cara pakai</button></div>
+          <div id="ar-guide" class="panel ar-guide hidden">
+            <p>Jawab dari kiri ke kanan, atau klik tab untuk kembali ke pertanyaan sebelumnya. Klik opsi untuk memilih, klik lagi untuk membatalkan. Angka di samping opsi adalah jumlah tesis TMI.</p>
+            <p><b>Belum tahu</b> melewati pertanyaan tanpa memilih. Layer yang dilewati tidak masuk ke query.</p>
+            <p><b>Lihat contoh tesis</b> menampilkan judul tesis yang cocok dengan pilihanmu sejauh ini, jadi pilih minimal satu hal dulu.</p>
+            <p><b>Buat hasil</b> bisa ditekan kapan saja setelah memilih minimal masalah, sektor, atau metode. Tidak perlu menjawab semua pertanyaan.</p>
+            <p>Hasilnya tidak mengisi Ikhtisar otomatis: salin query ke pencarian jurnal, lalu isi RQ dan kriteria di Ikhtisar bila sudah cocok. Pilihan di tab ini disimpan terpisah dari proyek dan tidak ikut Ekspor proyek.</p>
+          </div>
+          <div class="taxonomy-tabs" id="ar-tabs" role="tablist" aria-label="Pertanyaan arah riset"></div>
+          <div class="ar-wrap">
+            <div id="ar-step" class="panel ar-step" aria-live="polite"><div class="empty-state">Memuat…</div></div>
+            <div id="ar-result" class="panel ar-result"><div class="empty-state">Belum ada hasil. Pilih beberapa hal, lalu tekan Buat hasil.</div></div>
+          </div>
         </section>
 
         <section id="articles" class="page-section">

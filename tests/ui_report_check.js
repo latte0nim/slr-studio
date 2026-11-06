@@ -5,7 +5,7 @@ const {JSDOM, VirtualConsole} = require('jsdom'); const fs = require('fs');
 const [,, base = 'http://127.0.0.1:5055', projectJson, appJs = 'static/app.js'] = process.argv;
 if (!projectJson) { console.error('Butuh ekspor proyek JSON sebagai argumen ke-2.'); process.exit(2); }
 const sleep = ms => new Promise(r => setTimeout(r, ms));
-const results = []; const check = (name, ok, detail = '') => { results.push({name, ok: !!ok}); console.log((ok ? 'ok   ' : 'GAGAL') + ' ' + name + (ok ? '' : ' :: ' + detail)); };
+const errsExtra = []; const results = []; const check = (name, ok, detail = '') => { results.push({name, ok: !!ok}); console.log((ok ? 'ok   ' : 'GAGAL') + ' ' + name + (ok ? '' : ' :: ' + detail)); };
 
 async function boot(project) {
   const errors = [], vc = new VirtualConsole();
@@ -126,6 +126,35 @@ function sectionText(doc, prefix) { const h = [...doc.querySelectorAll('h2')].fi
   check('panduan memuat angka nyata proyek (jumlah artikel dan keluarga teknik)', new RegExp(incl.length + ' artikel').test(guideText) && /\(\d+ artikel\)/.test(guideText));
   check('seluruh laporan tanpa ID mentah, undefined, NaN, atau [object]', !/undefined|NaN|\[object/.test(text(doc.querySelector('main'))) && !/\b[0-9a-f]{16}\b/.test(guideText));
 
+  // ---- perbaikan konteks, contoh netral, filosofi bersyarat (state ini) ----
+  const phSt = incl.map(a => (((a.research_design || {}).philosophy || {}).value) || 'not_stated'), phAllNot = phSt.every(v => v === 'not_stated');
+  check('konteks bawaan = ITB TMI: panduan menyebut TMI dan ITB', /TMI/.test(guideText) && /ITB/.test(guideText));
+  check('contoh khas PTO ("prediksi yang menyuplai optimasi") sudah netral', !/prediksi yang menyuplai optimasi/.test(guideText));
+  check(phAllNot ? 'filosofi: semua tidak dinyatakan, kalimat keterbatasan muncul' : 'filosofi: ada yang dinyatakan, kalimat perbandingan muncul',
+        phAllNot ? /Tidak ada artikel yang menyatakan filosofinya/.test(guideText) && !/Bandingkan artikel yang menyatakan filosofi/.test(guideText) : /Bandingkan artikel yang menyatakan filosofi/.test(guideText) && !/Tidak ada artikel yang menyatakan filosofinya/.test(guideText));
+
+  // ---- bagian F: contoh naskah ----
+  const fStart = guideText.indexOf('F. Contoh naskah'); const fText = fStart >= 0 ? guideText.slice(fStart) : '';
+  const exDetails = [...guideEl.querySelectorAll('details.ex')];
+  check('F ada dengan 7 bagian contoh (judul-abstrak, Bab I-V, daftar pustaka)', fStart >= 0 && exDetails.length === 7, 'jumlah=' + exDetails.length);
+  check('F memuat contoh untuk Bab I, II, III, IV, V', ['Bab I.', 'Bab II.', 'Bab III.', 'Bab IV.', 'Bab V.'].every(h => exDetails.some(x => text(x.querySelector('summary')).startsWith(h))));
+  check('F melewati Bagian 8 (temuan dan celah) dan menyatakannya', /Bagian 8\)? tidak dicontohkan/.test(fText) && !exDetails.some(x => /Temuan dan celah/.test(text(x.querySelector('summary')))));
+  check('F tidak memuat kata khas konteks (TMI, ITB) sehingga aman untuk semua konteks', !/TMI|ITB/.test(fText));
+  const exRefs = [...guideEl.querySelectorAll('details.ex ol.refs-list li')];
+  const dois = incl.map(a => a.doi).filter(Boolean), sameCorpus = dois.length >= 15 && dois.filter(x => exRefs.some(li => li.textContent.includes(x))).length >= dois.length - 1;
+  check('F: daftar pustaka contoh memuat 17 entri bertanda "lengkapi dari DOI"', exRefs.length === 17 && exRefs.every(li => /lengkapi dari DOI/.test(li.textContent)));
+  // angka F dicocokkan dengan angka yang dihitung laporan sendiri (hanya bila korpusnya sama dengan korpus contoh)
+  const famRowsRep = (() => { const tb = [...doc.querySelectorAll('h2')].find(h => h.textContent.startsWith('6.')).nextElementSibling.querySelectorAll('tbody tr'); return [...tb].map(r => [text(r.children[0]), text(r.children[2])]); })();
+  const famRowsEx = (() => { const tbl = [...exDetails.find(x => /Bab III/.test(text(x.querySelector('summary')))).querySelectorAll('table')][2]; return [...tbl.querySelectorAll('tbody tr')].map(r => [text(r.children[1]), text(r.children[2])]); })();
+  const famNamesEx = famRowsEx.map(r => r[0]).sort().join('|');
+  const sameFam = [...famRowsRep.map(r => r[0])].sort().join('|') === famNamesEx;
+  if (sameCorpus && sameFam) {
+    const cnt = (rows, nm) => (rows.find(r => r[0] === nm) || [])[1];
+    check('F: jumlah artikel per keluarga teknik sama dengan laporan (10 keluarga)', famRowsEx.length === 10 && famRowsEx.every(r => { const rep = (() => { const tb = [...doc.querySelectorAll('h2')].find(h => h.textContent.startsWith('4.')).nextElementSibling.querySelectorAll('tbody tr'); const row = [...tb].find(x => text(x.children[1]) === r[0]); return row ? text(row.children[3]) : null; })(); return rep === r[1]; }));
+  } else {
+    console.log('ok   (dilewati) F dicocokkan dengan laporan hanya untuk korpus contoh; state ini berbeda');
+  }
+
   // ---- C. semua artikel terverifikasi: banner tidak lagi menyebut verifikasi ----
   const allV = JSON.parse(JSON.stringify(project)); allV.articles.forEach(a => { a.owner_verified = true; a.owner_verified_at = new Date().toISOString(); });
   const app2 = await boot(allV), html2 = await makeReport(app2), doc2 = new JSDOM(html2).window.document;
@@ -133,7 +162,29 @@ function sectionText(doc, prefix) { const h = [...doc.querySelectorAll('h2')].fi
   check('semua terverifikasi: banner tidak menyebut verifikasi lagi', !b2 || !/belum diverifikasi/.test(text(b2)), b2 && text(b2));
   check('semua terverifikasi: metode menyebut "N dari N artikel sudah diverifikasi"', new RegExp(incl.length + ' dari ' + incl.length + ' artikel sudah diverifikasi').test(text(doc2.querySelector('main'))));
 
-  const errs = [...app.errors, ...app2.errors].filter(e => !/Not implemented/.test(e));
+  // ---- D. konteks "Umum" dipilih lewat UI sungguhan ----
+  const dd = app.w.document; dd.querySelector('.nav-item[data-target="overview"]').click(); await sleep(300);
+  const sel = dd.querySelector('#guide-context');
+  check('form Ikhtisar punya pilihan "Konteks panduan naskah" (bawaan ITB TMI)', !!sel && sel.value === 'itb-tmi' && [...sel.options].map(o => o.value).join() === 'itb-tmi,umum');
+  sel.value = 'umum'; dd.querySelector('#project-form').dispatchEvent(new app.w.Event('submit', {cancelable: true})); await sleep(300);
+  check('pilihan konteks tersimpan di meta proyek', JSON.parse(app.w.localStorage.getItem(app.key)).meta.guide_context === 'umum');
+  const htmlU = await makeReport(app), docU = new JSDOM(htmlU).window.document, guideU = text(docU.querySelector('#panduan'));
+  check('konteks Umum: panduan dan contoh tanpa TMI, ITB, slide, arahan dosen, hardcopy', !/TMI|ITB|Slide tugas|arahan dosen|hardcopy/.test(guideU), (guideU.match(/TMI|ITB|Slide tugas|arahan dosen|hardcopy/g) || []).join(','));
+  check('konteks Umum: catatan format generik muncul dan struktur panduan tetap lengkap', /Ikuti pedoman penulisan yang diminta/.test(guideU) && ['A. Peta kerangka', 'B. Bab per bab', 'C. Alur kerja', 'D. Catatan format', 'E. Daftar periksa', 'F. Contoh naskah'].every(h => guideU.includes(h)));
+  const mirror = /pedoman penulisan yang diminta/.test(guideU) && !/format thesis TMI/.test(guideU);
+  check('konteks Umum: kalimat format dan saran ikut generik', mirror);
+
+  // ---- E. filosofi: satu artikel menyatakan filosofi -> kalimat perbandingan ----
+  const cb = await (await fetch(base + '/api/codebook')).json(), phKeys = Object.keys(((cb.fields || {}).philosophy || {}).values || {}).filter(k => k !== 'not_stated');
+  if (phKeys.length) {
+    const pv = JSON.parse(JSON.stringify(project)); const tgt = pv.articles.find(a => a.screening_decision === 'include' && a.eligibility_decision === 'include');
+    tgt.research_design.philosophy = {value: phKeys[0], basis: 'stated', evidence: []};
+    const app3 = await boot(pv), html3 = await makeReport(app3), g3 = text(new JSDOM(html3).window.document.querySelector('#panduan'));
+    check('filosofi dinyatakan satu artikel: kalimat perbandingan menggantikan kalimat keterbatasan', /Bandingkan artikel yang menyatakan filosofi/.test(g3) && !/Tidak ada artikel yang menyatakan filosofinya/.test(g3));
+    errsExtra.push(...app3.errors);
+  } else console.log('ok   (dilewati) codebook tidak punya nilai filosofi selain not_stated');
+
+  const errs = [...app.errors, ...app2.errors, ...errsExtra].filter(e => !/Not implemented/.test(e));
   check('tanpa galat JS selama seluruh uji', errs.length === 0, errs.join(' | '));
   const failed = results.filter(r => !r.ok).length;
   console.log(`\n${failed ? 'ADA YANG GAGAL' : 'SEMUA LULUS'}: ${results.length - failed}/${results.length} pengecekan`);

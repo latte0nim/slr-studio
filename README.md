@@ -26,6 +26,9 @@ artikel yang lolos menjadi tema, kontradiksi, research gap, taxonomy, jaringan i
   (berikut basis dinyatakan/disimpulkan dan kutipan yang diverifikasi ke PDF), disusun menjadi taksonomi desain riset
   dan matriks metodologi × strategi. Nama dan keluarga teknik dinormalisasi lewat usulan AI yang kamu setujui.
   Hasilnya bisa diekspor sebagai **laporan HTML** mandiri (bisa dicetak ke PDF).
+- **Arah Riset (khusus TMI ITB):** untuk yang belum punya topik. Pilih kelompok keilmuan, jenis masalah, sektor, dan metode dari
+  kategori yang diturunkan dari tesis TMI terdahulu; hasilnya topik umum, research question, query ScienceDirect/Scopus, dan
+  kriteria inklusi/eksklusi. Tanpa AI dan tanpa biaya token. Hasilnya arah awal, bukan topik final.
 - **Progres live** untuk analisis dan sintesis: persen berdasarkan langkah yang benar-benar selesai, log per
   panggilan AI (token, durasi, biaya), serta catatan retry bila jawaban terpotong.
 - **Popup pemakaian token** (klik chip token di pojok kanan atas): token, jumlah panggilan, estimasi biaya
@@ -103,6 +106,7 @@ limitasi, saran riset) ikut terbaca. Semua batas dapat diubah lewat `.env`.
 
 ## Cara menggunakan
 
+0. (Opsional, bila belum punya topik) buka **Arah Riset**, pilih arah dari tesis terdahulu, lalu salin query ke pencarian jurnal.
 1. Isi research question, sumber/database, tanggal dan query pencarian, serta kriteria inklusi/eksklusi.
 2. Unggah PDF berbasis teks. PDF yang sudah ada di proyek dilewati otomatis.
 3. Di tab **Artikel**, periksa hasil ekstraksi dan tetapkan keputusan screening, lalu keputusan full-text.

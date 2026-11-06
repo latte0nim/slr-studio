@@ -35,6 +35,8 @@ app.py                  Backend Flask. Config, provider AI, progres, biaya, prom
 templates/index.html    Satu halaman Jinja (hanya url_for untuk gambar). Semua tab ada di sini.
 static/app.js           Frontend: IIFE tunggal, state, render, upload, progres, popup token, ekspor/impor.
 static/style.css        Tema terminal (monokrom, font mono, variabel CSS).
+arah_riset.py          Langkah 0 (khusus TMI ITB): mesin pertanyaan dan generator topik/RQ/query/kriteria. Murni komputasi, tanpa AI.
+arah_riset_data/        thesis_facets.json (facet tesis TMI) + vocab_en.json (istilah query bahasa Inggris). BUKAN di data/ karena data/ di-gitignore.
 requirements.txt        Flask, PyMuPDF, python-dotenv.
 start_windows.bat       Peluncur Windows (venv + pip install + python app.py).
 .env.example            Seluruh variabel konfigurasi beserta penjelasan.
@@ -271,7 +273,7 @@ dibaca, dibagikan, dan dicetak ke PDF.
   metodologi x strategi, keluarga teknik + artikel, posisi dalam onion (kalimat otomatis, cabang kosong disebut), temuan dan celah
   (dari Review Synthesis; ID artikel mentah diganti nomor referensi, kode codebook diganti label), daftar pustaka. Lampiran A-F
   (konfigurasi, cara membaca, penggabungan/pembuangan nama, kepercayaan label, label per artikel, status verifikasi) ditandai
-  `.audit` dan disembunyikan di mode naskah. Tombol: Pratinjau naskah, Tampilan lengkap, Panduan kerangka, Cetak naskah, Cetak lengkap. Tampilan ketiga (`data-view="panduan"`, bagian `.guide`, menyembunyikan yang lain) berisi panduan kerangka dokumen: peta bab dengan status (salin/tulis ulang/tulis sendiri), pertanyaan pemandu per bab dengan contoh yang dihitung dari data proyek, alur kerja, catatan format ITB (dengan peringatan untuk diverifikasi ke template TMI), dan daftar periksa. `.refnote` di mode naskah/lengkap menegaskan bahwa laporan adalah acuan, bukan naskah final.
+  `.audit` dan disembunyikan di mode naskah. Tombol: Pratinjau naskah, Tampilan lengkap, Panduan kerangka, Cetak naskah, Cetak lengkap. Tampilan ketiga (`data-view="panduan"`, bagian `.guide`, menyembunyikan yang lain) berisi panduan kerangka dokumen: peta bab dengan status (salin/tulis ulang/tulis sendiri), pertanyaan pemandu per bab dengan contoh yang dihitung dari data proyek, alur kerja, catatan format ITB (dengan peringatan untuk diverifikasi ke template TMI), daftar periksa, dan F. contoh naskah statis (`exampleHtml`, kasus Predict-then-Optimize: judul-abstrak, Bab I-V, daftar pustaka; Bagian 8 temuan dan celah sengaja dilewati karena milik tahap SLR). `exampleHtml` adalah teks TETAP yang dibuat dari proyek contoh per 5 Nov 2026 (angka, tabel, dan 17 referensi diambil dari data itu, bukan diketik); bila korpus contoh berubah, perbarui manual. `ui_report_check.js` mencocokkan jumlah artikel per keluarga di F dengan laporan hanya jika korpusnya sama. Konteks panduan dipilih lewat `meta.guide_context` (`itb-tmi` bawaan, atau `umum`) di form Ikhtisar; kalimat khas kuliah/ITB (slide, arahan dosen, hardcopy, catatan format juknis ITB) hanya tampil pada `itb-tmi`, sedangkan F sengaja bebas kata TMI/ITB. Kalimat soal filosofi di pertanyaan pemandu bersyarat (hanya "tidak ada artikel yang menyatakan" bila memang semuanya tidak dinyatakan). `.refnote` di mode naskah/lengkap menegaskan bahwa laporan adalah acuan, bukan naskah final.
 - Jangan "mencuci" tebakan AI: banner DRAFT (tampil di KEDUA mode) menyebut artikel yang belum diverifikasi, pemetaan teknik yang belum
   disetujui atau masih draf, dan keluarga teknik tanpa definisi. Verifikasi = kotak "Sudah saya cek" di detail artikel
   (`owner_verified`, `owner_verified_at` pada artikel; ikut ekspor/impor proyek). Daftar pustaka membawa catatan bahwa nama jurnal,
@@ -284,6 +286,32 @@ dibaca, dibagikan, dan dicetak ke PDF.
   (dicatat di laporan).
 - Belum ada tes browser otomatis di repo; pengujian dilakukan dengan jsdom (termasuk muatan berbahaya di judul/penulis/DOI/teknik/topik)
   dan render PDF (WeasyPrint) untuk memeriksa tata letak cetak. Tampilan di browser sungguhan belum diverifikasi visual.
+
+### 4.8 Arah Riset (langkah 0, khusus TMI ITB)
+
+Untuk orang yang belum punya topik. Pengguna memilih dari kategori yang diturunkan dari tesis TMI terdahulu; hasilnya topik umum, RQ
+(penelitian dan untuk SLR), query ScienceDirect/Scopus, serta kriteria inklusi/eksklusi. Hasilnya disalin manual ke Ikhtisar
+(sengaja tidak mengisi otomatis; tools pencarian jurnal tetap di luar app ini).
+
+- **Tanpa AI saat runtime, tanpa biaya token.** AI hanya dipakai SEKALI di luar app (ekstraksi facet per tesis dari judul + keyword,
+  daftar kategori tertutup), hasilnya dibekukan di `arah_riset_data/thesis_facets.json`. `vocab_en.json` (ditulis tangan) memuat label dan
+  istilah pencarian bahasa Inggris per kategori; urutan istilah = prioritas saat query dipangkas.
+- **Layer**: kk, masalah, sektor, kelompok_metode, metode, pendekatan. Opsi tiap layer dihitung dari tesis yang cocok dengan pilihan layer
+  LAIN. "Belum tahu" melewati layer (tidak masuk query). `Buat hasil` butuh minimal masalah, sektor, metode, atau kelompok metode.
+- **Query**: blok Boolean (masalah, sektor, metode, kata kunci tambahan), sinonim digabung OR. `build_query` memangkas istilah
+  (dari blok terpanjang) sampai jumlah operator <= `max_ops`: 8 untuk ScienceDirect (batas per kolom; angka ini dari ingatan, VERIFIKASI
+  ke situs bila perlu), 20 untuk Scopus. Kutip selalu lurus, tanpa backslash.
+- **Celah**: hanya pasangan masalah x sektor yang belum pernah muncul di jurusan, diurutkan menurut perkiraan jumlah jika acak.
+  Celah metode sengaja TIDAK disarankan (sering tidak masuk akal, mis. adopsi teknologi x metaheuristik). "Belum ada di jurusan"
+  bukan bukti novelty global.
+- **Route** (semua `@auth_guard`): `GET /api/arah-riset/meta`, `POST /api/arah-riset/options|examples|generate`. Bila data hilang,
+  `ARAH_RISET = None` dan route menjawab 503; sisa app tetap jalan.
+- **State browser** di kunci SENDIRI `slr_arah_riset_v1` (pilihan, layer aktif, kata kunci tambahan). Tidak ikut Ekspor/Impor proyek dan
+  tidak terhapus oleh "Hapus semua artikel". Jangan digabung ke `litreview_studio_project_v1`.
+- **Memperbarui data**: jalankan ulang pipeline ekstraksi (di luar repo ini) dan timpa `thesis_facets.json`. Total tesis di halaman dibaca
+  dari data, jadi angkanya ikut berubah. Kategori tertutup (masalah, sektor, kelompok metode) didefinisikan di skrip ekstraksi; bila
+  daftar itu diubah, `vocab_en.json` harus ikut diubah supaya setiap kategori punya istilah query.
+- Tes: `python tests/test_arah_riset.py` (tanpa jaringan).
 
 ## 5. Model data
 
@@ -379,7 +407,7 @@ Helper `$`/`$$`, `esc()` (escape HTML, **wajib** untuk semua data AI yang masuk 
 | Area | Fungsi kunci |
 |---|---|
 | State & penyimpanan | `loadState`, `saveState`, `DEFAULT_STATE`, `STORE_KEY` |
-| Navigasi | `navigate(target)`, tombol `data-target`, 8 tab dalam DUA grup sidebar. TAKSONOMI (tugas desain riset): overview "Ikhtisar", articles "Artikel", design "Taksonomi Desain Riset". SLR LANJUTAN: prisma, synthesis, taxonomy "Peta Topik", cooccurrence, system-map. Id section dan `data-target` TIDAK diganti (hanya label tampil); urutan tombol tidak memengaruhi logika `navigate`. `renderDesignSteps()` menggambar panel LANGKAH di atas Desain Riset (status dibaca dari state, tidak disimpan) |
+| Navigasi | `navigate(target)`, tombol `data-target`, 9 tab: "Arah Riset" (id `arah-riset`, berdiri sendiri di atas kedua grup tanpa label, lencana TMI, bukan bagian alur proyek) dan 8 tab dalam DUA grup sidebar. TAKSONOMI (tugas desain riset): overview "Ikhtisar", articles "Artikel", design "Taksonomi Desain Riset". SLR LANJUTAN: prisma, synthesis, taxonomy "Peta Topik", cooccurrence, system-map. Id section dan `data-target` TIDAK diganti (hanya label tampil); urutan tombol tidak memengaruhi logika `navigate`. `renderDesignSteps()` menggambar panel LANGKAH di atas Desain Riset (status dibaca dari state, tidak disimpan) |
 | Upload | `handleUpload`: validasi → pre-check duplikat (`sha256Hex` via `crypto.subtle`) → FormData + `job_id` → polling → merge artikel |
 | Progres | `PANELS`, `renderProcessProgress`, `startProgressPolling(kind, jobId)` (interval 500 ms) |
 | Sintesis | `handleSynthesis` (menolak bila belum ada artikel INCLUDE/INCLUDE) |
@@ -429,7 +457,7 @@ hal-hal berikut adalah sifat kode saat ini dan harus dipenuhi oleh lingkungan tu
 
 ## 10. Verifikasi dan pengujian
 
-Uji UI (opsional, butuh `npm i jsdom` dan server berjalan): `node tests/ui_smoke.js http://127.0.0.1:5055 <ekspor-proyek.json|-> static/app.js` memuat halaman asli di jsdom, mengklik semua tab, dan melaporkan galat JS serta isi panel langkah. `node tests/ui_report_check.js http://127.0.0.1:5055 <ekspor-proyek.json> static/app.js` menguji end-to-end: verifikasi artikel lewat UI, pembuatan laporan, mode naskah/audit, tombol cetak, banner draf (35-38 pengecekan pada data nyata, ekspektasinya dihitung dari state proyek, bukan diasumsikan).
+Uji UI (opsional, butuh `npm i jsdom` dan server berjalan): `node tests/ui_smoke.js http://127.0.0.1:5055 <ekspor-proyek.json|-> static/app.js` memuat halaman asli di jsdom, mengklik semua tab, dan melaporkan galat JS serta isi panel langkah. `node tests/ui_report_check.js http://127.0.0.1:5055 <ekspor-proyek.json> static/app.js` menguji end-to-end: verifikasi artikel lewat UI, pembuatan laporan, mode naskah/audit, tombol cetak, banner draf (49-53 pengecekan pada data nyata, ekspektasinya dihitung dari state proyek, bukan diasumsikan).
 
 Tes otomatis tanpa jaringan dan tanpa API key: `python tests/test_research_design.py` (158 pengecekan: normalisasi
 kutipan, pembuangan referensi, pemotongan teks, validasi codebook, taksonomi desain, hierarki). Bagian yang butuh PDF
@@ -491,6 +519,7 @@ Urut kira-kira berdasarkan dampak:
 | Menambah/mengubah nilai research onion | `RESEARCH_ONION` (+ `METHOD_GROUPS`, naikkan `CODEBOOK_VERSION`); prompt, validasi, dan taksonomi mengikuti otomatis |
 | Mengubah batas | `.env` (lihat tabel bagian 3); bawaan ada di blok "Batas bawaan" `app.py` |
 | Mengubah tarif/jadwal peak | `.env` (`DEEPSEEK_PRICE_*`, `DEEPSEEK_PEAK_MULTIPLIER`); jadwal di `deepseek_is_peak` dan `deepseek_pricing_info` |
+| Mengubah kategori/istilah query Arah Riset | `arah_riset_data/vocab_en.json` (istilah, urutan = prioritas), `arah_riset.py` (`RQ_TEMPLATE`, kriteria, `max_ops`) |
 | Menambah tab/halaman | `index.html` (tombol `data-target` + `section.page-section`), `navigate`/`renderAll` di `app.js` |
 | Mengubah tema | variabel `:root` di `style.css` + warna SVG di `app.js` |
 | Menambah kredensial/rahasia | `.env` (dan secret manager platform bila nanti ada deployment); jangan pernah commit nilainya |

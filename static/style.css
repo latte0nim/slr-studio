@@ -316,3 +316,27 @@ td{padding:12px;border-bottom:1px dashed var(--line-soft);vertical-align:top;fon
 /* Verifikasi artikel */
 .verify-box{display:flex;gap:10px;align-items:center;margin:12px 0;padding:9px 12px;border:1px solid var(--line);cursor:pointer}
 .verified-mark{display:inline-block;margin-left:8px;font-size:11px;border:1px solid var(--line);padding:0 6px;color:var(--bright)}
+
+.field select{width:100%;border:1px solid var(--line);background:var(--bg);padding:9px 10px;color:var(--bright)}
+
+/* Arah Riset (langkah 0, khusus TMI) */
+.side-nav-solo{margin-bottom:18px}
+.ar-guide{padding:12px 16px;margin-bottom:12px;color:var(--dim);font-size:12px}.ar-guide p{margin:4px 0}.ar-guide b{color:var(--bright)}
+.ar-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:14px;align-items:start}
+.ar-step,.ar-result{padding:16px 18px}
+.ar-step h2,.ar-result h2{font-size:15px;margin:0 0 4px}.ar-q{color:var(--dim);font-size:12px;margin:0 0 12px}
+.ar-count{font-size:11px;color:var(--dim);margin:0 0 10px}.ar-warn{color:var(--warn)}
+.ar-opt{position:relative;display:flex;justify-content:space-between;gap:12px;width:100%;text-align:left;border:1px solid var(--line-soft);background:transparent;color:var(--text);padding:9px 12px;margin:0 0 6px;overflow:hidden;font-size:13px}
+.ar-opt i{position:absolute;left:0;top:0;bottom:0;background:var(--raised)}.ar-opt span{position:relative}
+.ar-opt:hover{border-color:var(--bright)}.ar-opt .ar-n{color:var(--dim);font-size:11px;white-space:nowrap}
+.ar-opt.sel{background:var(--bright);color:var(--bg);font-weight:700;border-color:var(--bright)}.ar-opt.sel i{display:none}.ar-opt.sel .ar-n{color:var(--bg)}
+.ar-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.ar-ex{list-style:none;padding:0;margin:12px 0 0}.ar-ex li{padding:8px 0;border-top:1px dashed var(--line-soft);font-size:12px}
+.ar-ex a{color:var(--text);text-decoration:none}.ar-ex a:hover{text-decoration:underline}.ar-ex small{color:var(--dim);margin-left:6px}
+.ar-extra{margin-top:16px}
+.ar-card{border:1px solid var(--line-soft);padding:10px 12px;margin-bottom:10px}
+.ar-card h3{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 0 6px;font-size:11px;color:var(--dim);font-weight:400}
+.ar-card pre{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;font-size:12px;color:var(--bright)}
+.ar-card p{margin:0;font-size:12px}.ar-card ul{margin:0;padding-left:18px;font-size:12px}.ar-card li{margin:2px 0}
+.ar-hint{color:var(--dim);font-size:11px}
+@media(max-width:1100px){.ar-wrap{grid-template-columns:1fr}}
